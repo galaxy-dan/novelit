@@ -1,0 +1,7 @@
+-- CREATE TABLE user (
+--      `id`        Long          NOT NULL AUTO_INCREMENT,
+--      `uuid`      VARCHAR(36)   NOT NULL,
+--      `email`     VARCHAR(320)  NOT NULL,
+--      `priority`  TINYINT      NOT NULL,
+--      PRIMARY KEY (id)
+-- );

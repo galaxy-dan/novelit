@@ -47,11 +47,13 @@ services:
       - "3305:3305"
     env_file: .env
     environment:
+      MARIADB_DATABASE : ""
       MARIADB_USER: "${MARIADB_USERNAME}"
-      MARIADB_ROOT_PASSWORD: "${MARIADB_PASSWORD}"
       MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
+      MARIADB_ROOT_PASSWORD: "${MARIADB_PASSWORD}"
     command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+#     초기화 파일 실행 (create & use database)
+      - --init-file ./db/mariadb/initdb.d/init.sql
     volumes:
-      - ./db/mariadb/data:/
+      - ./db/mariadb:/
+      - init.sql:./db/mariadb/initdb.d/init.sql
