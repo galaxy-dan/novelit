@@ -1,0 +1,285 @@
+spring:
+  config:
+    import: env.yml
+  profiles:
+    group:
+      development:
+        - common
+        - development_database
+        - port_8003
+      production-set1:
+        - common
+        - production_database
+        - port_8001
+      production-set2:
+        - common
+        - production_database
+        - port_8002
+---
+
+spring:
+  config:
+    activate:
+      on-profile: common
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            client-name: Kakao
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+#            redirect-uri: ${KAKAO_REDIRECT_URL}
+#            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+            scope:
+              - profile_nickname
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: development_database
+    import: env.yml
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      max-lifetime: 60000
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: production_database
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 148
+      max-lifetime: 60000
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: port_8003
+    import: env.yml
+    security:
+      oauth2:
+        client:
+          registration:
+            kakao:
+              client-id: ${KAKAO_CLIENT_ID}
+              client-secret: ${KAKAO_CLIENT_SECRET}
+              scope:
+                - account_email
+              client-name: Kakao
+              authorization-grant-type: authorization_code
+              client-authentication-method: POST
+              # redirect-uri: ${KAKAO_REDIRECT_URL}
+          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+          provider:
+            kakao:
+              authorization-uri: https://kauth.kakao.com/oauth/authorize
+              token-uri: https://kauth.kakao.com/oauth/token
+              user-info-uri: https://kapi.kakao.com/v2/user/me
+              user-name-attribute: id
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl # ?? camelCase-> underscore ?? ??.
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+        order_updates: true
+        order_inserts: true
+        jdbc:
+          batch_size: 100
+
+jwt:
+  header: Authorization
+  secret: ${JWT_SECRET_KEY}
+  access-token-expire: ${ACCESS_TOKEN_EXPIRE}
+  refresh-token-expire: ${REFRESH_TOKEN_EXPIRE}
+
+#  cors:
+#    allowed-origins: '*'
+#    allowed-methods: '*'
+#    allowed-headers: '*'
+#    max-age: 3600
+
+
+
+
+server:
+  servlet:
+    #    context-path: /api
+    encoding:
+      charset: UTF-8
+      force: true
+  port: 8003
+  address: 0.0.0.0
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: port_8001
+    import: env.yml
+    security:
+      oauth2:
+        client:
+          registration:
+            kakao:
+              client-id: ${KAKAO_CLIENT_ID}
+              client-secret: ${KAKAO_CLIENT_SECRET}
+              scope:
+                - account_email
+              client-name: Kakao
+              authorization-grant-type: authorization_code
+              client-authentication-method: POST
+              # redirect-uri: ${KAKAO_REDIRECT_URL}
+          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+          provider:
+            kakao:
+              authorization-uri: https://kauth.kakao.com/oauth/authorize
+              token-uri: https://kauth.kakao.com/oauth/token
+              user-info-uri: https://kapi.kakao.com/v2/user/me
+              user-name-attribute: id
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl # ?? camelCase-> underscore ?? ??.
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+        order_updates: true
+        order_inserts: true
+        jdbc:
+          batch_size: 100
+
+jwt:
+  header: Authorization
+  secret: ${JWT_SECRET_KEY}
+  access-token-expire: ${ACCESS_TOKEN_EXPIRE}
+  refresh-token-expire: ${REFRESH_TOKEN_EXPIRE}
+
+#    cors:
+#      allowed-origins: '*'
+#      allowed-methods: '*'
+#      allowed-headers: '*'
+#      max-age: 3600
+
+server:
+  servlet:
+    #    context-path: /api
+    encoding:
+      charset: UTF-8
+      force: true
+  port: 8001
+  address: 0.0.0.0
+---
+
+spring:
+  config:
+    activate:
+      on-profile: port_8002
+    import: env.yml
+    security:
+      oauth2:
+        client:
+          registration:
+            kakao:
+              client-id: ${KAKAO_CLIENT_ID}
+              client-secret: ${KAKAO_CLIENT_SECRET}
+              scope:
+                - account_email
+              client-name: Kakao
+              authorization-grant-type: authorization_code
+              client-authentication-method: POST
+              # redirect-uri: ${KAKAO_REDIRECT_URL}
+          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+          provider:
+            kakao:
+              authorization-uri: https://kauth.kakao.com/oauth/authorize
+              token-uri: https://kauth.kakao.com/oauth/token
+              user-info-uri: https://kapi.kakao.com/v2/user/me
+              user-name-attribute: id
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl # ?? camelCase-> underscore ?? ??.
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+        order_updates: true
+        order_inserts: true
+        jdbc:
+          batch_size: 100
+
+jwt:
+  header: Authorization
+  secret: ${JWT_SECRET_KEY}
+  access-token-expire: ${ACCESS_TOKEN_EXPIRE}
+  refresh-token-expire: ${REFRESH_TOKEN_EXPIRE}
+
+#    cors:
+#      allowed-origins: '*'
+#      allowed-methods: '*'
+#      allowed-headers: '*'
+#      max-age: 3600
+
+server:
+  servlet:
+    #    context-path: /api
+    encoding:
+      charset: UTF-8
+      force: true
+  port: 8002
+  address: 0.0.0.0
+
+---
+
+# 토큰 관련 secret Key 및 RedirectUri 설정
+#  app:
+#    auth:
+#      tokenSecret:
+#      tokenExpiry:
+#      refreshTokenExpiry:
+#    oauth2:
+#      authorizedRedirectUris:
+#        -
+
+
