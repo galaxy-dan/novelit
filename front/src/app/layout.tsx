@@ -39,9 +39,8 @@ export default function RootLayout({
       <body className="w-full">
         <QueryProvider>
           <RecoilProvider>
-            <div className="flex flex-col max-w-md min-h-screen mx-auto">
+            <div className="w-full overflow-x-auto fixed top-0 left-0 h-screen bg-white">
               <main className="grow mb-[9.5vh]">{children}</main>
-              <p>안녕하세요</p>
             </div>
           </RecoilProvider>
         </QueryProvider>
