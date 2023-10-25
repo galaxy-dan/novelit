@@ -25,10 +25,7 @@ export default function RootLayout({
       <body className="w-full">
         <QueryProvider>
           <RecoilProvider>
-            <div className="flex flex-col max-w-md min-h-screen mx-auto">
-              <main className="grow mb-[9.5vh]">{children}</main>
-              <p>안녕하세요</p>
-            </div>
+            <main>{children}</main>
           </RecoilProvider>
         </QueryProvider>
       </body>
