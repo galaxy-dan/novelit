@@ -2,26 +2,12 @@ import QueryProvider from '@/context/QueryProvider';
 import './globals.css';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { Nanum_Myeongjo } from 'next/font/google';
 import RecoilProvider from '@/context/RecoilProvider';
 
-const spokaFont = localFont({
-  src: [
-    {
-      path: '../../public/fonts/SpoqaHanSansNeo-Regular.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/SpoqaHanSansNeo-Medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/SpoqaHanSansNeo-Bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-  ],
+const nanumFont = Nanum_Myeongjo({
+  subsets: ['latin'],
+  weight: ['400', '700', '800'],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={spokaFont.className}>
+    <html lang="ko" className={nanumFont.className}>
       <body className="w-full">
         <QueryProvider>
           <RecoilProvider>
