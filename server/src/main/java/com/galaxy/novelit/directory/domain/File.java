@@ -1,5 +1,7 @@
 package com.galaxy.novelit.directory.domain;
 
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,4 +28,6 @@ public class File {
 	private String content;
 	@Column(name = "directory_uuid", length = 36, nullable = false)
 	private String directoryUUID;
+	@Column(name = "deleted", nullable = false)
+	private boolean deleted;
 }

@@ -1,6 +1,7 @@
 package com.galaxy.novelit.directory.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,5 +38,11 @@ public class DirectoryController {
 	@GetMapping
 	public ResponseEntity<DirectoryResDTO> getDirectory(@RequestParam String uuid){
 		return ResponseEntity.ok(directoryService.getDirectory(uuid, "123"));
+	}
+
+	@DeleteMapping
+	public ResponseEntity<Void> deleteDirectory(String uuid){
+		directoryService.deleteDirectory(uuid, "123");
+		return ResponseEntity.ok().build();
 	}
 }
