@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class PlotEntity {
     @Id
     @Column(name = "plot_id")
-    private String plotId;
+    private Long plotId;
     @Id
     @Column(name = "workspace_uuid")
     private UUID workspaceUuid;

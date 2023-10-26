@@ -1,5 +1,6 @@
 package com.galaxy.novelit.character.entity;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,10 +11,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 public class CharacterEntity {
-    private String workspace;
-    private String name;
+    private Long characterId;
+    private UUID groupUuid;
+    private UUID characterUuid;
+    private String characterName;
     private String description;
     private String information;
     private String relationship;
+    private boolean isDeleted;
 
 }
