@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -13,8 +13,32 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      fontFamily: {
+        nanum: ['"Nanum Myeongjo"'],
+        noto: ['"Noto Sans Korean"'],
+        nanumPen: ['"Nanum Pen Script"'],
+        melody: ['"Hi Melody"'],
+      },
     },
   },
   plugins: [],
-}
-export default config
+  purge: {
+    content: [
+      './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+      './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+      './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    ],
+    options: {
+      safelist: [
+        'text-xs',
+        'text-sm',
+        'text-base',
+        'text-lg',
+        'text-xl',
+        'text-2xl',
+        'text-3xl',
+      ],
+    },
+  },
+};
+export default config;
