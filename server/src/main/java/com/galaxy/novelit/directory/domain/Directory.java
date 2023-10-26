@@ -37,4 +37,7 @@ public class Directory {
 	@Field(name = "file_uuid")
 	private String fileUUID;
 
+	public void editName(String name){
+		this.name = name;
+	}
 }
