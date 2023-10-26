@@ -1,8 +1,14 @@
 package com.galaxy.novelit.character.entity;
 
-import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity(name = "character")
+@Getter
+@AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class CharacterEntity {
     private String workspace;
     private String name;
