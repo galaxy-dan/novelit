@@ -67,8 +67,7 @@ spring:
       authentication-database: admin
       username: ${DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
-      uri: mongodb://mongo:27017/novelit
-#      uri: mongodb://localhost:27017/novelit
+      uri: ${MONGODB_URL}
       database: novelit
   #      uri: mongodb://localhost:27017/test
 
@@ -93,7 +92,7 @@ spring:
       authentication-database: admin
       username: ${DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
-      uri: mongodb://mongo:27017/novelit
+      uri: ${MONGODB_URL}
 #      uri: mongodb://localhost:27017/novelit
       database: novelit
 

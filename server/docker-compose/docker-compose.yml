@@ -24,36 +24,34 @@
 #      - /db/mongodb/data:/
 
 
-version: "3.1"
-services:
-  mongodb:
-    image: mongo
-    restart: always
-    container_name: mongodb
-    ports:
-      - "27017:27017"
-    env_file: .env
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: "${MONGODB_USERNAME}"
-      MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD}"
-    volumes:
-      - ./db/mongodb/data:/
-
-  mariadb:
-    image: mariadb
-    restart: always
-    container_name: mariadb
-    ports:
-      - "3305:3305"
-    env_file: .env
-    environment:
-      MARIADB_DATABASE : ""
-      MARIADB_USER: "${MARIADB_USERNAME}"
-      MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
-      MARIADB_ROOT_PASSWORD: "${MARIADB_PASSWORD}"
-    command:
-#     초기화 파일 실행 (create & use database)
-      - --init-file ./db/mariadb/initdb.d/init.sql
-    volumes:
-      - ./db/mariadb:/
-      - init.sql:./db/mariadb/initdb.d/init.sql
+#version: "3.1"
+#services:
+#  mongodb:
+#    image: mongo
+#    restart: always
+#    container_name: mongodb
+#    ports:
+#      - "27017:27017"
+#    env_file: .env
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: "${MONGODB_USERNAME}"
+#      MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD}"
+#    volumes:
+#      - ./db/mongodb/data:/
+#
+#  mariadb:
+#    image: mariadb
+#    restart: always
+#    container_name: mariadb
+#    ports:
+#      - "3305:3305"
+#    env_file: .env
+#    environment:
+#      MARIADB_USER: "${MARIADB_USERNAME}"
+#      MARIADB_ROOT_PASSWORD: "${MARIADB_PASSWORD}"
+#      MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
+#    command:
+#      - --character-set-server=utf8mb4
+#      - --collation-server=utf8mb4_unicode_ci
+#    volumes:
+#      - ./db/mariadb/data:/

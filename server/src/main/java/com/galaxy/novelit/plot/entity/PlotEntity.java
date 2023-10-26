@@ -49,4 +49,6 @@ public class PlotEntity {
             .ending(ending)
             .build();
     }
+
+
 }
