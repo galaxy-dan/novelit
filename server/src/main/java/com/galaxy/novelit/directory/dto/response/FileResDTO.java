@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class FileResDTO {
+	private String title;
 	private String content;
 }

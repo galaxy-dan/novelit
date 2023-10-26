@@ -111,6 +111,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 
 	@Override
 	public FileResDTO getFile(String directoryUUID, String userUUID) {
+		Directory directory = directoryRepository.findByUuid(directoryUUID);
 		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
 
 		if(userUUID != ){
@@ -119,6 +120,6 @@ public class DirectoryServiceImpl implements DirectoryService{
 		*/
 
 		File file = fileRepository.findByDirectoryUUID(directoryUUID);
-		return new FileResDTO(file.getContent());
+		return new FileResDTO(directory.getName(), file.getContent());
 	}
 }
