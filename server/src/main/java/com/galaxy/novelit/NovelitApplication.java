@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class NovelitApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NovelitApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(NovelitApplication.class, args);
+    }
 
 }
