@@ -1,6 +1,7 @@
 package com.galaxy.novelit.directory.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.domain.File;
 import com.galaxy.novelit.directory.dto.request.DirectoryCreateReqDTO;
+import com.galaxy.novelit.directory.dto.request.DirectoryNameEditReqDTO;
+import com.galaxy.novelit.directory.dto.response.DirectoryResDTO;
+import com.galaxy.novelit.directory.dto.response.DirectorySimpleElementDTO;
+import com.galaxy.novelit.directory.dto.response.FileResDTO;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.directory.repository.FileRepository;
 
@@ -61,5 +66,60 @@ public class DirectoryServiceImpl implements DirectoryService{
 			fileRepository.save(file);
 		}
 
+	}
+
+	@Transactional
+	@Override
+	public void editDirectoryName(DirectoryNameEditReqDTO dto, String userUUID) {
+		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함 (DB 2번)
+			=> 디렉토리 테이블 내에 작가 uuid 박아넣으면 DB 조회 1번으로 가능? 나중에 생각
+
+		if(userUUID != ){
+
+		}
+		*/
+		Directory directory = directoryRepository.findByUuid(dto.getUuid());
+		/* 404 예외 처리
+
+		*/
+
+		directory.editName(dto.getName());
+		directoryRepository.save(directory);
+	}
+
+	@Override
+	public DirectoryResDTO getDirectory(String directoryUUID, String userUUID) {
+		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
+
+		if(userUUID != ){
+
+		}
+		*/
+
+		Directory directory = directoryRepository.findByUuid(directoryUUID);
+		List<Directory> children = directory.getChildren();
+		List<DirectorySimpleElementDTO> directories = children.stream()
+			.filter(Directory::isDirectory)
+			.map(child -> new DirectorySimpleElementDTO(child.getUuid(), child.getName()))
+			.toList();
+		List<DirectorySimpleElementDTO> files = children.stream()
+			.filter(child -> !child.isDirectory())
+			.map(child -> new DirectorySimpleElementDTO(child.getUuid(), child.getName()))
+			.toList();
+		return new DirectoryResDTO(directories, files);
+	}
+
+	@Override
+	public FileResDTO getFile(String directoryUUID, String userUUID) {
+		Directory directory = directoryRepository.findByUuid(directoryUUID);
+		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
+
+		if(userUUID != ){
+
+		}
+		*/
+
+		File file = fileRepository.findByDirectoryUUID(directoryUUID);
+		return new FileResDTO(directory.getName(), file.getContent());
 	}
 }

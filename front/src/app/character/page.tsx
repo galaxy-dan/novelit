@@ -1,11 +1,9 @@
-import CharacterCard from '@/component/CharacterCard';
-import { getRedirectTypeFromError } from 'next/dist/client/components/redirect';
-import Image from 'next/image';
+import CharacterCard from '@/components/CharacterCard';
 import React from 'react';
-import { BsFillPersonFill, BsSearch } from 'react-icons/BS';
+import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
 export default function page() {
   return (
-    <div className="ml-10 mt-20">
+    <div className="mx-60 mt-20">
       {/* 제목 */}
       <div className="flex items-end text-5xl">
         <BsFillPersonFill className="mr-2" />
@@ -27,7 +25,7 @@ export default function page() {
         {/* 캐릭터 카드 그룹 */}
         <div>
           <p className="text-2xl font-semibold mt-14">Group 1</p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4   grid-flow-row gap4 ">
+          <div className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 grid-flow-row gap-4 ">
             <CharacterCard />
             <CharacterCard />
             <CharacterCard />
