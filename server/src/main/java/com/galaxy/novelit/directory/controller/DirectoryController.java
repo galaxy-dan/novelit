@@ -1,12 +1,14 @@
 package com.galaxy.novelit.directory.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.galaxy.novelit.directory.dto.request.DirectoryCreateReqDTO;
+import com.galaxy.novelit.directory.dto.request.DirectoryNameEditReqDTO;
 import com.galaxy.novelit.directory.service.DirectoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,12 @@ public class DirectoryController {
 	@PostMapping
 	public ResponseEntity<Void> createDirectory(@RequestBody DirectoryCreateReqDTO dto){
 		directoryService.createDirectory(dto, "123");
+		return ResponseEntity.ok().build();
+	}
+
+	@PatchMapping
+	public ResponseEntity<Void> editDirectoryName(@RequestBody DirectoryNameEditReqDTO dto){
+		directoryService.editDirectoryName(dto, "123");
 		return ResponseEntity.ok().build();
 	}
 }
