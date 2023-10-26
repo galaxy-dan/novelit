@@ -30,4 +30,7 @@ public class File {
 	private String directoryUUID;
 	@Column(name = "deleted", nullable = false)
 	private boolean deleted;
+	public void updateContent(String content){
+		this.content = content;
+	}
 }
