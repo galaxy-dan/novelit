@@ -17,6 +17,7 @@ import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.domain.File;
 import com.galaxy.novelit.directory.dto.request.DirectoryCreateReqDTO;
 import com.galaxy.novelit.directory.dto.request.DirectoryNameEditReqDTO;
+import com.galaxy.novelit.directory.dto.request.FileWorkReqDTO;
 import com.galaxy.novelit.directory.dto.response.DirectoryResDTO;
 import com.galaxy.novelit.directory.dto.response.DirectorySimpleElementDTO;
 import com.galaxy.novelit.directory.dto.response.FileResDTO;
@@ -186,6 +187,21 @@ public class DirectoryServiceImpl implements DirectoryService{
 		}
 	}
 
+	@Transactional
+	@Override
+	public void workFile(FileWorkReqDTO dto, String userUUID) {
+		String directoryUUID = dto.getUuid();
+		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
+		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
 
+		if(userUUID != ){
+
+		}
+		*/
+		File file = fileRepository.findByDirectoryUUIDAndDeleted(directoryUUID, false);
+		file.updateContent(dto.getContent());
+
+		fileRepository.save(file);
+	}
 
 }
