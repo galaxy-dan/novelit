@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/Ai';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { Core, NodeSingular, EdgeSingular } from 'cytoscape';
-
+import Image from 'next/image';
+import loadingImg from 'frontpublicimageloadingImg.gif';
 
 export default function RelationshipDiagram() {
   const [showGraph, setShowGraph] = useState(false);
-  const [count , setCount] = useState(0);
+  const [count, setCount] = useState(0);
   const [width, setWith] = useState('100%');
   const [height, setHeight] = useState('450px');
   const [graphData, setGraphData] = useState({
@@ -362,7 +363,7 @@ export default function RelationshipDiagram() {
           x: originalPositions[i].x || 0,
           y: originalPositions[i].y || 0,
         });
-      }else{
+      } else {
         // 여기서 position 저장안 된 놈 저장하기
         // 이건 굳이 새로 받을 필요없음
       }
@@ -383,7 +384,16 @@ export default function RelationshipDiagram() {
       </div>
 
       <div>
-        <div className={`rounded-xl border border-gray-300 shadow-md mt-12 ${!showGraph&&"invisible"}`}>
+        <div className="rounded-xl border border-gray-300 shadow-md mt-12 " style={{ width: width, height: height }}>
+          <div className={`h-full w-full relative ${showGraph && 'hidden'}` }>
+            <Image
+              src="/image/loadingImg.gif"
+              alt="로딩이미지"
+              width={1000}
+              height={1000}
+              className={`h-52 w-52 absolute mx-auto my-auto left-0 right-0`}
+            />
+          </div>
           <CytoscapeComponent
             elements={CytoscapeComponent.normalizeElements(graphData)}
             style={{ width: width, height: height }}
@@ -394,8 +404,8 @@ export default function RelationshipDiagram() {
             boxSelectionEnabled={true}
             layout={layout}
             stylesheet={styleSheet}
+            className={`${!showGraph && 'invisible'}`}
             cy={(cy) => {
-
               cy.on('layoutstop', () => {
                 setNodesPosition(cy);
                 setShowGraph(true);
@@ -409,7 +419,14 @@ export default function RelationshipDiagram() {
               cy.on('dragfree', 'node', (e) => {
                 //여기서 position 변경해서 저장하기
                 // 이거도 저장만 하고 받을 필요는 없음
-                console.log(e.target.id()+": { "+e.target.position('x')+","+e.target.position('y')+" }");
+                console.log(
+                  e.target.id() +
+                    ': { ' +
+                    e.target.position('x') +
+                    ',' +
+                    e.target.position('y') +
+                    ' }',
+                );
               });
             }}
           />
