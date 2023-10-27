@@ -35,6 +35,8 @@ public class Directory {
 	private String content;
 	@Field(name = "workspace_uuid")
 	private String workspaceUUID;
+	@Field(name = "user_uuid")
+	private String userUUID;
 	@Field(name = "deleted")
 	private boolean deleted;
 

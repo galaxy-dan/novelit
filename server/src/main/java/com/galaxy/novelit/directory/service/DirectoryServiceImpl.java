@@ -13,6 +13,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
+import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.dto.request.DirectoryCreateReqDTO;
 import com.galaxy.novelit.directory.dto.request.DirectoryNameEditReqDTO;
@@ -42,6 +45,12 @@ public class DirectoryServiceImpl implements DirectoryService{
 		String parentUUID = dto.getParentUUID();
 		boolean isDirectory = dto.isDirectory();
 
+		Directory parent = directoryRepository.findByUuidAndDeleted(parentUUID, false);
+		//존재하지 않는 부모 디렉토리
+		if(parentUUID != null && parent == null){
+			throw new NoSuchDirectoryException();
+		}
+
 		String directoryUUID = UUID.randomUUID().toString();
 		Directory.DirectoryBuilder builder = Directory.builder()
 			.uuid(directoryUUID)
@@ -49,6 +58,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 			.directory(isDirectory)
 			.parentUUID(parentUUID)
 			.workspaceUUID(dto.getWorkspaceUUID())
+			.userUUID(userUUID)
 			.deleted(false);
 		if(isDirectory){
 			builder.children(new ArrayList<>());
@@ -61,9 +71,8 @@ public class DirectoryServiceImpl implements DirectoryService{
 
 		//상위 디렉토리 있으면 children으로 추가
 		if(parentUUID != null) {
-			Directory parent = directoryRepository.findByUuidAndDeleted(parentUUID, false);
 			parent.getChildren().add(directory);
-			directoryRepository.save(parent);
+			directoryRepository.save(directory);
 		}
 
 	}
@@ -79,9 +88,8 @@ public class DirectoryServiceImpl implements DirectoryService{
 		}
 		*/
 		Directory directory = directoryRepository.findByUuidAndDeleted(dto.getUuid(), false);
-		/* 404 예외 처리
 
-		*/
+		checkDirectoryException(directory, userUUID);
 
 		directory.editName(dto.getName());
 		directoryRepository.save(directory);
@@ -98,7 +106,13 @@ public class DirectoryServiceImpl implements DirectoryService{
 		*/
 
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
+		//예외 처리
+		checkDirectoryException(directory, userUUID);
+		if(!directory.isDirectory()){
+			throw new WrongDirectoryTypeException();
+		}
 
+		//자식 디렉토리와 파일 따로 분류
 		List<Directory> children = directory.getChildren();
 		List<DirectorySimpleElementDTO> directories = children.stream()
 			.filter(child -> child.isDirectory() && !child.isDeleted())
@@ -115,12 +129,12 @@ public class DirectoryServiceImpl implements DirectoryService{
 	@Override
 	public FileResDTO getFile(String directoryUUID, String userUUID) {
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
-		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
-
-		if(userUUID != ){
-
+		System.out.println(directory);
+		//예외 처리
+		checkDirectoryException(directory, userUUID);
+		if(directory.isDirectory()){
+			throw new WrongDirectoryTypeException();
 		}
-		*/
 
 		return new FileResDTO(directory.getName(), directory.getContent());
 	}
@@ -128,47 +142,43 @@ public class DirectoryServiceImpl implements DirectoryService{
 	@Transactional
 	@Override
 	public void deleteDirectory(String directoryUUID, String userUUID) {
-		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
-
-		if(userUUID != ){
-
-		}
-		*/
-
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
-		if(directory != null){
-			//children 모두 삭제
-			List<String> deletedDirectories = new ArrayList<>();
+		//예외 처리
+		checkDirectoryException(directory, userUUID);
+
+		//삭제할 uuid 저장용
+		List<String> deletedDirectories = new ArrayList<>();
+		deletedDirectories.add(directory.getUuid());
+
+		//디렉토리라면 children도 삭제 필요
+		if(directory.isDirectory()) {
 
 			//bfs로 하위 디렉토리 완전 탐색
 			Queue<Directory> queue = new ArrayDeque<>();
 			queue.add(directory);
 
-			deletedDirectories.add(directory.getUuid());
-
-			while(!queue.isEmpty()) {
+			while (!queue.isEmpty()) {
 				Directory cur = queue.poll();
 				List<Directory> children = cur.getChildren();
-				for(Directory child : children){
+				for (Directory child : children) {
 					//이미 삭제된 애들은 무시
-					if(child.isDeleted()){
+					if (child.isDeleted()) {
 						continue;
 					}
 					deletedDirectories.add(child.getUuid());
-					if(child.isDirectory()){
+					if (child.isDirectory()) {
 						queue.add(child);
 					}
-
 				}
 			}
-
-			//directory와 file 수정 작업
-			mongoTemplate.updateMulti(
-				Query.query(Criteria.where("uuid").in(deletedDirectories)),
-				Update.update("deleted", true),
-				Directory.class
-			);
 		}
+
+		mongoTemplate.updateMulti(
+			Query.query(Criteria.where("uuid").in(deletedDirectories)),
+			Update.update("deleted", true),
+			Directory.class
+		);
+
 	}
 
 	@Transactional
@@ -176,14 +186,30 @@ public class DirectoryServiceImpl implements DirectoryService{
 	public void workFile(FileWorkReqDTO dto, String userUUID) {
 		String directoryUUID = dto.getUuid();
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
-		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
 
-		if(userUUID != ){
-
+		//예외 처리
+		checkDirectoryException(directory, userUUID);
+		if(directory.isDirectory()){
+			throw new WrongDirectoryTypeException();
 		}
-		*/
+
 		directory.updateContent(dto.getContent());
 		directoryRepository.save(directory);
+	}
+
+	//공통적인 directory 예외 처리
+	private void checkDirectoryException(Directory directory, String userUUID){
+		System.out.println("123"+directory);
+		//404 예외 처리
+		if(directory == null){
+			System.out.println("123123");
+			throw new NoSuchDirectoryException();
+		}
+
+		//권한 예외 처리
+		if(!directory.getUserUUID().equals(userUUID)){
+			throw new AccessRefusedException();
+		}
 	}
 
 }
