@@ -1,6 +1,5 @@
 'use client';
 import { ForwardedRef, useRef, useState } from 'react';
-import { Treebeard } from 'react-treebeard';
 import { NodeRendererProps, Tree, TreeApi } from 'react-arborist';
 
 import { MdOutlineStickyNote2 } from 'react-icons/md';

@@ -1,7 +1,7 @@
 'use client';
 
 import { Reply } from '@/model/editor/editor';
-import { fontFamily, fontSize, lineHeight } from '@/service/editor/editor';
+import { fontFamily, fontSize } from '@/service/editor/editor';
 import { ChangeEvent, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
