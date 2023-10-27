@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class UserDto{
     private long userId;
-    private String userName;
+    private String userUUID;
     private String email;
     private String nickname;
 }
