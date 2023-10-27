@@ -1,20 +1,20 @@
-//package com.galaxy.novelit.groups.entity;
-//
-//import jakarta.persistence.Column;
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.Id;
-//import java.util.UUID;
-//import lombok.AllArgsConstructor;
-//import lombok.Builder;
-//import lombok.Getter;
-//import lombok.NoArgsConstructor;
-//
+package com.galaxy.novelit.character.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 //@Getter
 //@AllArgsConstructor
 //@Builder
 //@NoArgsConstructor
 //@Entity(name = "groups")
-//public class GroupsEntity {
+public class GroupsEntity {
 //    @Id
 //    @Column(name = "group_id")
 //    private Long groupId;
@@ -30,4 +30,4 @@
 //    @Column(name = "is_deleted")
 //    private boolean isDeleted;
 //
-//}
+}

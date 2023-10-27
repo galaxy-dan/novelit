@@ -10,4 +10,5 @@ public interface DirectoryService {
 	void editDirectoryName(DirectoryNameEditReqDTO dto, String userUUID);
 	DirectoryResDTO getDirectory(String directoryUUID, String userUUID);
 	FileResDTO getFile(String directoryUUID, String userUUID);
+	void deleteDirectory(String directoryUUID, String userUUID);
 }
