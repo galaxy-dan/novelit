@@ -34,8 +34,8 @@ public class Directory {
 	private List<Directory> children;
 	@Field(name = "workspace_uuid")
 	private String workspaceUUID;
-	@Field(name = "file_uuid")
-	private String fileUUID;
+	@Field(name = "deleted")
+	private boolean deleted;
 
 	public void editName(String name){
 		this.name = name;
