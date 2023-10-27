@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.galaxy.novelit.directory.domain.Directory;
-import com.galaxy.novelit.directory.domain.File;
 import com.galaxy.novelit.directory.dto.request.DirectoryCreateReqDTO;
 import com.galaxy.novelit.directory.dto.request.DirectoryNameEditReqDTO;
 import com.galaxy.novelit.directory.dto.request.FileWorkReqDTO;
@@ -22,7 +21,6 @@ import com.galaxy.novelit.directory.dto.response.DirectoryResDTO;
 import com.galaxy.novelit.directory.dto.response.DirectorySimpleElementDTO;
 import com.galaxy.novelit.directory.dto.response.FileResDTO;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
-import com.galaxy.novelit.directory.repository.FileRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DirectoryServiceImpl implements DirectoryService{
 	private final DirectoryRepository directoryRepository;
-	private final FileRepository fileRepository;
 	private final MongoTemplate mongoTemplate;
 	@Transactional
 	@Override
@@ -43,17 +40,22 @@ public class DirectoryServiceImpl implements DirectoryService{
 		}
 		*/
 		String parentUUID = dto.getParentUUID();
+		boolean isDirectory = dto.isDirectory();
 
 		String directoryUUID = UUID.randomUUID().toString();
-		Directory directory = Directory.builder()
+		Directory.DirectoryBuilder builder = Directory.builder()
 			.uuid(directoryUUID)
 			.name(dto.getName())
-			.directory(dto.isDirectory())
+			.directory(isDirectory)
 			.parentUUID(parentUUID)
-			.children(new ArrayList<>())
 			.workspaceUUID(dto.getWorkspaceUUID())
-			.deleted(false)
-			.build();
+			.deleted(false);
+		if(isDirectory){
+			builder.children(new ArrayList<>());
+		}else{
+			builder.content("");
+		}
+		Directory directory = builder.build();
 
 		directoryRepository.save(directory);
 
@@ -62,18 +64,6 @@ public class DirectoryServiceImpl implements DirectoryService{
 			Directory parent = directoryRepository.findByUuidAndDeleted(parentUUID, false);
 			parent.getChildren().add(directory);
 			directoryRepository.save(parent);
-		}
-
-
-		//디렉토리가 아니라 파일인 경우 파일 테이블에 따로 데이터 생성
-		if(!dto.isDirectory()){
-			File file = File.builder()
-				.content("")
-				.directoryUUID(directoryUUID)
-				.deleted(false)
-				.build();
-
-			fileRepository.save(file);
 		}
 
 	}
@@ -108,6 +98,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 		*/
 
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
+
 		List<Directory> children = directory.getChildren();
 		List<DirectorySimpleElementDTO> directories = children.stream()
 			.filter(child -> child.isDirectory() && !child.isDeleted())
@@ -131,8 +122,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 		}
 		*/
 
-		File file = fileRepository.findByDirectoryUUIDAndDeleted(directoryUUID, false);
-		return new FileResDTO(directory.getName(), file.getContent());
+		return new FileResDTO(directory.getName(), directory.getContent());
 	}
 
 	@Transactional
@@ -149,16 +139,11 @@ public class DirectoryServiceImpl implements DirectoryService{
 		if(directory != null){
 			//children 모두 삭제
 			List<String> deletedDirectories = new ArrayList<>();
-			List<String> deletedFiles = new ArrayList<>();
 
-			//bfs로 완전 하위 디렉토리 완전 탐색
+			//bfs로 하위 디렉토리 완전 탐색
 			Queue<Directory> queue = new ArrayDeque<>();
 			queue.add(directory);
 
-			//파일이면 디렉토리랑 파일 db까지 deleted 표시
-			if(!directory.isDirectory()){
-				deletedFiles.add(directory.getUuid());
-			}
 			deletedDirectories.add(directory.getUuid());
 
 			while(!queue.isEmpty()) {
@@ -169,11 +154,11 @@ public class DirectoryServiceImpl implements DirectoryService{
 					if(child.isDeleted()){
 						continue;
 					}
-					if(!child.isDirectory()){
-						deletedFiles.add(child.getUuid());
-					}
 					deletedDirectories.add(child.getUuid());
-					queue.add(child);
+					if(child.isDirectory()){
+						queue.add(child);
+					}
+
 				}
 			}
 
@@ -183,7 +168,6 @@ public class DirectoryServiceImpl implements DirectoryService{
 				Update.update("deleted", true),
 				Directory.class
 			);
-			fileRepository.updateDeleted(deletedFiles, true);
 		}
 	}
 
@@ -198,10 +182,8 @@ public class DirectoryServiceImpl implements DirectoryService{
 
 		}
 		*/
-		File file = fileRepository.findByDirectoryUUIDAndDeleted(directoryUUID, false);
-		file.updateContent(dto.getContent());
-
-		fileRepository.save(file);
+		directory.updateContent(dto.getContent());
+		directoryRepository.save(directory);
 	}
 
 }

@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { Nanum_Myeongjo } from 'next/font/google';
 import RecoilProvider from '@/context/RecoilProvider';
+import SideMenu from '@/components/SideMenu';
 
 const nanumFont = Nanum_Myeongjo({
   subsets: ['latin'],
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="w-full">
         <QueryProvider>
           <RecoilProvider>
+            <SideMenu />
             <main>{children}</main>
           </RecoilProvider>
         </QueryProvider>
