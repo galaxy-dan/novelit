@@ -1,7 +1,7 @@
 'use client';
 
 import { Reply } from '@/model/editor/editor';
-import { fontFamily, fontSize, lineHeight } from '@/service/editor/editor';
+import { fontFamily, fontSize } from '@/service/editor/editor';
 import { ChangeEvent, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -96,7 +96,9 @@ export default function Editor() {
 
   return (
     <>
-      <div className="flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24">
+      <div
+        className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
+      >
         <div className="w-[924px]">제목입니다.</div>
       </div>
       <div className="flex gap-6 justify-center items-center">

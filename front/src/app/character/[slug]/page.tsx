@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaRegTrashAlt, FaMinus } from 'react-icons/fa';
-import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/Ai';
+import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/ai';
 import { HiPlus } from 'react-icons/hi';
 import Image from 'next/image';
 

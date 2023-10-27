@@ -109,7 +109,26 @@ public class CommentServiceImpl implements CommentService {
         // 코멘트 서치
         Comment comment = commentRepository.findByDirectoryUUIDAndSpaceId(directoryUUID, spaceId);
 
-        // commentOrder 서치
+        // 해당 코멘트 서치
+        for (CommentInfo info: comment.getCommentInfoList()) {
+            // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
+            if (info.getCommentId().equals(commentDeleteRequestDto.getUserUUID())){
+                comment.getCommentInfoList().remove(info);
+                commentRepository.save(comment);
+                log.info("novelist");
+                return;
+            }
+            // 편집자인 경우 : 아이디 비번 둘다 확인
+            if (info.getCommentId().equals(commentDeleteRequestDto.getCommentId())
+                && info.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())){
+                comment.getCommentInfoList().remove(info);
+                commentRepository.save(comment);
+                log.info("editor");
+                return;
+            }
+        }
+
+        /*// commentOrder 서치
         List<CommentInfo> commentInfoList = comment.getCommentInfoList();
         CommentInfo info = getCommentInfo(commentDeleteRequestDto.getCommentOrder(), commentInfoList);
 
@@ -117,15 +136,26 @@ public class CommentServiceImpl implements CommentService {
 
         // 소설가인 경우 : 비밀번호 없음
         if (info.getCommentId().equals(commentDeleteRequestDto.getUserUUID())){
+            log.info("novelist");
             commentInfoList.remove(commentDeleteRequestDto.getCommentOrder());
-            return;
         }
 
         // 편집자인 경우
-        if (info.getCommentId().equals(commentDeleteRequestDto.getCommentId())
+        else if (info.getCommentId().equals(commentDeleteRequestDto.getCommentId())
         && info.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())){
+            log.info("editor");
             commentInfoList.remove(commentDeleteRequestDto.getCommentOrder());
+            //log.info("{}",commentInfoList.get(1).getCommentId());
         }
+
+        Comment comment1 = Comment.builder()
+            ._id(comment.get_id())
+            .spaceId(comment.getSpaceId())
+            .content(comment.getContent())
+            .userUUID(comment.getUserUUID())
+            .directoryUUID(comment.getDirectoryUUID())
+            .commentInfoList(commentInfoList)
+            .build();*/
     }
 
     public CommentInfo getCommentInfo(Long commentOrder, List<CommentInfo> infoList){
