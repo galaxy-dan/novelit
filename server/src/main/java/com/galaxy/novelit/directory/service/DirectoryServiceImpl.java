@@ -46,9 +46,9 @@ public class DirectoryServiceImpl implements DirectoryService{
 		boolean isDirectory = dto.isDirectory();
 
 		Directory parent = directoryRepository.findByUuidAndDeleted(parentUUID, false);
-		//존재하지 않는 부모 디렉토리
-		if(parentUUID != null && parent == null){
-			throw new NoSuchDirectoryException();
+		//부모 예외 처리
+		if(parentUUID != null){
+			checkDirectoryException(parent, userUUID);
 		}
 
 		String directoryUUID = UUID.randomUUID().toString();
@@ -72,7 +72,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 		//상위 디렉토리 있으면 children으로 추가
 		if(parentUUID != null) {
 			parent.getChildren().add(directory);
-			directoryRepository.save(directory);
+			directoryRepository.save(parent);
 		}
 
 	}
@@ -123,13 +123,13 @@ public class DirectoryServiceImpl implements DirectoryService{
 			.map(child -> new DirectorySimpleElementDTO(child.getUuid(), child.getName()))
 			.toList();
 		return new DirectoryResDTO(directories, files);
+
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public FileResDTO getFile(String directoryUUID, String userUUID) {
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
-		System.out.println(directory);
 		//예외 처리
 		checkDirectoryException(directory, userUUID);
 		if(directory.isDirectory()){
@@ -199,10 +199,8 @@ public class DirectoryServiceImpl implements DirectoryService{
 
 	//공통적인 directory 예외 처리
 	private void checkDirectoryException(Directory directory, String userUUID){
-		System.out.println("123"+directory);
 		//404 예외 처리
 		if(directory == null){
-			System.out.println("123123");
 			throw new NoSuchDirectoryException();
 		}
 

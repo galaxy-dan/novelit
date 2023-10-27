@@ -30,7 +30,7 @@ public class Directory {
 	private String prevUUID;
 	@Field(name = "next_uuid")
 	private String nextUUID;
-	@DBRef
+	@DBRef(lazy = true)
 	private List<Directory> children;
 	private String content;
 	@Field(name = "workspace_uuid")
