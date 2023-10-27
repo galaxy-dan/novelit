@@ -9,7 +9,9 @@ import People from '../../public/images/people.svg';
 import Image from 'next/image';
 import { BiSolidHome } from 'react-icons/bi';
 import { FiChevronsLeft } from 'react-icons/fi';
-import { AiFillFolderAdd } from 'react-icons/ai';
+import { AiFillFolderAdd, AiFillFileAdd } from 'react-icons/ai';
+import { MdEdit } from 'react-icons/md';
+import { RxCross2 } from 'react-icons/rx';
 
 const temp = {
   name: 'root',
@@ -57,6 +59,11 @@ const temp2 = [
       { id: 'd3', name: 'ㄴ' },
     ],
   },
+  {
+    id: '5',
+    name: '로맨스',
+    children: [],
+  },
 ];
 
 export default function SideMenu() {
@@ -64,6 +71,7 @@ export default function SideMenu() {
   const [cursor, setCursor] = useState<any>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const treeRef = useRef<any>(null);
+  const [term, setTerm] = useState<string>('');
 
   //   const onToggle = (node: any, toggled: any) => {
   //     if (cursor) {
@@ -82,8 +90,9 @@ export default function SideMenu() {
   return (
     <>
       <button onClick={() => setIsOpen((prev) => !prev)}>열기</button>
-      {!isOpen && (
-        <div className="fixed left-0 top-0 bg-lime-50 w-64 font-melody">
+
+      {isOpen && (
+        <div className="fixed left-0 top-0 bg-violet-50 w-64 font-melody">
           <div>
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
@@ -106,14 +115,30 @@ export default function SideMenu() {
                     <div>📔</div>
                     <div className="pb-1">소설작성</div>
                   </div>
-                  <button
-                    onClick={() => {
-                      treeRef.current.createInternal(treeRef.current.root.id);
-                    }}
-                  >
-                    <AiFillFolderAdd size={25} />
-                  </button>
+                  <div>
+                    <button
+                      onClick={() => {
+                        treeRef.current.createLeaf(treeRef.current.root.id);
+                      }}
+                    >
+                      <AiFillFileAdd size={25} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        treeRef.current.createInternal(treeRef.current.root.id);
+                      }}
+                    >
+                      <AiFillFolderAdd size={25} />
+                    </button>
+                  </div>
                 </div>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="py-0 px-2 outline-none rounded-sm w-full h-6 border-none my-1 focus:border-2 focus:border-solid focus:border-gray-300"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                />
                 <Tree
                   ref={treeRef}
                   initialData={temp2}
@@ -125,6 +150,10 @@ export default function SideMenu() {
                   paddingTop={30}
                   paddingBottom={10}
                   padding={25 /* sets both */}
+                  searchTerm={term}
+                  searchMatch={(node, term) =>
+                    node.data.name.toLowerCase().includes(term.toLowerCase())
+                  }
                 >
                   {Node}
                 </Tree>
@@ -138,33 +167,49 @@ export default function SideMenu() {
   );
 }
 
-function Node({ node, style, dragHandle }: NodeRendererProps<any>) {
+function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
   /* This node instance can do many things. See the API reference. */
   return (
     <>
-      {node.isEditing ? (
-        <input
-          type="text"
-          defaultValue={node.data.name}
-          onFocus={(e) => e.currentTarget.select()}
-          onBlur={() => node.reset()}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') node.reset();
-            if (e.key === 'Enter') node.submit(e.currentTarget.value);
-          }}
-          autoFocus
-        />
-      ) : (
-        <div
-          style={style}
-          className="text-sm font-bold"
-          ref={dragHandle}
-          onClick={() => node.toggle()}
-        >
-          {node.isLeaf ? '📖' : node.isOpen ? '📂' : '📁'}
-          {node.data.name}
+      <div
+        className={`flex justify-between items-center text-violet-50 hover:text-black hover:bg-slate-50 ${
+          node.isSelected ? 'bg-slate-50' : 'bg-violet-50'
+        }`}
+        ref={dragHandle}
+        onClick={() => node.toggle()}
+      >
+        <div className="text-black">
+          {node.isEditing ? (
+            <input
+              type="text"
+              defaultValue={node.data.name}
+              onFocus={(e) => e.currentTarget.select()}
+              onBlur={() => node.reset()}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') node.reset();
+                if (e.key === 'Enter') node.submit(e.currentTarget.value);
+              }}
+              autoFocus
+            />
+          ) : (
+            <div style={style} className="text-sm font-bold">
+              {node.isLeaf ? '📖' : node.isOpen ? '📂' : '📁'}
+              {node.data.name}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className={`file-actions flex items-center`}>
+          <div className="folderFileActions flex items-center">
+            <button onClick={() => node.edit()} title="Rename...">
+              <MdEdit />
+            </button>
+            <button onClick={() => tree.delete(node.id)} title="Delete">
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
