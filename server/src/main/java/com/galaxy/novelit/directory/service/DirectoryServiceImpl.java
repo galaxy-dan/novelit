@@ -123,13 +123,13 @@ public class DirectoryServiceImpl implements DirectoryService{
 			.map(child -> new DirectorySimpleElementDTO(child.getUuid(), child.getName()))
 			.toList();
 		return new DirectoryResDTO(directories, files);
+
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public FileResDTO getFile(String directoryUUID, String userUUID) {
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
-		System.out.println(directory);
 		//예외 처리
 		checkDirectoryException(directory, userUUID);
 		if(directory.isDirectory()){
