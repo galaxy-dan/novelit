@@ -18,7 +18,7 @@ public class CharacterController {
     private final CharacterService characterService;
 
     @GetMapping
-    public ResponseEntity<?> getCharacter(@RequestParam String characterUuid) {
+    public ResponseEntity<Object> getCharacter(@RequestParam String characterUuid) {
         try {
             CharacterDtoRes dto = characterService.getCharacter(characterUuid);;
             return ResponseEntity.ok(dto);
@@ -28,7 +28,7 @@ public class CharacterController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCharacter() {
+    public ResponseEntity<Object> createCharacter() {
         try {
             characterService.createCharacter();
             return ResponseEntity.ok().build();
