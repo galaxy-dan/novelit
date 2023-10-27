@@ -32,6 +32,7 @@ public class Directory {
 	private String nextUUID;
 	@DBRef
 	private List<Directory> children;
+	private String content;
 	@Field(name = "workspace_uuid")
 	private String workspaceUUID;
 	@Field(name = "deleted")
@@ -39,5 +40,8 @@ public class Directory {
 
 	public void editName(String name){
 		this.name = name;
+	}
+	public void updateContent(String content){
+		this.content = content;
 	}
 }
