@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class CharacterEntity {
     @Id
     private String characterId;
+    @Field(name = "user_uuid")
+    private String userUuid;
     @Field(name = "group_uuid")
     private String groupUuid;
     @Field(name = "character_uuid")
