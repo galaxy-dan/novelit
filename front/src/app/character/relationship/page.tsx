@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/Ai';
+import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/ai';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { Core, NodeSingular, EdgeSingular } from 'cytoscape';
 import Image from 'next/image';
-import loadingImg from 'frontpublicimageloadingImg.gif';
 
 export default function RelationshipDiagram() {
   const [showGraph, setShowGraph] = useState(false);
@@ -371,7 +370,7 @@ export default function RelationshipDiagram() {
   };
 
   return (
-    <div className="mx-60 mt-20">
+    <div className="mx-80 my-20">
       <div className="flex items-end justify-between">
         <div className="flex items-end">
           <p className="text-4xl font-bold mr-4">관계도</p>
@@ -384,19 +383,20 @@ export default function RelationshipDiagram() {
       </div>
 
       <div>
-        <div className="rounded-xl border border-gray-300 shadow-md mt-12 " style={{ width: width, height: height }}>
-          <div className={`h-full w-full relative ${showGraph && 'hidden'}` }>
+        <div className="rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]">
+          <div className={`h-full w-full relative ${showGraph && 'hidden'}`}>
             <Image
-              src="/image/loadingImg.gif"
+              src="/images/loadingImg.gif"
               alt="로딩이미지"
               width={1000}
               height={1000}
-              className={`h-52 w-52 absolute mx-auto my-auto left-0 right-0`}
+              className={`h-[30vh] w-[30vh] absolute mx-auto my-auto top-0 left-0 right-0 bottom-0`}
+              loading="eager"
+              priority={true}
             />
           </div>
           <CytoscapeComponent
             elements={CytoscapeComponent.normalizeElements(graphData)}
-            style={{ width: width, height: height }}
             zoomingEnabled={true}
             maxZoom={1.5}
             minZoom={0.3}
@@ -404,7 +404,7 @@ export default function RelationshipDiagram() {
             boxSelectionEnabled={true}
             layout={layout}
             stylesheet={styleSheet}
-            className={`${!showGraph && 'invisible'}`}
+            className={`${!showGraph && 'invisible'}  w-full h-[80vh]`}
             cy={(cy) => {
               cy.on('layoutstop', () => {
                 setNodesPosition(cy);
