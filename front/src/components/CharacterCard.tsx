@@ -13,8 +13,8 @@ export default function CharacterCard() {
       />
 
       <div className="ml-4 w-36 my-auto">
-        <p className="font-bold text-xl">배트맨</p>
-        <div className="">
+        <p className="font-extrabold text-xl">배트맨</p>
+        <div className="font-bold">
           <div className="flex mt-1 min-w-0">
             <p className="mr-2">나이:</p>
             <p className="flex-1 truncate">aaaaaaaaaaaaaaaaaaaaaaaa</p>
