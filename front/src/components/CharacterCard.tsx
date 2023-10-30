@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export default function CharacterCard() {
   return (
-    <div className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8">
+    <div className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8 cursor-pointer" onClick={()=>{}}>
       <Image
         src="https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8"
         width={100}
