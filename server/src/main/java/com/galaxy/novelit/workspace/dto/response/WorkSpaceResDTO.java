@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class WorkSpaceResDTO {
     String workspaceUUID;
-    String titlte;
+    String title;
 }
