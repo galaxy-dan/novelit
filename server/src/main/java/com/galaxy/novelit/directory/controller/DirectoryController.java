@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/directory")
 @RequiredArgsConstructor
-@CrossOrigin
 public class DirectoryController {
 	private final DirectoryService directoryService;
 
