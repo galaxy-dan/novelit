@@ -3,6 +3,7 @@ package com.galaxy.novelit.workspace.controller;
 import com.galaxy.novelit.workspace.domain.Workspace;
 import com.galaxy.novelit.workspace.dto.request.WorkSpaceCreateReqDTO;
 import com.galaxy.novelit.workspace.dto.request.WorkSpaceModifiedReqDTO;
+import com.galaxy.novelit.workspace.dto.response.WorkSpaceInfoResDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceResDTO;
 import com.galaxy.novelit.workspace.service.WorkspaceService;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -53,7 +55,7 @@ public class WorkspaceController {
     }
 
     @GetMapping
-    public void getWorkspaceInfo() {
-
+    public ResponseEntity<WorkSpaceInfoResDTO> getWorkspaceInfo(@RequestParam String uuid) {
+        return ResponseEntity.ok(workspaceService.getWorkspaceInfo(uuid));
     }
 }
