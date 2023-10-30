@@ -5,6 +5,7 @@ import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.DiagramDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.character.service.GroupService;
+import com.galaxy.novelit.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CharacterController {
     private final CharacterService characterService;
+    private final WordsService wordsService;
 
     @GetMapping
     public ResponseEntity<Object> getCharacter(@RequestParam String characterUuid) {
@@ -35,7 +37,9 @@ public class CharacterController {
     @PostMapping
     public ResponseEntity<Object> createCharacter() {
         try {
+
             characterService.createCharacter();
+
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
