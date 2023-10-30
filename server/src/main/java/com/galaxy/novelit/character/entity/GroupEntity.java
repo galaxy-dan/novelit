@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "groups")
 public class GroupEntity {
     @Id
-    private String groupId;
+    private Long groupId;
     @Field(name = "user_uuid")
     private String userUuid;
     @Field(name = "workspace_uuid")

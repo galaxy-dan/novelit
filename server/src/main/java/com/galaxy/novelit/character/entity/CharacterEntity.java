@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 public class CharacterEntity {
     @Id
-    private String characterId;
+    private Long characterId;
     @Field(name = "user_uuid")
     private String userUuid;
     @Field(name = "group_uuid")
