@@ -31,7 +31,7 @@ export default function MainPage() {
           </div>
           <div>
             <div className="text-base mb-2">내 작품</div>
-            <div className="border-2 border-dotted grid grid-cols-3 gap-10 p-5">
+            <div className="border-2 border-dotted flex flex-wrap gap-10 p-5">
               {[0, 1, 2, 3, 4, 5].map((el, index) => (
                 <Link
                   href="/novel"
