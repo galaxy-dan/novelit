@@ -5,10 +5,15 @@ import localFont from 'next/font/local';
 import { Nanum_Myeongjo } from 'next/font/google';
 import RecoilProvider from '@/context/RecoilProvider';
 import SideMenu from '@/components/SideMenu';
+import { Hi_Melody } from "next/font/google"
 
-const nanumFont = Nanum_Myeongjo({
+// const nanumFont = Nanum_Myeongjo({
+//   subsets: ['latin'],
+//   weight: ['400', '700', '800'],
+// });
+const nanumFont = Hi_Melody({
   subsets: ['latin'],
-  weight: ['400', '700', '800'],
+  weight: ['400'],
 });
 
 export const metadata: Metadata = {
