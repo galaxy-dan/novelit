@@ -55,7 +55,7 @@ public class WorkspaceController {
     }
 
     @GetMapping
-    public ResponseEntity<WorkSpaceInfoResDTO> getWorkspaceInfo(@RequestParam String uuid) {
-        return ResponseEntity.ok(workspaceService.getWorkspaceInfo(uuid));
+    public ResponseEntity<WorkSpaceInfoResDTO> getWorkspaceInfo(@RequestParam String workspaceUUID) {
+        return ResponseEntity.ok(workspaceService.getWorkspaceInfo(workspaceUUID));
     }
 }
