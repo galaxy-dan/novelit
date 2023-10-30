@@ -17,13 +17,13 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "groups")
 public class GroupEntity {
     @Id
-    private Long groupId;
+    private String groupId;
+    @Field(name = "group_uuid")
+    private String groupUuid;
     @Field(name = "user_uuid")
     private String userUuid;
     @Field(name = "workspace_uuid")
     private String workspaceUuid;
-    @Field(name = "group_uuid")
-    private String groupUuid;
     @Field(name = "group_name")
     private String groupName;
     @Field(name = "parent_uuid")

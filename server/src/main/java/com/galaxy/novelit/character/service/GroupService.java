@@ -5,8 +5,8 @@ import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 
 public interface GroupService {
     GroupDtoRes getGroup(String groupUuid);
-    void createGroup();
+    void createGroup(GroupDtoReq dto);
     void deleteGroup(String groupUuid);
-    GroupDtoRes updateGroupName(String groupName);
+    void updateGroupName(String groupName);
 
 }

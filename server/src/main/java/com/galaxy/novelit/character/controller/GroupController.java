@@ -1,6 +1,7 @@
 package com.galaxy.novelit.character.controller;
 
 
+import com.galaxy.novelit.character.dto.req.GroupDtoReq;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.service.GroupService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,9 +33,9 @@ public class GroupController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createGroup() {
+    public ResponseEntity<Object> createGroup(@RequestBody GroupDtoReq dto) {
         try {
-            groupService.createGroup();
+            groupService.createGroup(dto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

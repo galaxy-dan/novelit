@@ -2,7 +2,10 @@ package com.galaxy.novelit.character.repository;
 
 import com.galaxy.novelit.character.entity.GroupEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface GroupRepository extends MongoRepository<GroupEntity, String> {
-    GroupEntity findByGroupUuidAndUserUuid(String groupUuid, String userUuid);
+//    GroupEntity findByGroupUuidAndUserUuid(String groupUuid, String userUuid);
+    GroupEntity findByGroupUuid(String groupUuid);
 }
