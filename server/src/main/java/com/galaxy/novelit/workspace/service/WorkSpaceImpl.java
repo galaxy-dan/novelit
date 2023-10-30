@@ -9,6 +9,8 @@ import com.galaxy.novelit.workspace.mapper.WorkspaceMapper;
 import com.galaxy.novelit.workspace.repository.WorkspaceRepository;
 import jakarta.persistence.EntityManager;
 
+import com.galaxy.novelit.workspace.dto.response.WorkSpaceResDTO;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -72,15 +74,29 @@ public class WorkSpaceImpl implements WorkspaceService{
     @Override
     public WorkSpaceInfoResDTO getWorkspaceInfo(String workSpaceUUID) {
         Optional<Workspace> workspace = workspaceRepository.findByWorkspaceUUID(workSpaceUUID);
-        if(workspace.isPresent()){
+        if (workspace.isPresent()) {
             Workspace ws = workspace.get();
-            List<WorkSpaceElementDTO> directories = directoryRepository.findByParentUUIDAndDeletedAndWorkspaceUUID(null, false, workSpaceUUID).stream()
+            List<WorkSpaceElementDTO> directories = directoryRepository.findByParentUUIDAndDeletedAndWorkspaceUUID(null,
+                    false, workSpaceUUID).stream()
                 .map(workspaceMapper::toElementDto)
                 .toList();
 
             return new WorkSpaceInfoResDTO(ws.getTitle(), directories);
-        }else {
+        } else {
             throw new IllegalStateException("없는 작품 입니다.");
         }
+    }
+    @Override
+    public List<?> getWorkspaces(String userUUID) {
+
+        List<Workspace> workspaceList = workspaceRepository.findAllByUserUUID(userUUID);
+
+        List<WorkSpaceResDTO> workspaceNames = new ArrayList<>();
+
+        for (Workspace ws : workspaceList) {
+            workspaceNames.add(new WorkSpaceResDTO(ws.getWorkspaceUUID(), ws.getTitle()));
+        }
+        return workspaceNames;
+
     }
 }
