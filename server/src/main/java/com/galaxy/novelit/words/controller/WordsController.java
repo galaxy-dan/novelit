@@ -1,8 +1,6 @@
-package com.galaxy.novelit.character.controller;
+package com.galaxy.novelit.words.controller;
 
-
-import com.galaxy.novelit.character.dto.res.GroupDtoRes;
-import com.galaxy.novelit.character.service.GroupService;
+import com.galaxy.novelit.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,25 +13,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/group")
+@RequestMapping("/words")
 @RequiredArgsConstructor
-public class GroupController {
-    private final GroupService groupService;
+public class WordsController {
 
-    @GetMapping
-    public ResponseEntity<Object> getGroup(@RequestParam String groupUuid) {
-        try {
-            GroupDtoRes dto = groupService.getGroup(groupUuid);
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+    private final WordsService wordsService;
 
     @PostMapping
-    public ResponseEntity<Object> createGroup() {
+    public ResponseEntity<Object> createWord(@RequestParam String word) {
         try {
-            groupService.createGroup();
+            wordsService.createWord(word);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -41,9 +30,9 @@ public class GroupController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateGroupName(@RequestParam String groupName) {
+    public ResponseEntity<Object> updateWord(@RequestParam String word) {
         try {
-            groupService.updateGroupName(groupName);
+            wordsService.updateWord(word);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -51,13 +40,12 @@ public class GroupController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Object> deleteGroup(@RequestParam String groupUuid) {
+    public ResponseEntity<Object> deleteWord(@RequestParam String word) {
         try {
-            groupService.deleteGroup(groupUuid);
+//            wordsService.updateWord(word);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
 }

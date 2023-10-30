@@ -7,6 +7,6 @@ public interface GroupService {
     GroupDtoRes getGroup(String groupUuid);
     void createGroup();
     void deleteGroup(String groupUuid);
-    GroupDtoRes updateGroup(GroupDtoReq groupDtoReq);
+    GroupDtoRes updateGroupName(String groupName);
 
 }
