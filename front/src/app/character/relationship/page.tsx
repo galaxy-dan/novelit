@@ -8,14 +8,11 @@ import Image from 'next/image';
 
 export default function RelationshipDiagram() {
   const [showGraph, setShowGraph] = useState(false);
-  const [count, setCount] = useState(0);
-  const [width, setWith] = useState('100%');
-  const [height, setHeight] = useState('450px');
   const [graphData, setGraphData] = useState({
     nodes: [
       {
         data: { id: '1', label: '그룹 1', type: 'group' },
-        position: { x: 200, y: 200 },
+        position: { x: 150, y: 200 },
         style: {},
       },
       {
@@ -373,17 +370,17 @@ export default function RelationshipDiagram() {
     <div className="mx-80 my-20">
       <div className="flex items-end justify-between">
         <div className="flex items-end">
-          <p className="text-4xl font-bold mr-4">관계도</p>
+          <p className="text-4xl font-extrabold mr-4">관계도</p>
         </div>
         <div className="flex items-center">
-          <p className="text-2xl font-bold mr-2">저장중</p>
+          <p className="text-2xl font-extrabold mr-2">저장중</p>
           <AiOutlineLoading3Quarters className="animate-spin text-xl " />
           <AiOutlineCheck className="text-2xl" />
         </div>
       </div>
 
       <div>
-        <div className="rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]">
+        <div className={`rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]`}>
           <div className={`h-full w-full relative ${showGraph && 'hidden'}`}>
             <Image
               src="/images/loadingImg.gif"
