@@ -68,6 +68,7 @@ tasks.named('test') {
 }
 
 def querydslDir = "src/main/generated"
+def querydslDirBuild = "$buildDir/generated/querydsl"
 
 configurations {
 	compileOnly {
@@ -77,11 +78,14 @@ configurations {
 
 clean {
 	delete file(querydslDir)
+	delete file(querydslDirBuild)
+
 }
 
 // querydsl QClass 파일 생성 위치를 지정
 tasks.withType(JavaCompile) {
 	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDirBuild))
 }
 
 //querydsl {

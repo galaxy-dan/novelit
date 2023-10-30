@@ -65,9 +65,9 @@ spring:
       host: mongo
       port: 27017
       authentication-database: admin
-      username: ${DATABASE_USERNAME}
+      username: ${MONGO_DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
-      uri: ${MONGODB_URL}
+#      uri: ${MONGODB_URL}
       database: novelit
   #      uri: mongodb://localhost:27017/test
 
@@ -90,9 +90,9 @@ spring:
       host: mongo
       port: 27017
       authentication-database: admin
-      username: ${DATABASE_USERNAME}
+      username: ${MONGO_DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
-      uri: ${MONGODB_URL}
+#      uri: ${MONGODB_URL}
 #      uri: mongodb://localhost:27017/novelit
       database: novelit
 

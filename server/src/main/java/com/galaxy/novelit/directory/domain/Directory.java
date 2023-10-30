@@ -30,14 +30,20 @@ public class Directory {
 	private String prevUUID;
 	@Field(name = "next_uuid")
 	private String nextUUID;
-	@DBRef
+	@DBRef(lazy = true)
 	private List<Directory> children;
+	private String content;
 	@Field(name = "workspace_uuid")
 	private String workspaceUUID;
+	@Field(name = "user_uuid")
+	private String userUUID;
 	@Field(name = "deleted")
 	private boolean deleted;
 
 	public void editName(String name){
 		this.name = name;
+	}
+	public void updateContent(String content){
+		this.content = content;
 	}
 }
