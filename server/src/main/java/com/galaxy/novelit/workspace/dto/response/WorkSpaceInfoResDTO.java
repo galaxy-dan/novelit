@@ -1,15 +1,15 @@
 package com.galaxy.novelit.workspace.dto.response;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class WorkSpaceResDTO {
-    String workspaceUUID;
-    String title;
+public class WorkSpaceInfoResDTO {
+	private String title;
+	private List<WorkSpaceElementDTO> directories;
 }
