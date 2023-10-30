@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkSpaceCreateReqDTO {
-    String title;
+public class WorkSpaceDeleteReqDTO {
+    String workspaceUUID;
 }
