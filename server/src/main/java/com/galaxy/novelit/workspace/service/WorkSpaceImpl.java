@@ -2,9 +2,12 @@ package com.galaxy.novelit.workspace.service;
 
 import com.galaxy.novelit.workspace.domain.Workspace;
 import com.galaxy.novelit.workspace.dto.WorkSpaceDTO;
+import com.galaxy.novelit.workspace.dto.response.WorkSpaceResDTO;
 import com.galaxy.novelit.workspace.mapper.WorkspaceMapper;
 import com.galaxy.novelit.workspace.repository.WorkspaceRepository;
 import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,5 +64,18 @@ public class WorkSpaceImpl implements WorkspaceService{
         } else {
             throw new IllegalStateException("없는 작품 입니다.");
         }
+    }
+
+    @Override
+    public List<?> getWorkspaces(String userUUID) {
+
+        List<Workspace> workspaceList = workspaceRepository.findAllByUserUUID(userUUID);
+
+        List<WorkSpaceResDTO> workspaceNames = new ArrayList<>();
+
+        for (Workspace ws : workspaceList) {
+            workspaceNames.add(new WorkSpaceResDTO(ws.getWorkspaceUUID(), ws.getTitle()));
+        }
+        return workspaceNames;
     }
 }
