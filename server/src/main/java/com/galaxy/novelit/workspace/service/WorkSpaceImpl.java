@@ -9,7 +9,6 @@ import com.galaxy.novelit.workspace.mapper.WorkspaceMapper;
 import com.galaxy.novelit.workspace.repository.WorkspaceRepository;
 import jakarta.persistence.EntityManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
