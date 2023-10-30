@@ -35,6 +35,5 @@ public class UserController {
         System.out.println(authorAndWorkspaceResDTO.getNickname());
         System.out.println(authorAndWorkspaceResDTO.getWorkspaces());
         return ResponseEntity.ok(authorAndWorkspaceResDTO);
-//        return null;
     }
 }

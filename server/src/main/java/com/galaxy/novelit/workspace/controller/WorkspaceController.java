@@ -48,8 +48,8 @@ public class WorkspaceController {
 
     }
 
-    @DeleteMapping("/{workSpaceUUID}")
-    public void deleteWorkspace(@PathVariable String workSpaceUUID) {
+    @DeleteMapping
+    public void deleteWorkspace(@RequestParam String workSpaceUUID) {
 //        String workSpaceUUID = workSpaceModifiedReqDTO.getWorkspaceUUID();
         workspaceService.deleteWorkspace(workSpaceUUID);
     }
