@@ -7,5 +7,5 @@ import com.galaxy.novelit.directory.domain.Directory;
 
 @Repository
 public interface DirectoryRepository extends MongoRepository<Directory, String> {
-	Directory findByUuid(String uuid);
+	Directory findByUuidAndDeleted(String uuid, boolean deleted);
 }
