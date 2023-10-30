@@ -88,7 +88,7 @@ export default function SideMenu() {
 
   return (
     <>
-      <button onClick={() => setIsOpen((prev) => !prev)}>열기</button>
+      <button className='fixed top-0 left-0' onClick={() => setIsOpen((prev) => !prev)}>열기</button>
 
       {isOpen && (
         <div className="fixed left-0 top-0 bg-violet-50 w-64 font-melody">
