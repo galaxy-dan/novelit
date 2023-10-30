@@ -1,8 +1,8 @@
 package com.galaxy.novelit.workspace.controller;
 
-import com.galaxy.novelit.workspace.domain.Workspace;
 import com.galaxy.novelit.workspace.dto.request.WorkSpaceCreateReqDTO;
 import com.galaxy.novelit.workspace.dto.request.WorkSpaceModifiedReqDTO;
+import com.galaxy.novelit.workspace.dto.response.WorkSpaceInfoResDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceResDTO;
 import com.galaxy.novelit.workspace.service.WorkspaceService;
 import java.util.UUID;
@@ -55,7 +55,7 @@ public class WorkspaceController {
     }
 
     @GetMapping
-    public void getWorkspaceInfo() {
-
+    public ResponseEntity<WorkSpaceInfoResDTO> getWorkspaceInfo(@RequestParam String uuid) {
+        return ResponseEntity.ok(workspaceService.getWorkspaceInfo(uuid));
     }
 }

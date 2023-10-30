@@ -1,5 +1,6 @@
 package com.galaxy.novelit.workspace.service;
 
+import com.galaxy.novelit.workspace.dto.response.WorkSpaceInfoResDTO;
 import java.util.List;
 
 public interface WorkspaceService {
@@ -8,5 +9,7 @@ public interface WorkspaceService {
 
     void deleteWorkspace(String workSpaceUUID);
 
+    WorkSpaceInfoResDTO getWorkspaceInfo(String workSpaceUUID);
     List<?> getWorkspaces(String testUUID);
+
 }
