@@ -5,7 +5,9 @@ import localFont from 'next/font/local';
 import { Nanum_Myeongjo } from 'next/font/google';
 import RecoilProvider from '@/context/RecoilProvider';
 import SideMenu from '@/components/SideMenu';
-import { Hi_Melody } from "next/font/google"
+import { Hi_Melody } from 'next/font/google';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // const nanumFont = Nanum_Myeongjo({
 //   subsets: ['latin'],
@@ -31,6 +33,7 @@ export default function RootLayout({
       <body className="w-full">
         <QueryProvider>
           <RecoilProvider>
+            <ToastContainer pauseOnFocusLoss={false} />
             <SideMenu />
             <main>{children}</main>
           </RecoilProvider>
