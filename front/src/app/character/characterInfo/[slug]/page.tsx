@@ -7,9 +7,7 @@ import { HiPlus } from 'react-icons/hi';
 import Image from 'next/image';
 import { getS3URL, uploadImage } from '@/service/character/image';
 import {
-  characterType,
-  informationType,
-  relationType,
+  characterType
 } from '@/model/charactor';
 
 type Props = {
@@ -79,7 +77,6 @@ export default function page({ params }: Props) {
             <input
               className="text-4xl font-extrabold max-w-[30rem] truncate"
               style={{ width }}
-              autoFocus
               type="text"
               onChange={(e) => {
                 setCharacter((prev) => ({ ...prev, name: e.target.value }));
