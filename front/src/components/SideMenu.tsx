@@ -11,6 +11,17 @@ import { FiChevronsLeft } from 'react-icons/fi';
 import { AiFillFolderAdd, AiFillFileAdd } from 'react-icons/ai';
 import { MdEdit } from 'react-icons/md';
 import { RxCross2 } from 'react-icons/rx';
+import {
+  UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { PostDirectory } from '@/model/novel';
+import { postDirectory } from '@/service/api/novel';
+import { getWorkspace } from '@/service/api/workspace';
+import { Directory, Novel } from '@/model/workspace';
+import { useParams, useSearchParams } from 'next/navigation';
 
 const temp = {
   name: 'root',
@@ -38,8 +49,8 @@ const temp = {
 };
 
 const temp2 = [
-  { id: '1', name: '역사' },
-  { id: '2', name: '에세이' },
+  { id: '1', name: '역사', children: null },
+  { id: '2', name: '에세이', children: [] },
   {
     id: '3',
     name: '액션',
@@ -67,28 +78,26 @@ const temp2 = [
 
 export default function SideMenu() {
   const [data, setData] = useState<any>(temp);
-  const [cursor, setCursor] = useState<any>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const treeRef = useRef<any>(null);
   const [term, setTerm] = useState<string>('');
 
-  //   const onToggle = (node: any, toggled: any) => {
-  //     if (cursor) {
-  //       cursor.active = false;
-  //     }
-  //     node.active = true;
+  const searchParams = useParams();
 
-  //     if (node.children) {
-  //       node.toggled = toggled;
-  //     }
-
-  //     setCursor(node);
-  //     setData(Object.assign({}, data));
-  //   };
+  const { data: workspace }: UseQueryResult<Novel> = useQuery({
+    queryKey: ['workspace'],
+    queryFn: () => getWorkspace({ workspaceUUID: searchParams.slug }),
+    enabled: !!searchParams.slug,
+  });
 
   return (
     <>
-      <button className='fixed top-0 left-0' onClick={() => setIsOpen((prev) => !prev)}>열기</button>
+      <button
+        className="fixed top-0 left-0"
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        열기
+      </button>
 
       {isOpen && (
         <div className="fixed left-0 top-0 bg-violet-50 w-64 font-melody">
@@ -138,25 +147,26 @@ export default function SideMenu() {
                   value={term}
                   onChange={(e) => setTerm(e.target.value)}
                 />
-                <Tree
-                  ref={treeRef}
-                  initialData={temp2}
-                  openByDefault={false}
-                  width={200}
-                  height={1000}
-                  indent={24}
-                  rowHeight={36}
-                  paddingTop={30}
-                  paddingBottom={10}
-                  padding={25 /* sets both */}
-                  searchTerm={term}
-                  searchMatch={(node, term) =>
-                    node.data.name.toLowerCase().includes(term.toLowerCase())
-                  }
-                >
-                  {Node}
-                </Tree>
-                {/* <Treebeard data={data} onToggle={onToggle} /> */}
+                {workspace?.directories && (
+                  <Tree
+                    ref={treeRef}
+                    initialData={workspace.directories}
+                    openByDefault={false}
+                    width={200}
+                    height={1000}
+                    indent={24}
+                    rowHeight={36}
+                    paddingTop={30}
+                    paddingBottom={10}
+                    padding={25 /* sets both */}
+                    searchTerm={term}
+                    searchMatch={(node, term) =>
+                      node.data.name.toLowerCase().includes(term.toLowerCase())
+                    }
+                  >
+                    {Node}
+                  </Tree>
+                )}
               </div>
             </div>
           </div>
@@ -167,7 +177,16 @@ export default function SideMenu() {
 }
 
 function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
-  /* This node instance can do many things. See the API reference. */
+  const searchParams = useParams();
+  const queryClient = useQueryClient();
+  const mutate = useMutation({
+    mutationFn: postDirectory,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['workspace']);
+      console.log('성공?');
+    },
+  });
+
   return (
     <>
       <div
@@ -186,7 +205,21 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
               onBlur={() => node.reset()}
               onKeyDown={(e) => {
                 if (e.key === 'Escape') node.reset();
-                if (e.key === 'Enter') node.submit(e.currentTarget.value);
+                if (e.key === 'Enter') {
+                  console.log(
+                    node.id
+                  );
+                  mutate.mutate({
+                    name: e.currentTarget.value,
+                    workspaceUUID: searchParams.slug,
+                    parentUUID:
+                      node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
+                        ? null
+                        : node.parent?.id,
+                    directory: !node.isLeaf,
+                  });
+                  node.submit(e.currentTarget.value);
+                }
               }}
               autoFocus
             />
