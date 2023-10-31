@@ -1,6 +1,6 @@
 'use client';
 
-import { Reply } from '@/model/editor/editor';
+import { Reply } from '@/model/editor';
 import { fontFamily, fontSize } from '@/service/editor/editor';
 import { ChangeEvent, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -122,7 +122,7 @@ export default function Editor() {
 
         <div className="flex flex-col w-[200px] justify-start items-center gap-6">
           <button
-            className="p-4 bg-green-50 rounded-lg"
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={() => {
               setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
             }}
@@ -130,7 +130,7 @@ export default function Editor() {
             <BiSolidPencil size={20} />
           </button>
           <button
-            className="p-4 bg-green-50 rounded-lg"
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={() => {
               setFontIndex((prev) => (prev + 1) % fontSize.length);
             }}
@@ -138,20 +138,20 @@ export default function Editor() {
             <PiTextTLight size={20} />
           </button>
           <button
-            className="p-4 bg-green-50 rounded-lg"
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={(e) => {
               clickExecCommand(e, 'bold');
             }}
           >
             <BiBold size={20} />
           </button>
-          <button className="p-4 bg-green-50 rounded-lg" onClick={addReply}>
+          <button className="p-4 bg-green-50 bg-opacity-40 rounded-lg" onClick={addReply}>
             <FaCheck size={20} />
           </button>
-          <button className="p-4 bg-green-50 rounded-lg" onClick={addReply2}>
+          <button className="p-4 bg-green-50 bg-opacity-40 rounded-lg" onClick={addReply2}>
             <BiSolidTrashAlt size={20} />
           </button>
-          <button className="p-4 bg-green-50 rounded-lg" onClick={shareDoc}>
+          <button className="p-4 bg-green-50 bg-opacity-40 rounded-lg" onClick={shareDoc}>
             <FaShareSquare size={20} />
           </button>
         </div>
