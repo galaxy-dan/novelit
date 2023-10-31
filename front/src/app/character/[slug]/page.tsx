@@ -1,7 +1,7 @@
 'use client';
 import CharacterCard from '@/components/CharacterCard';
 import SubGroupCard from '@/components/SubGroupCard';
-import { groupType } from '@/model/editor/charactor';
+import { groupType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
