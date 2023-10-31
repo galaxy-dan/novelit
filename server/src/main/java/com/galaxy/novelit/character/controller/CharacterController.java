@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,11 +36,9 @@ public class CharacterController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCharacter() {
+    public ResponseEntity<Object> createCharacter(@RequestBody CharacterDtoReq dto) {
         try {
-
-            characterService.createCharacter();
-
+            characterService.createCharacter(dto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -47,10 +46,10 @@ public class CharacterController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateCharacter(@RequestParam String characterUuid) {
+    public ResponseEntity<Object> updateCharacter(@RequestBody CharacterDtoReq dto) {
         try {
-            CharacterDtoRes characterDtoRes = characterService.getCharacter(characterUuid);
-//            characterService.updateCharacter(characterDtoRes);
+//            CharacterDtoRes characterDtoRes = characterService.getCharacter(dto.getCharacterUuid());
+            characterService.updateCharacter(dto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
