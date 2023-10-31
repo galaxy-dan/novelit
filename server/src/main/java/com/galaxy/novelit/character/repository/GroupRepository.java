@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GroupRepository extends MongoRepository<GroupEntity, String> {
-//    GroupEntity findByGroupUuidAndUserUuid(String groupUuid, String userUuid);
     GroupEntity findByGroupUuid(String groupUuid);
 }

@@ -43,9 +43,9 @@ public class GroupController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateGroupName(@RequestParam String groupName) {
+    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUuid, String newName) {
         try {
-            groupService.updateGroupName(groupName);
+            groupService.updateGroupName(groupUuid, newName);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
