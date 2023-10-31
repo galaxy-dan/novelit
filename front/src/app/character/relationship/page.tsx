@@ -7,6 +7,8 @@ import { Core, NodeSingular, EdgeSingular } from 'cytoscape';
 import Image from 'next/image';
 
 export default function RelationshipDiagram() {
+  var prevNode = { id: '', count: 0 };
+
   const [showGraph, setShowGraph] = useState(false);
   const [graphData, setGraphData] = useState({
     nodes: [
@@ -302,35 +304,12 @@ export default function RelationshipDiagram() {
           ),
         );
       unvisitedElements.style({ opacity: 0.2 });
-    } else if (type === 'character') {
-      const connectedNodes = selectedNode.edgesTo('*').connectedNodes();
-
-      if (connectedNodes.length === 0) {
-        cy.elements().not(selectedNode).style({ opacity: 0.2 });
-      } else {
-        const visitedNodes = new Set<string>(
-          connectedNodes.map((node) => node.id()),
-        );
-        const visitedEdges = new Set<string>(
-          selectedNode.edgesTo(connectedNodes).map((edge) => edge.id()),
-        );
-        const unvisitedElements = cy
-          .elements()
-          .difference(
-            cy.$(
-              [
-                ...Array.from(visitedNodes).map((id) => `node[id = '${id}']`),
-                ...Array.from(visitedEdges).map((id) => `edge[id = '${id}']`),
-              ].join(', '),
-            ),
-          );
-        unvisitedElements.style({ opacity: 0.2 });
-      }
     }
   };
 
   const handleNodeUnselect = (cy: Core) => {
     cy.elements().style({ opacity: 1 });
+    prevNode = { id: '', count: 0 };
   };
 
   const handleEdgeSelect = (event: any, cy: Core) => {
@@ -353,6 +332,7 @@ export default function RelationshipDiagram() {
   };
 
   const setNodesPosition = (cy: Core) => {
+    
     cy.nodes().map((ele, i) => {
       if (originalPositions[i] !== null) {
         ele.position({
@@ -364,6 +344,94 @@ export default function RelationshipDiagram() {
         // 이건 굳이 새로 받을 필요없음
       }
     });
+  };
+
+  const handleDragFree = (event: any, cy: Core) => {
+    //여기서 position 변경해서 저장하기
+    //이거도 저장만 하고 받을 필요는 없음
+    console.log(prevNode);
+    
+    prevNode = { id: event.target.data().id, count: 0 };
+    cy.$(':selected').unselect();
+    cy.elements().style({ opacity: 1 });
+    
+  };
+
+  const handleNodeClicked = (event: any, cy: Core) => {
+    const selectedNode: NodeSingular = event.target;
+    const type = selectedNode.data().type;
+
+    if (type === 'character') {
+      cy.elements().style({ opacity: 1 });
+
+      var selectedNodes = cy.$(':selected');
+      var nodesToUnselect = selectedNodes.difference(event.target);
+      nodesToUnselect.unselect();
+      event.target.select();
+
+      // 1: 모두 2: 받은 것 3: 주는 것
+      if (prevNode.id === selectedNode.data().id) {
+        prevNode = {
+          id: selectedNode.data().id,
+          count: (prevNode.count % 3) + 1,
+        };
+      } else {
+        prevNode = { id: selectedNode.data().id, count: 1 };
+      }
+
+      var connectedNodes: cytoscape.NodeCollection = cy.collection();
+
+      if (prevNode.count === 1) {
+        connectedNodes = selectedNode.edgesWith('*').connectedNodes();
+      } else if (prevNode.count === 2) {
+        connectedNodes = selectedNode.edgesTo('*').connectedNodes();
+      } else if (prevNode.count === 3) {
+        connectedNodes = selectedNode
+          .incomers()
+          .sources()
+          .filter((em) => em.data().type == 'character');
+        connectedNodes.merge(selectedNode);
+      }
+
+      // 연결된 노드가 없으면
+      if (connectedNodes.length === 0) {
+        cy.elements().not(selectedNode).style({ opacity: 0.2 });
+      }
+      // 연결된 노드가 있으면
+      else {
+        const visitedNodes = new Set<string>(
+          connectedNodes.map((node) => node.id()),
+        );
+
+        var visitedEdges = new Set<string>();
+
+        if (prevNode.count === 1) {
+          visitedEdges = new Set<string>(
+            selectedNode.edgesWith(connectedNodes).map((edge) => edge.id()),
+          );
+        } else if (prevNode.count === 2) {
+          visitedEdges = new Set<string>(
+            selectedNode.edgesTo(connectedNodes).map((edge) => edge.id()),
+          );
+        } else if (prevNode.count === 3) {
+          visitedEdges = new Set<string>(
+            connectedNodes.edgesTo(selectedNode).map((edge) => edge.id()),
+          );
+        }
+
+        const unvisitedElements = cy
+          .elements()
+          .difference(
+            cy.$(
+              [
+                ...Array.from(visitedNodes).map((id) => `node[id = '${id}']`),
+                ...Array.from(visitedEdges).map((id) => `edge[id = '${id}']`),
+              ].join(', '),
+            ),
+          );
+        unvisitedElements.style({ opacity: 0.2 });
+      }
+    }
   };
 
   return (
@@ -380,7 +448,9 @@ export default function RelationshipDiagram() {
       </div>
 
       <div>
-        <div className={`rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]`}>
+        <div
+          className={`rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]`}
+        >
           <div className={`h-full w-full relative ${showGraph && 'hidden'}`}>
             <Image
               src="/images/loadingImg.gif"
@@ -399,10 +469,11 @@ export default function RelationshipDiagram() {
             minZoom={0.3}
             autounselectify={false}
             boxSelectionEnabled={true}
+            wheelSensitivity={0.1}
             layout={layout}
             stylesheet={styleSheet}
             className={`${!showGraph && 'invisible'}  w-full h-[80vh]`}
-            cy={(cy) => {
+            cy={(cy: Core) => {
               cy.on('layoutstop', () => {
                 setNodesPosition(cy);
                 setShowGraph(true);
@@ -412,19 +483,10 @@ export default function RelationshipDiagram() {
               cy.on('unselect', 'node', () => handleNodeUnselect(cy));
               cy.on('select', 'edge', (e) => handleEdgeSelect(e, cy));
               cy.on('unselect', 'edge', () => handleEdgeUnselect(cy));
+              cy.on('', '', () => {});
+              cy.on('free', 'node', (e) => handleNodeClicked(e, cy));
 
-              cy.on('dragfree', 'node', (e) => {
-                //여기서 position 변경해서 저장하기
-                // 이거도 저장만 하고 받을 필요는 없음
-                console.log(
-                  e.target.id() +
-                    ': { ' +
-                    e.target.position('x') +
-                    ',' +
-                    e.target.position('y') +
-                    ' }',
-                );
-              });
+              cy.on('dragfreeon', 'node', (e) => handleDragFree(e, cy));
             }}
           />
         </div>
