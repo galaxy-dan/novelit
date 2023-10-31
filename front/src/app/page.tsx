@@ -11,7 +11,7 @@ export default function Home() {
         <div className="flex flex-col font-extrabold text-5xl gap-6 items-center">
           <Image alt="logo" src={Logo} width={500} />
         </div>
-        <Link href={'/editor'}>
+        <Link href={'/main'}>
           <Image alt="kakao" src={KakaoButton} width={400} />
         </Link>
       </div>

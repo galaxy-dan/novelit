@@ -56,8 +56,8 @@ export const put = async (url: string, body?: any) => {
   return res.data;
 };
 
-export const del = async (url: string) => {
-  const res = await axios.delete<Response>(getUrl(url), getConfig());
+export const del = async (url: string, query = {}) => {
+  const res = await axios.delete<Response>(getUrl(url), getConfig(query));
   return res.data;
 };
 
