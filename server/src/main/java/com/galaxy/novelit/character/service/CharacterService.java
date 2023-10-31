@@ -6,6 +6,6 @@ import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 public interface CharacterService {
     CharacterDtoRes getCharacter(String characterUuid);
     void createCharacter(CharacterDtoReq dto);
-    void updateCharacter(CharacterDtoReq characterDtoReq);
+    void updateCharacter(CharacterDtoReq dto);
     void deleteCharacter(String characterUuid);
 }
