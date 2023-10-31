@@ -12,12 +12,12 @@ import {
   relationType,
 } from '@/model/editor/charactor';
 
-type Prop = {
+type Props = {
   params: {
     slug: string;
   };
 };
-export default function page({ params }: Prop) {
+export default function page({ params }: Props) {
   const [character, setCharacter] = useState<characterType>({
     id: '',
     name: '배트맨',
@@ -39,15 +39,17 @@ export default function page({ params }: Prop) {
       { id: '', name: '', content: '' },
     ],
   });
-  const [name, setName] = useState<string>('배트맨');
-  const [image, setImage] = useState<string>(
-    'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-  );
-  const [information, setInformation] = useState<informationType[]>(
-    character.information,
-  );
-  const [relation, setRelation] = useState<relationType[]>(character.relation);
-  const [summary, setSummary] = useState<string>('');
+  
+  // const [name, setName] = useState<string>('배트맨');
+  // const [image, setImage] = useState<string>(
+  //   'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+  // );
+  // const [information, setInformation] = useState<informationType[]>(
+  //   character.information,
+  // );
+  // const [relation, setRelation] = useState<relationType[]>(character.relation);
+  // const [summary, setSummary] = useState<string>('');
+
   const imgRef = useRef<HTMLInputElement>(null);
   const [width, setWidth] = useState(100);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -156,7 +158,7 @@ export default function page({ params }: Prop) {
         <p className="text-xl font-extrabold">기본 정보</p>
         <table className="text-xl border w-full border-gray-300 rounded-xl overflow-hidden border-separate border-spacing-0">
           <tbody>
-            {information.map((info, i) => (
+            {character.information.map((info, i) => (
               <tr className="h-16" key={i}>
                 <td className="border border-gray-300 w-1/5 px-2 py-1 text-center">
                   <input
@@ -165,7 +167,7 @@ export default function page({ params }: Prop) {
                     //value={information[i].title}
                     value={character.information[i].title}
                     onChange={(e) => {
-                      var newItem = [...information];
+                      var newItem = [...character.information];
                       newItem[i].title = e.target.value;
                       //setInformation(newItem);
                       setCharacter((prev) => ({
@@ -183,7 +185,7 @@ export default function page({ params }: Prop) {
                       //value={information[i].content}
                       value={character.information[i].content}
                       onChange={(e) => {
-                        var newItem = [...information];
+                        var newItem = [...character.information];
                         newItem[i].content = e.target.value;
                         //setInformation(newItem);
                         setCharacter((prev) => ({
@@ -212,7 +214,7 @@ export default function page({ params }: Prop) {
         <p className="text-xl font-extrabold">관계</p>
         <table className="text-xl border w-full border-gray-300 rounded-xl overflow-hidden border-separate border-spacing-0">
           <tbody>
-            {relation.map((info, i) => (
+            {character.relation.map((info, i) => (
               <tr className="h-16" key={i}>
                 <td className="border border-gray-300 w-1/5 px-2 py-1 text-center">
                   <input
@@ -221,7 +223,7 @@ export default function page({ params }: Prop) {
                     //value={info.name}
                     value={character.relation[i].name}
                     onChange={(e) => {
-                      var newItem = [...relation];
+                      var newItem = [...character.relation];
                       newItem[i].name = e.target.value;
                       //setRelation(newItem);
                       setCharacter((prev) => ({ ...prev, ralation: newItem }));
@@ -236,7 +238,7 @@ export default function page({ params }: Prop) {
                       //value={relation[i].content}
                       value={character.relation[i].content}
                       onChange={(e) => {
-                        var newItem = [...relation];
+                        var newItem = [...character.relation];
                         newItem[i].content = e.target.value;
                         //setRelation(newItem);
                         setCharacter((prev) => ({

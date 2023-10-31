@@ -2,21 +2,43 @@
 import CharacterCard from '@/components/CharacterCard';
 import SubGroupCard from '@/components/SubGroupCard';
 import { groupType } from '@/model/editor/charactor';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
 
-export default function page() {
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+
+export default function page({ params }: Props) {
   const [groups, setGroups] = useState<groupType[]>([
     {
-      id: '',
+      id: 'group1',
       name: '그룹 1',
       subGroups: [
-        { id: '', name: '서브그룹 1' },
-        { id: '', name: '서브그룹 2' },
+        { id: 'subgroup1', name: '서브그룹 1' },
+        { id: 'subgroup2', name: '서브그룹 2' },
       ],
       characters: [
         {
-          id: '',
+          id: 'character1',
+          name: '배트맨',
+          image:
+            'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+          summary: '',
+          information: [
+            {
+              id: '',
+              title: '나이',
+              content: '24',
+            },
+          ],
+          relation: [],
+        },
+        {
+          id: 'character2',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
@@ -41,7 +63,7 @@ export default function page() {
           relation: [],
         },
         {
-          id: '',
+          id: 'character3',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
@@ -66,32 +88,7 @@ export default function page() {
           relation: [],
         },
         {
-          id: '',
-          name: '배트맨',
-          image:
-            'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-          summary: '',
-          information: [
-            {
-              id: '',
-              title: '',
-              content: '',
-            },
-            {
-              id: '',
-              title: '',
-              content: '',
-            },
-            {
-              id: '',
-              title: '',
-              content: '',
-            },
-          ],
-          relation: [],
-        },
-        {
-          id: '',
+          id: 'character4',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
@@ -118,11 +115,11 @@ export default function page() {
       ],
     },
     {
-      id: '',
+      id: 'group2',
       name: '그룹 2',
       characters: [
         {
-          id: '',
+          id: 'character5',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
@@ -147,7 +144,7 @@ export default function page() {
           relation: [],
         },
         {
-          id: '',
+          id: 'character6',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
@@ -174,6 +171,8 @@ export default function page() {
       ],
     },
   ]);
+  
+  const router = useRouter();
 
   return (
     <div className="ml-80 mr-60 my-20 select-none">
@@ -201,19 +200,21 @@ export default function page() {
             <div>
               <p
                 className="text-2xl font-extrabold mt-14 cursor-pointer"
-                onClick={() => {}}
+                onClick={() => {
+                  router.push(`/character/${group.id}`);
+                }}
               >
                 {group.name}
               </p>
 
               <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
                 {group.subGroups?.map((subGroup, i) => (
-                  <SubGroupCard />
+                  <SubGroupCard subGroup={subGroup} />
                 ))}
               </div>
               <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
                 {group.characters?.map((character, i) => (
-                  <CharacterCard />
+                  <CharacterCard character={character} />
                 ))}
               </div>
             </div>
