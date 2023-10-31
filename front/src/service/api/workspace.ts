@@ -1,3 +1,5 @@
+import { Novels } from './../../model/workspace';
+import { Directory } from '@/model/workspace';
 import { del, get, patch, post } from './http';
 
 export const getUser = async () => {
@@ -23,9 +25,30 @@ export const deleteWorkspace = async (workspaceUUID: string) => {
   return data;
 };
 
+const transformData = (data: any) => {
+  return data.map((el: any) => {
+    const newItem: Novels = {
+      id: el.uuid,
+      name: el.name,
+    };
+
+    if (el.children && el.children.length >= 0) {
+      newItem.children = transformData(el.children);
+    }
+
+    return newItem;
+  });
+};
+
 export const getWorkspace = async (req: {
   workspaceUUID: string | string[];
 }) => {
-  const data = await get('/workspace', req);
-  return data;
+  const data: any = await get('/workspace', req);
+
+  const newData = {
+    title: data.title,
+    directories: transformData(data.directories),
+  };
+  
+  return newData;
 };
