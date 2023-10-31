@@ -1,6 +1,7 @@
 package com.galaxy.novelit.plot.entity;
 
 import com.galaxy.novelit.plot.dto.request.PlotCreateRequestDto;
+import com.galaxy.novelit.plot.dto.request.PlotSaveRequestDto;
 import com.galaxy.novelit.plot.dto.response.PlotDetailsResponseDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -17,12 +18,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.util.ObjectUtils;
 
 @Entity(name = "plot")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
+@DynamicInsert
+@DynamicUpdate
 public class PlotEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,6 +89,33 @@ public class PlotEntity{
             .build();
     }
 
+    public void updatePlotTitle(String plotTitle) {
+        this.plotTitle = plotTitle;
+    }
+
+    public void updateStory(String story) {
+        this.story = story;
+    }
+
+    public void updateBeginning(String beginning) {
+        this.beginning = beginning;
+    }
+
+    public void updateRising(String rising) {
+        this.rising = rising;
+    }
+
+    public void updateCrisis(String crisis) {
+        this.crisis = crisis;
+    }
+
+    public void updateClimax(String climax) {
+        this.climax = climax;
+    }
+
+    public void updateEnding(String ending) {
+        this.ending = ending;
+    }
 
     public void updatePlot(String plotTitle, String story, String beginning, String rising, String crisis,
         String climax, String ending) {
@@ -93,6 +126,14 @@ public class PlotEntity{
         this.crisis = crisis;
         this.climax = climax;
         this.ending = ending;
+    }
+
+
+    public void plotInfo(PlotSaveRequestDto saveDto) {
+        // null 값 체크
+        if (ObjectUtils.isEmpty(saveDto.getPlotTitle())) {
+
+        }
     }
 
 }
