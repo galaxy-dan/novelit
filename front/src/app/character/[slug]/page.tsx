@@ -1,157 +1,175 @@
 'use client';
 import CharacterCard from '@/components/CharacterCard';
 import SubGroupCard from '@/components/SubGroupCard';
+import { groupType } from '@/model/editor/charactor';
 import React, { useState } from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
-
-type groupType = {
-  name: string;
-  subGroups?: string[];
-  characters?: characterType[];
-};
-
-type characterType = {
-  name: string;
-  image: string;
-  summary: string;
-  information: informationType[];
-};
-
-type informationType = {
-  title: string;
-  content: string;
-};
 
 export default function page() {
   const [groups, setGroups] = useState<groupType[]>([
     {
+      id: '',
       name: '그룹 1',
-      subGroups: ['서브그룹 1', '서브그룹 2'],
+      subGroups: [
+        { id: '', name: '서브그룹 1' },
+        { id: '', name: '서브그룹 2' },
+      ],
       characters: [
         {
+          id: '',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
           summary: '',
           information: [
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
           ],
+          relation: [],
         },
         {
+          id: '',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
           summary: '',
           information: [
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
           ],
+          relation: [],
         },
         {
+          id: '',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
           summary: '',
           information: [
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
           ],
+          relation: [],
         },
         {
+          id: '',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
           summary: '',
           information: [
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
           ],
+          relation: [],
         },
       ],
     },
     {
+      id: '',
       name: '그룹 2',
       characters: [
         {
+          id: '',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
           summary: '',
           information: [
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
           ],
+          relation: [],
         },
         {
+          id: '',
           name: '배트맨',
           image:
             'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
           summary: '',
           information: [
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
             {
+              id: '',
               title: '',
               content: '',
             },
           ],
+          relation: [],
         },
       ],
     },

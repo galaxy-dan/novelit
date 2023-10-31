@@ -6,24 +6,12 @@ import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/ai';
 import { HiPlus } from 'react-icons/hi';
 import Image from 'next/image';
 import { getS3URL, uploadImage } from '@/service/character/image';
-import { Shippori_Antique } from 'next/font/google';
+import {
+  characterType,
+  informationType,
+  relationType,
+} from '@/model/editor/charactor';
 
-type informationType = {
-  title: string;
-  content: string;
-};
-type relationType = {
-  name: string;
-  content: string;
-};
-
-type characterType = {
-  name: string;
-  image: string;
-  summary: string;
-  information: informationType[];
-  relation: relationType[];
-};
 type Prop = {
   params: {
     slug: string;
@@ -31,37 +19,24 @@ type Prop = {
 };
 export default function page({ params }: Prop) {
   const [character, setCharacter] = useState<characterType>({
+    id: '',
     name: '배트맨',
     image:
       'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
     summary: '',
     information: [
       {
+        id: '',
         title: '',
         content: '',
       },
-      {
-        title: '',
-        content: '',
-      },
-      {
-        title: '',
-        content: '',
-      },
+      { id: '', title: '', content: '' },
+      { id: '', title: '', content: '' },
     ],
     relation: [
-      {
-        name: '',
-        content: '',
-      },
-      {
-        name: '',
-        content: '',
-      },
-      {
-        name: '',
-        content: '',
-      },
+      { id: '', name: '', content: '' },
+      { id: '', name: '', content: '' },
+      { id: '', name: '', content: '' },
     ],
   });
   const [name, setName] = useState<string>('배트맨');
@@ -80,7 +55,7 @@ export default function page({ params }: Prop) {
   useEffect(() => {
     if (nameRef !== null && nameRef.current !== null) {
       if (nameRef.current.offsetWidth > 100) {
-        setWidth(nameRef.current.offsetWidth+5);
+        setWidth(nameRef.current.offsetWidth + 5);
       } else {
         setWidth(100);
       }
@@ -93,7 +68,10 @@ export default function page({ params }: Prop) {
       <div className="flex items-end justify-between">
         <div className="flex items-end">
           <div>
-            <span ref={nameRef} className='invisible opacity-0 absolute text-4xl font-extrabold'>
+            <span
+              ref={nameRef}
+              className="invisible opacity-0 absolute text-4xl font-extrabold"
+            >
               {character.name}
             </span>
             <input
