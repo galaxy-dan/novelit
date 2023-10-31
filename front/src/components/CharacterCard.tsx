@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { characterType } from '@/model/editor/charactor';
+import { characterType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 type Props = {
   character: characterType;
