@@ -10,7 +10,7 @@ import {
   characterType,
   informationType,
   relationType,
-} from '@/model/editor/charactor';
+} from '@/model/charactor';
 
 type Props = {
   params: {
