@@ -22,12 +22,12 @@ public class FileController {
 
 	@GetMapping
 	public ResponseEntity<FileResDTO> getFile(@RequestParam String uuid){
-		return ResponseEntity.ok(directoryService.getFile(uuid, "123"));
+		return ResponseEntity.ok(directoryService.getFile(uuid, "f72a8efc-99dc-4afd-a658-6f42073fb7a3"));
 	}
 
 	@PatchMapping
 	public ResponseEntity<Void> workFile(@RequestBody FileWorkReqDTO dto){
-		directoryService.workFile(dto,"123");
+		directoryService.workFile(dto,"f72a8efc-99dc-4afd-a658-6f42073fb7a3");
 		return ResponseEntity.ok().build();
 	}
 }
