@@ -1,7 +1,7 @@
 export type PostDirectory = {
   name: string;
   workspaceUUID: string | string[];
-  parentUUID: string | null | undefined;
+  parentUUID?: string | null | undefined;
   directory: boolean;
   uuid: string;
 };
