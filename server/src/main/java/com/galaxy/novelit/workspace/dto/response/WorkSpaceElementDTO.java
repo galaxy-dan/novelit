@@ -13,8 +13,6 @@ public class WorkSpaceElementDTO {
 	private String uuid;
 	private String name;
 	private boolean directory;
-	private String prev;
-	private String next;
 	private List<WorkSpaceElementDTO> children;
 
 }
