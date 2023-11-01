@@ -2,6 +2,7 @@ package com.galaxy.novelit.directory.repository;
 
 import java.util.List;
 
+import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,5 +11,7 @@ import com.galaxy.novelit.directory.domain.Directory;
 @Repository
 public interface DirectoryRepository extends MongoRepository<Directory, String> {
 	Directory findByUuidAndDeleted(String uuid, boolean deleted);
-	List<Directory> findByParentUUIDAndDeletedAndWorkspaceUUID(String parentUUID, boolean deleted, String workspaceUUID);
+	List<Directory> findByWorkspaceUUIDAndDeleted(String workspaceUUID, boolean deleted);
+
+	Optional<Directory> findDirectoryByUuid(String directoryUUID);
 }

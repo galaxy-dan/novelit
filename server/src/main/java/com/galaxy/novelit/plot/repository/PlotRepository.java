@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PlotRepository extends JpaRepository <PlotEntity, Long> {
+public interface PlotRepository extends JpaRepository <PlotEntity, Long> , PlotRepositoryCustom{
 
     Optional<List<PlotEntity>> findAllByWorkspaceUuid(String workspaceUuid);
+    Optional<List<PlotEntity>> findByWorkspaceUuidAndPlotTitleContaining(String workspaceUuid, String keyword);
     Optional<PlotEntity> findPlotEntityByPlotUuid(String plotUuid);
     Optional<PlotEntity> deletePlotEntitiesByPlotUuid(String plotUuid);
 }

@@ -2,6 +2,7 @@ package com.galaxy.novelit.workspace.controller;
 
 import com.galaxy.novelit.workspace.dto.request.WorkSpaceCreateReqDTO;
 import com.galaxy.novelit.workspace.dto.request.WorkSpaceModifiedReqDTO;
+import com.galaxy.novelit.workspace.dto.request.WorkSpaceTreeChangeReqDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceInfoResDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceResDTO;
 import com.galaxy.novelit.workspace.service.WorkspaceService;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,5 +57,11 @@ public class WorkspaceController {
     @GetMapping
     public ResponseEntity<WorkSpaceInfoResDTO> getWorkspaceInfo(@RequestParam String workspaceUUID) {
         return ResponseEntity.ok(workspaceService.getWorkspaceInfo(workspaceUUID));
+    }
+
+    @PatchMapping("/tree")
+    public ResponseEntity<Void> changeTree(@RequestBody WorkSpaceTreeChangeReqDTO dto){
+        workspaceService.changeTree(dto, "f72a8efc-99dc-4afd-a658-6f42073fb7a3");
+        return ResponseEntity.ok().build();
     }
 }

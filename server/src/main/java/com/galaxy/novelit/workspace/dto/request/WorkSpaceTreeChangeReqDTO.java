@@ -1,4 +1,4 @@
-package com.galaxy.novelit.directory.dto.request;
+package com.galaxy.novelit.workspace.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class DirectoryCreateReqDTO {
-	private String name;
+public class WorkSpaceTreeChangeReqDTO {
 	private String workspaceUUID;
+	private String directoryUUID;
 	private String parentUUID;
-	private boolean directory;
-	private String uuid;
+	private String nextUUID;
+
 }

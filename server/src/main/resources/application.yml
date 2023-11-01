@@ -62,14 +62,13 @@ spring:
       max-lifetime: 60000
   data:
     mongodb:
-#      host: mongo
-#      port: 27017
-#      authentication-database: admin
-#      username: ${MONGO_DATABASE_USERNAME}
-#      password: ${DATABASE_PASSWORD}
-##      uri: ${MONGODB_URL}
-#      database: novelit
-        uri: mongodb://localhost:27017/novelit
+      host: mongo
+      port: 27017
+      authentication-database: admin
+      username: ${MONGO_DATABASE_USERNAME}
+      password: ${DATABASE_PASSWORD}
+      database: novelit
+      #  uri: mongodb://localhost:27017/novelit
 
 ---
 

@@ -7,9 +7,9 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 export default function NovelPage() {
-
   return (
     <div className="pl-48 font-melody">
+      <div className="font-extrabold text-4xl my-32">퇴근후에 만나요</div>
       <CardList />
     </div>
   );
