@@ -1,8 +1,14 @@
 package com.galaxy.novelit.workspace.service;
 
+import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
+import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
+import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
+import com.galaxy.novelit.directory.service.DirectoryService;
 import com.galaxy.novelit.workspace.domain.Workspace;
 import com.galaxy.novelit.workspace.dto.WorkSpaceDTO;
+import com.galaxy.novelit.workspace.dto.request.WorkSpaceTreeChangeReqDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceElementDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceInfoResDTO;
 import com.galaxy.novelit.workspace.mapper.WorkspaceMapper;
@@ -22,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkSpaceImpl implements WorkspaceService{
 
     private final WorkspaceMapper workspaceMapper;
-
+    private final DirectoryService directoryService;
     private final WorkspaceRepository workspaceRepository;
     private final EntityManager em;
     private final DirectoryRepository directoryRepository;
@@ -37,6 +43,15 @@ public class WorkSpaceImpl implements WorkspaceService{
             .build());
 
         workspaceRepository.save(workspace);
+
+        Directory root = Directory.builder()
+            .uuid(workSpaceUUID)
+            .directory(true)
+            .userUUID(user_uuid)
+            .deleted(false)
+            .children(new ArrayList<>())
+            .build();
+        directoryRepository.save(root);
     }
 
     @Override
@@ -66,6 +81,7 @@ public class WorkSpaceImpl implements WorkspaceService{
         if (workspace.isPresent()) {
             Workspace ws = workspace.get();
             workspaceRepository.delete(ws);
+            directoryService.deleteDirectory(workSpaceUUID, ws.getUserUUID());
         } else {
             throw new IllegalStateException("없는 작품 입니다.");
         }
@@ -73,18 +89,17 @@ public class WorkSpaceImpl implements WorkspaceService{
 
     @Override
     public WorkSpaceInfoResDTO getWorkspaceInfo(String workSpaceUUID) {
-        Optional<Workspace> workspace = workspaceRepository.findByWorkspaceUUID(workSpaceUUID);
-        if (workspace.isPresent()) {
-            Workspace ws = workspace.get();
-            List<WorkSpaceElementDTO> directories = directoryRepository.findByParentUUIDAndDeletedAndWorkspaceUUID(null,
-                    false, workSpaceUUID).stream()
-                .map(workspaceMapper::toElementDto)
-                .toList();
+        Workspace workspace = workspaceRepository.findByWorkspaceUUID(workSpaceUUID).orElseThrow(
+            NoSuchWorkspaceException::new);
 
-            return new WorkSpaceInfoResDTO(ws.getTitle(), directories);
-        } else {
-            throw new IllegalStateException("없는 작품 입니다.");
-        }
+        List<WorkSpaceElementDTO> directories = directoryRepository.findByUuidAndDeleted(workSpaceUUID,
+                false).getChildren().stream()
+            .filter(d->!d.isDeleted())
+            .map(workspaceMapper::toElementDto)
+            .toList();
+
+        return new WorkSpaceInfoResDTO(workspace.getTitle(), directories);
+
     }
     @Override
     public List<?> getWorkspaces(String userUUID) {
@@ -98,5 +113,83 @@ public class WorkSpaceImpl implements WorkspaceService{
         }
         return workspaceNames;
 
+    }
+
+    @Transactional
+    @Override
+    public void changeTree(WorkSpaceTreeChangeReqDTO dto, String userUUID) {
+        String workspaceUUID = dto.getWorkspaceUUID();
+        Workspace workspace = workspaceRepository.findByWorkspaceUUID(workspaceUUID).orElseThrow(()->new IllegalStateException("없는 작품 입니다."));
+        //권한 예외 처리
+        if(!workspace.getUserUUID().equals(userUUID)){
+            throw new AccessRefusedException();
+        }
+
+        String directoryUUID = dto.getDirectoryUUID();
+        Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
+
+        //새로운 부모 예외 처리
+        String parentUUID = dto.getParentUUID();
+        Directory parent = parentUUID == null ? directoryRepository.findByUuidAndDeleted(workspaceUUID, false) : directoryRepository.findByUuidAndDeleted(parentUUID, false);
+        if(parentUUID != null){
+            checkDirectoryException(parent, userUUID, workspaceUUID);
+        }else{
+            if(parent == null){
+                throw new NoSuchDirectoryException();
+            }
+        }
+
+
+        checkDirectoryException(directory, userUUID, workspaceUUID);
+
+        //이전 부모 예외 처리
+        String lastParentUUID = directory.getParentUUID();
+        Directory lastParent = lastParentUUID == null ? directoryRepository.findByUuidAndDeleted(workspaceUUID, false) : directoryRepository.findByUuidAndDeleted(lastParentUUID, false);
+        if(lastParentUUID != null){
+            checkDirectoryException(lastParent, userUUID, workspaceUUID);
+        }else{
+            if(lastParent == null){
+                throw new NoSuchDirectoryException();
+            }
+        }
+
+        //이전 부모 children에서 삭제
+        List<Directory> lastChildren = lastParent.getChildren();
+        lastChildren.remove(directory);
+        lastParent.updateChildren(lastChildren);
+        directoryRepository.save(lastParent);
+
+        //새로운 부모 children에 추가
+        String nextUUID = dto.getNextUUID();
+        List<Directory> children = parent.getChildren();
+        if(nextUUID == null){
+            children.add(directory);
+        }else{
+            int index = 0;
+            for (Directory d : children) {
+                if(d.getUuid().equals(nextUUID)){
+                    break;
+                }
+                index++;
+            }
+            children.add(index, directory);
+        }
+        parent.updateChildren(children);
+        directoryRepository.save(parent);
+
+        directory.updateParentUUID(parent.getUuid());
+        directoryRepository.save(directory);
+    }
+
+    private void checkDirectoryException(Directory directory, String userUUID, String workspaceUUID){
+        //404 예외 처리
+        if(directory == null){
+            throw new NoSuchDirectoryException();
+        }
+
+        //권한 예외 처리
+        if(!directory.getUserUUID().equals(userUUID) && !directory.getWorkspaceUUID().equals(workspaceUUID)){
+            throw new AccessRefusedException();
+        }
     }
 }

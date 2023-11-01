@@ -1,23 +1,38 @@
 package com.galaxy.novelit.character.entity;
 
+import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+@Document(collection = "character")
 @Getter
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
+@Builder
 public class CharacterEntity {
-    private Long characterId;
-    private UUID groupUuid;
-    private UUID characterUuid;
+    @Id
+    private String characterId;
+    @Field(name = "user_uuid")
+    private String userUuid;
+    @Field(name = "group_uuid")
+    private String groupUuid;
+    @Field(name = "character_uuid")
+    private String characterUuid;
+    @Field(name = "character_name")
     private String characterName;
+    @Field(name = "description")
     private String description;
-    private String information;
-    private String relationship;
+    @Field(name = "information")
+    private Map<String, String> information;
+    @Field(name = "relationship")
+    private Map<String, String> relationship;
+    @Field(name = "is_deleted")
     private boolean isDeleted;
 
 }

@@ -18,10 +18,15 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { PostDirectory } from '@/model/novel';
-import { postDirectory } from '@/service/api/novel';
+import {
+  deleteDirectory,
+  patchDirectory,
+  postDirectory,
+} from '@/service/api/novel';
 import { getWorkspace } from '@/service/api/workspace';
 import { Directory, Novel } from '@/model/workspace';
 import { useParams, useSearchParams } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 
 const temp = {
   name: 'root',
@@ -81,13 +86,18 @@ export default function SideMenu() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const treeRef = useRef<any>(null);
   const [term, setTerm] = useState<string>('');
+  const queryClient = useQueryClient();
 
   const searchParams = useParams();
 
+  const slug = Array.isArray(searchParams.slug)
+    ? searchParams.slug[0]
+    : searchParams.slug;
+
   const { data: workspace }: UseQueryResult<Novel> = useQuery({
     queryKey: ['workspace'],
-    queryFn: () => getWorkspace({ workspaceUUID: searchParams.slug }),
-    enabled: !!searchParams.slug,
+    queryFn: () => getWorkspace({ workspaceUUID: slug }),
+    enabled: !!slug,
   });
 
   return (
@@ -126,6 +136,7 @@ export default function SideMenu() {
                   <div>
                     <button
                       onClick={() => {
+                        // console.log(treeRef.current.root.id);
                         treeRef.current.createLeaf(treeRef.current.root.id);
                       }}
                     >
@@ -153,12 +164,13 @@ export default function SideMenu() {
                     initialData={workspace.directories}
                     openByDefault={false}
                     width={200}
-                    height={1000}
+                    // height={1000}
                     indent={24}
                     rowHeight={36}
                     paddingTop={30}
                     paddingBottom={10}
                     padding={25 /* sets both */}
+                    className="scrollbar-hide"
                     searchTerm={term}
                     searchMatch={(node, term) =>
                       node.data.name.toLowerCase().includes(term.toLowerCase())
@@ -179,13 +191,33 @@ export default function SideMenu() {
 function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
   const searchParams = useParams();
   const queryClient = useQueryClient();
-  const mutate = useMutation({
+
+  const slug = Array.isArray(searchParams.slug)
+    ? searchParams.slug[0]
+    : searchParams.slug;
+
+  const postMutate = useMutation({
     mutationFn: postDirectory,
     onSuccess: () => {
       queryClient.invalidateQueries(['workspace']);
-      console.log('성공?');
     },
   });
+
+  const patchMutate = useMutation({
+    mutationFn: patchDirectory,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['workspace']);
+    },
+  });
+
+  const deleteMutate = useMutation({
+    mutationFn: deleteDirectory,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['workspace']);
+    },
+  });
+
+  console.log(dragHandle);
 
   return (
     <>
@@ -206,18 +238,29 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
               onKeyDown={(e) => {
                 if (e.key === 'Escape') node.reset();
                 if (e.key === 'Enter') {
-                  console.log(
-                    node.id
-                  );
-                  mutate.mutate({
-                    name: e.currentTarget.value,
-                    workspaceUUID: searchParams.slug,
-                    parentUUID:
-                      node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
-                        ? null
-                        : node.parent?.id,
-                    directory: !node.isLeaf,
-                  });
+                  if (node.id.includes('simple')) {
+                    // 생성
+                    const uuid = uuidv4();
+                    node.data.id = uuid;
+
+                    postMutate.mutate({
+                      name: e.currentTarget.value,
+                      workspaceUUID: slug,
+                      directory: !node.isLeaf,
+                      parentUUID:
+                        node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
+                          ? slug
+                          : node.parent?.id,
+                      uuid,
+                    });
+                  } else {
+                    // 수정
+                    patchMutate.mutate({
+                      uuid: node.data.id,
+                      name: e.currentTarget.value,
+                    });
+                  }
+
                   node.submit(e.currentTarget.value);
                 }
               }}
@@ -236,7 +279,13 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
             <button onClick={() => node.edit()} title="Rename...">
               <MdEdit />
             </button>
-            <button onClick={() => tree.delete(node.id)} title="Delete">
+            <button
+              onClick={() => {
+                deleteMutate.mutate({ uuid: node.id });
+                tree.delete(node.id);
+              }}
+              title="Delete"
+            >
               <RxCross2 />
             </button>
           </div>

@@ -1,21 +1,20 @@
 package com.galaxy.novelit.character.dto.res;
 
-import java.util.Map;
+import com.galaxy.novelit.character.entity.GroupEntity;
+import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
-public class CharacterDtoRes {
+public class GroupDtoRes {
     private String userUuid;
+    private String workspaceUuid;
     private String groupUuid;
-    private String characterUuid;
-    private String characterName;
-    private String description;
-    private Map<String, String> information;
-    private Map<String, String> relationship;
+    private String groupName;
+    private String parentUuid;
+    private List<GroupEntity> childUuid;
     private boolean isDeleted;
 }

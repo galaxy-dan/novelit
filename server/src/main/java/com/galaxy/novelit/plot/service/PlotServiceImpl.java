@@ -8,6 +8,8 @@ import com.galaxy.novelit.plot.dto.response.PlotDetailsResponseDto;
 import com.galaxy.novelit.plot.dto.response.PlotListResponseDto;
 import com.galaxy.novelit.plot.entity.PlotEntity;
 import com.galaxy.novelit.plot.repository.PlotRepository;
+import com.galaxy.novelit.plot.repository.PlotRepositoryCustom;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,7 +26,7 @@ public class PlotServiceImpl implements PlotService{
 
     private final PlotRepository plotRepository;
 
-    @Override
+    /*@Override
     public PlotListResponseDto getPlotList(PlotListRequestDto plotListRequestDto) {
         if (plotListRequestDto.getKeyword() == null) {
             List<PlotEntity> plotEntities = plotRepository.findAllByWorkspaceUuid(
@@ -33,27 +35,38 @@ public class PlotServiceImpl implements PlotService{
 
             return PlotListResponseDto.entityToDto(plotEntities);
         }
+        else if (plotListRequestDto.getKeyword() != null){
+            // 키워드가있을때 -> querydsl 검색
+            *//*List<PlotEntity> plotEntities = plotRepository.findByWorkspaceUuidAndPlotTitleContaining(
+                    plotListRequestDto.getWorkspaceUuid(),
+                    plotListRequestDto.getKeyword())
+                .orElseThrow(() -> new NoSuchPlotException());
+            return PlotListResponseDto.entityToDto(plotEntities);*//*
+
+        }
         return null;
+    }*/
+
+    @Override
+    public PlotListResponseDto getPlotList(String workspaceUuid) {
+        List<PlotEntity> plotEntities = plotRepository.findAllByWorkspaceUuid(workspaceUuid)
+            .orElseThrow(() -> new NoSuchPlotException());
+        return PlotListResponseDto.entityToDto(plotEntities);
+    }
+
+    @Override
+    public PlotListResponseDto getPlotListByKeyword(String workspaceUuid, String keyword) {
+        List<PlotEntity> plotEntities = plotRepository.findByKeyword(workspaceUuid, keyword)
+            .orElseThrow(() -> new NoSuchPlotException());
+
+        return PlotListResponseDto.entityToDto(plotEntities);
     }
 
     @Override
     public void createPlot(PlotCreateRequestDto dto) {
-        // 작품, 플롯 uuid
         UUID plotUuid = UUID.randomUUID();
 
         String plotString = plotUuid.toString();
-        
-        /*PlotEntity plotEntity = PlotEntity.builder()
-            .workspaceUuid(workspaceUuid)
-            .plotUuid(plotUuid)
-            .plotTitle(plotTitle)
-            .story(story)
-            .beginning(beginning)
-            .rising(rising)
-            .crisis(crisis)
-            .climax(climax)
-            .ending(ending)
-            .build();*/
 
         plotRepository.save(PlotEntity.create(plotString, dto));
     }
@@ -61,23 +74,17 @@ public class PlotServiceImpl implements PlotService{
     @Override
     public PlotDetailsResponseDto getPlotDetails(String plotUuid) {
 
-        // entity 찾음
         PlotEntity plotEntity = plotRepository.findPlotEntityByPlotUuid(plotUuid)
             .orElseThrow(() -> new NoSuchPlotException());
 
-        // entity -> dto
         return PlotDetailsResponseDto.toDto(plotEntity);
     }
 
     @Override
     public void savePlot(PlotSaveRequestDto dto) {
-        // 플롯 Uuid로 찾기
         PlotEntity plotEntity = plotRepository.findPlotEntityByPlotUuid(dto.getPlotUuid())
             .orElseThrow(() -> new NoSuchPlotException());
 
-        log.info("plotEntity : {}" , plotEntity.getEnding());
-
-        // 바뀐내용만 업데이트 : null이면 x -> 내일 수정
         if (dto.getPlotTitle() != null) {
             plotEntity.updatePlotTitle(dto.getPlotTitle());
         }
@@ -106,23 +113,12 @@ public class PlotServiceImpl implements PlotService{
             plotEntity.updateEnding(dto.getEnding());
         }
 
-        log.info("plotEntity : {}" , plotEntity.getEnding());
-
-        /*plotEntity.updatePlot(dto.getPlotTitle(),
-            dto.getStory(),
-            dto.getBeginning(),
-            dto.getRising(),
-            dto.getCrisis(),
-            dto.getClimax(),
-            dto.getEnding());*/
-        // 저장
         plotRepository.save(plotEntity);
     }
 
     @Override
     @Transactional
     public void deletePlot(String plotUuid) {
-        // DB에서 삭제
         plotRepository.deletePlotEntitiesByPlotUuid(plotUuid)
             .orElseThrow(() -> new NoSuchPlotException());
     }

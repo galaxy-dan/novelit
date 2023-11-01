@@ -1,5 +1,6 @@
 package com.galaxy.novelit.common.exception.advice;
 
+import com.galaxy.novelit.common.exception.IllegalUUIDException;
 import com.galaxy.novelit.common.exception.NoSuchPlotException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
+import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
 import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.common.exception.dto.ExceptionResDTO;
 
@@ -33,6 +35,16 @@ public class ExceptionAdvice {
 
 	@ExceptionHandler(NoSuchPlotException.class)
 	public ResponseEntity<ExceptionResDTO> noSuchPlotException(NoSuchPlotException e){
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(IllegalUUIDException.class)
+	public ResponseEntity<ExceptionResDTO> IllegalUUIDException(IllegalUUIDException e){
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(NoSuchWorkspaceException.class)
+	public ResponseEntity<ExceptionResDTO> NoSuchWorkspaceException(NoSuchWorkspaceException e){
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
 	}
 }

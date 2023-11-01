@@ -15,8 +15,8 @@ public interface WorkspaceMapper {
     WorkSpaceDTO toDto(Workspace workspace);
     default WorkSpaceElementDTO toElementDto(Directory directory){
         List<Directory> dirList = directory.getChildren();
-        List<WorkSpaceElementDTO> dtoList = dirList == null ? null : dirList.stream().map(this::toElementDto).toList();
-        return new WorkSpaceElementDTO(directory.getUuid(), directory.getName(), directory.isDirectory(),
-            directory.getPrevUUID(), directory.getNextUUID(), dtoList);
+        List<WorkSpaceElementDTO> dtoList = dirList == null ? null : dirList.stream()
+            .filter(d->!d.isDeleted()).map(this::toElementDto).toList();
+        return new WorkSpaceElementDTO(directory.getUuid(), directory.getName(), directory.isDirectory(), dtoList);
     }
 }
