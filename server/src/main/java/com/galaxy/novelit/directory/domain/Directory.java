@@ -26,10 +26,6 @@ public class Directory {
 	private boolean directory;
 	@Field(name = "parent_uuid")
 	private String parentUUID;
-	@Field(name = "prev_uuid")
-	private String prevUUID;
-	@Field(name = "next_uuid")
-	private String nextUUID;
 	@DBRef(lazy = true)
 	private List<Directory> children;
 	private String content;
@@ -45,5 +41,20 @@ public class Directory {
 	}
 	public void updateContent(String content){
 		this.content = content;
+	}
+	public void updateChildren(List<Directory> children){
+		this.children = children;
+	}
+	public void updateParentUUID(String parentUUID){
+		this.parentUUID = parentUUID;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		Directory d = (Directory) obj;
+		if(d.getUuid().equals(uuid)){
+			return true;
+		}
+		return super.equals(obj);
 	}
 }
