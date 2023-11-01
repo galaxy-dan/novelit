@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.IllegalUUIDException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
 import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.directory.domain.Directory;
@@ -51,7 +52,10 @@ public class DirectoryServiceImpl implements DirectoryService{
 			checkDirectoryException(parent, userUUID);
 		}
 
-		String directoryUUID = UUID.randomUUID().toString();
+		String directoryUUID = dto.getUuid();
+		if(directoryUUID == null){
+			throw new IllegalUUIDException();
+		}
 		Directory.DirectoryBuilder builder = Directory.builder()
 			.uuid(directoryUUID)
 			.name(dto.getName())

@@ -1,5 +1,11 @@
 package com.galaxy.novelit.character.service;
 
-public interface CharacterService {
+import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
+import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 
+public interface CharacterService {
+    CharacterDtoRes getCharacter(String characterUuid);
+    void createCharacter(CharacterDtoReq dto);
+    void updateCharacter(CharacterDtoReq dto);
+    void deleteCharacter(String characterUuid);
 }

@@ -1,11 +1,9 @@
 package com.galaxy.novelit.character.controller;
 
-import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
-import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
-import com.galaxy.novelit.character.dto.res.DiagramDtoRes;
-import com.galaxy.novelit.character.service.CharacterService;
+
+import com.galaxy.novelit.character.dto.req.GroupDtoReq;
+import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.service.GroupService;
-import com.galaxy.novelit.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +17,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/character")
+@RequestMapping("/group")
 @RequiredArgsConstructor
-public class CharacterController {
-    private final CharacterService characterService;
-    private final WordsService wordsService;
+public class GroupController {
+    private final GroupService groupService;
 
     @GetMapping
-    public ResponseEntity<Object> getCharacter(@RequestParam String characterUuid) {
+    public ResponseEntity<Object> getGroup(@RequestParam String groupUuid) {
         try {
-            CharacterDtoRes dto = characterService.getCharacter(characterUuid);;
+            GroupDtoRes dto = groupService.getGroup(groupUuid);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -36,9 +33,9 @@ public class CharacterController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCharacter(@RequestBody CharacterDtoReq dto) {
+    public ResponseEntity<Object> createGroup(@RequestBody GroupDtoReq dto) {
         try {
-            characterService.createCharacter(dto);
+            groupService.createGroup(dto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -46,10 +43,9 @@ public class CharacterController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateCharacter(@RequestBody CharacterDtoReq dto) {
+    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUuid, String newName) {
         try {
-//            CharacterDtoRes characterDtoRes = characterService.getCharacter(dto.getCharacterUuid());
-            characterService.updateCharacter(dto);
+            groupService.updateGroupName(groupUuid, newName);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -57,21 +53,9 @@ public class CharacterController {
     }
 
     @DeleteMapping
-    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUuid) {
+    public ResponseEntity<Object> deleteGroup(@RequestParam String groupUuid) {
         try {
-            characterService.deleteCharacter(characterUuid);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/diagram")
-    public ResponseEntity<Object> drawDiagram() {
-        try {
-            final GroupService groupService;
-            DiagramDtoRes diagramDtoRes;
-
+            groupService.deleteGroup(groupUuid);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
