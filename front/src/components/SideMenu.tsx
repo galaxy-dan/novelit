@@ -90,10 +90,14 @@ export default function SideMenu() {
 
   const searchParams = useParams();
 
+  const slug = Array.isArray(searchParams.slug)
+    ? searchParams.slug[0]
+    : searchParams.slug;
+
   const { data: workspace }: UseQueryResult<Novel> = useQuery({
     queryKey: ['workspace'],
-    queryFn: () => getWorkspace({ workspaceUUID: searchParams.slug[0] }),
-    enabled: !!searchParams.slug?.[0],
+    queryFn: () => getWorkspace({ workspaceUUID: slug }),
+    enabled: !!slug,
   });
 
   return (
@@ -188,6 +192,9 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
   const searchParams = useParams();
   const queryClient = useQueryClient();
 
+  const slug = Array.isArray(searchParams.slug)
+    ? searchParams.slug[0]
+    : searchParams.slug;
 
   const postMutate = useMutation({
     mutationFn: postDirectory,
@@ -235,14 +242,15 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                     // 생성
                     const uuid = uuidv4();
                     node.data.id = uuid;
+
                     postMutate.mutate({
                       name: e.currentTarget.value,
-                      workspaceUUID: searchParams.slug,
+                      workspaceUUID: slug,
+                      directory: !node.isLeaf,
                       parentUUID:
                         node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
-                          ? null
+                          ? slug
                           : node.parent?.id,
-                      directory: !node.isLeaf,
                       uuid,
                     });
                   } else {
