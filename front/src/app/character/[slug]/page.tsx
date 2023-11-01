@@ -1,6 +1,6 @@
 'use client';
-import CharacterCard from '@/components/CharacterCard';
-import SubGroupCard from '@/components/SubGroupCard';
+import CharacterCard from '@/components/character/CharacterCard';
+import SubGroupCard from '@/components/character/SubGroupCard';
 import { groupType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -145,7 +145,7 @@ export default function page({ params }: Props) {
         />
       </div>
       {/* 캐릭터 카드 전체 모음 */}
-      <div className='mt-6'>
+      <div className="mt-6">
         {/* 캐릭터 카드 그룹 */}
         <div>
           <span

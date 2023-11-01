@@ -1,6 +1,6 @@
 'use client';
-import CharacterCard from '@/components/CharacterCard';
-import SubGroupCard from '@/components/SubGroupCard';
+import CharacterCard from '@/components/character/CharacterCard';
+import SubGroupCard from '@/components/character/SubGroupCard';
 import { groupType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -139,11 +139,9 @@ export default function page() {
         />
       </div>
       {/* 캐릭터 카드 전체 모음 */}
-      <div className='mt-6'>
+      <div className="mt-6">
         {/* 캐릭터 카드 그룹 */}
-        <p className='text-4xl font-extrabold'>
-          전체
-        </p>
+        <p className="text-4xl font-extrabold">전체</p>
 
         <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
           {group.subGroups?.map((subGroup, i) => (
