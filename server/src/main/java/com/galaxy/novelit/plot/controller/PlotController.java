@@ -33,17 +33,20 @@ public class PlotController {
         return ResponseEntity.ok(plotService.getPlotList(plotListRequestDto));
     }*/
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity<PlotListResponseDto> getPlotList(
         @RequestParam("workspaceUuid") String workspaceUuid) {
         return ResponseEntity.ok(plotService.getPlotList(workspaceUuid));
-    }
+    }*/
 
-    @GetMapping("/keyword")
+    @GetMapping
     public ResponseEntity<PlotListResponseDto> getPlotList(
         @RequestParam("workspaceUuid") String workspaceUuid,
         @RequestParam("keyword") String keyword) {
-        return ResponseEntity.ok(plotService.getPlotListByKeyword(workspaceUuid,keyword));
+        if (keyword != null) {
+            return ResponseEntity.ok(plotService.getPlotListByKeyword(workspaceUuid, keyword));
+        }
+        return ResponseEntity.ok(plotService.getPlotList(workspaceUuid));
     }
 
     @PostMapping
