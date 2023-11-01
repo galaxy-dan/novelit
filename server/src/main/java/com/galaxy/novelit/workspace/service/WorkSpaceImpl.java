@@ -94,6 +94,7 @@ public class WorkSpaceImpl implements WorkspaceService{
 
         List<WorkSpaceElementDTO> directories = directoryRepository.findByUuidAndDeleted(workSpaceUUID,
                 false).getChildren().stream()
+            .filter(d->!d.isDeleted())
             .map(workspaceMapper::toElementDto)
             .toList();
 
@@ -176,7 +177,7 @@ public class WorkSpaceImpl implements WorkspaceService{
         parent.updateChildren(children);
         directoryRepository.save(parent);
 
-        directory.updateParentUUID(parentUUID);
+        directory.updateParentUUID(parent.getUuid());
         directoryRepository.save(directory);
     }
 

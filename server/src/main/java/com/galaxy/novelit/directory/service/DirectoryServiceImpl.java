@@ -39,7 +39,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 		String parentUUID = dto.getParentUUID();
 		boolean isDirectory = dto.isDirectory();
 
-		Directory parent = parentUUID == null ? directoryRepository.findByUuidAndDeleted(workspaceUUID, false) : directoryRepository.findByUuidAndDeleted(parentUUID, false);
+		Directory parent = directoryRepository.findByUuidAndDeleted(parentUUID, false);
 		checkDirectoryException(parent, userUUID);
 
 		String directoryUUID = dto.getUuid();
