@@ -14,13 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.IllegalUUIDException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
 import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.dto.request.DirectoryCreateReqDTO;
 import com.galaxy.novelit.directory.dto.request.DirectoryNameEditReqDTO;
 import com.galaxy.novelit.directory.dto.request.FileWorkReqDTO;
-import com.galaxy.novelit.directory.dto.response.DirectoryCreateResDTO;
 import com.galaxy.novelit.directory.dto.response.DirectoryResDTO;
 import com.galaxy.novelit.directory.dto.response.DirectorySimpleElementDTO;
 import com.galaxy.novelit.directory.dto.response.FileResDTO;
@@ -35,7 +35,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 	private final MongoTemplate mongoTemplate;
 	@Transactional
 	@Override
-	public DirectoryCreateResDTO createDirectory(DirectoryCreateReqDTO dto, String userUUID) {
+	public void createDirectory(DirectoryCreateReqDTO dto, String userUUID) {
 		/* dto의 workspaceUUID로 작품을 얻어오고 작가의 uuid와 인자로 받은 userUUID 비교해야함
 
 
@@ -52,7 +52,10 @@ public class DirectoryServiceImpl implements DirectoryService{
 			checkDirectoryException(parent, userUUID);
 		}
 
-		String directoryUUID = UUID.randomUUID().toString();
+		String directoryUUID = dto.getUuid();
+		if(directoryUUID == null){
+			throw new IllegalUUIDException();
+		}
 		Directory.DirectoryBuilder builder = Directory.builder()
 			.uuid(directoryUUID)
 			.name(dto.getName())
@@ -75,7 +78,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 			parent.getChildren().add(directory);
 			directoryRepository.save(parent);
 		}
-		return new DirectoryCreateResDTO(directoryUUID);
+
 	}
 
 	@Transactional
