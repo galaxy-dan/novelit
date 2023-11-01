@@ -2,6 +2,7 @@ package com.galaxy.novelit.workspace.service;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
+import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.directory.service.DirectoryService;
@@ -88,18 +89,16 @@ public class WorkSpaceImpl implements WorkspaceService{
 
     @Override
     public WorkSpaceInfoResDTO getWorkspaceInfo(String workSpaceUUID) {
-        Optional<Workspace> workspace = workspaceRepository.findByWorkspaceUUID(workSpaceUUID);
-        if (workspace.isPresent()) {
-            Workspace ws = workspace.get();
-            List<WorkSpaceElementDTO> directories = directoryRepository.findByUuidAndDeleted(workSpaceUUID,
-                    false).getChildren().stream()
-                .map(workspaceMapper::toElementDto)
-                .toList();
+        Workspace workspace = workspaceRepository.findByWorkspaceUUID(workSpaceUUID).orElseThrow(
+            NoSuchWorkspaceException::new);
 
-            return new WorkSpaceInfoResDTO(ws.getTitle(), directories);
-        } else {
-            throw new IllegalStateException("없는 작품 입니다.");
-        }
+        List<WorkSpaceElementDTO> directories = directoryRepository.findByUuidAndDeleted(workSpaceUUID,
+                false).getChildren().stream()
+            .map(workspaceMapper::toElementDto)
+            .toList();
+
+        return new WorkSpaceInfoResDTO(workspace.getTitle(), directories);
+
     }
     @Override
     public List<?> getWorkspaces(String userUUID) {
