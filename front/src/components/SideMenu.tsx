@@ -243,19 +243,16 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                     const uuid = uuidv4();
                     node.data.id = uuid;
 
-                    const postData: PostDirectory = {
+                    postMutate.mutate({
                       name: e.currentTarget.value,
                       workspaceUUID: slug,
                       directory: !node.isLeaf,
+                      parentUUID:
+                        node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
+                          ? slug
+                          : node.parent?.id,
                       uuid,
-                    };
-
-                    if (
-                      node.parent?.id !== '__REACT_ARBORIST_INTERNAL_ROOT__'
-                    ) {
-                      postData.parentUUID = node.parent?.id;
-                    }
-                    postMutate.mutate(postData);
+                    });
                   } else {
                     // 수정
                     patchMutate.mutate({
