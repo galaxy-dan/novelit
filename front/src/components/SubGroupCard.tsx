@@ -1,11 +1,10 @@
-import { subGroupType } from '@/model/editor/charactor';
+import { subGroupType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 type Props = {
   subGroup: subGroupType;
 };
 export default function SubGroupCard({ subGroup }: Props) {
-
   const router = useRouter();
 
   return (
