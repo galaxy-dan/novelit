@@ -41,20 +41,30 @@ export default function page({ params }: Props) {
     ],
   });
 
+  const [imageInput, setImageInput] = useState<string>(character.image);
+  const [imageUrl, setImageUrl] = useState<string>(character.image);
   const imgRef = useRef<HTMLInputElement>(null);
+  const [lastUploadTime, setLastUploadTime] = useState<number>(0);
+  const uploadInterval = 3000
+
+
   const [width, setWidth] = useState(100);
   const nameRef = useRef<HTMLInputElement>(null);
-
   const [nameInput, setNameInput] = useState<string>(character.name);
-  const [imageInput, setImageInput] = useState<string>(character.image);
+
   const [summaryInput, setSummaryInput] = useState<string>(character.summary);
+
   const [informationInput, setInformationInput] = useState<informationType[]>(
     character.information,
   );
+
   const [relationInput, setRelationInput] = useState<relationType[]>(
     character.relation,
   );
+  
   const [state, setState] = useState<number>(0);
+
+  ;
 
   const hello = () => {
     setCharacter((prev) => ({
@@ -86,13 +96,12 @@ export default function page({ params }: Props) {
       }
     }
   }, [nameInput]);
-
-  const loaderProp = ({ src }:any) => {
+  const loaderProp = ({ src }: any) => {
     return src;
   };
-
   return (
     <div className="mx-80 my-20 select-none">
+      <p>{imageInput}</p>
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
       <div className="flex items-end justify-between">
         <div className="flex items-end">
@@ -128,7 +137,7 @@ export default function page({ params }: Props) {
       <div className="flex h-64 mt-6">
         <div className="relative w-56 h-56 mr-10 place-self-end">
           <Image
-            src={imageInput}
+            src={imageUrl}
             alt="캐릭터 상세 이미지"
             priority={true}
             className="object-cover w-full h-full cursor-pointer"
@@ -146,26 +155,40 @@ export default function page({ params }: Props) {
             ref={imgRef}
             accept="image/*"
             onChange={(e) => {
+              const now = Date.now();
+
+              if (now - lastUploadTime < uploadInterval) {
+                alert('이미지 업로드 간격이 너무 짧아요!');
+                return;
+              } else {
+                console.log(
+                  now + ' / ' + lastUploadTime + ' / ' + uploadInterval,
+                );
+              }
+
               setState(1);
 
               const targetFiles = (e.target as HTMLInputElement)
                 .files as FileList;
-              const targetFile = targetFiles[0];
-
-              const yeah = async () => {
-                const url = await getS3URL(targetFile.name);
-                // 이후에 이미지를 S3 서버에 전송, 실패하면 백엔드에 실패 및 url 삭제 요청
-                const imgUrl = url.split('?')[0];
-                // 업로드 실패 시
-                if (!(await uploadImage(url, targetFile))) {
-                } else {
-                  setImageInput(imgUrl);
-                }
-              };
-
-              yeah();
-              console.log('이미지는 ' + imageInput);
-              console.log('다음으로는 ' + character.image);
+              if (targetFiles[0]) {
+                const targetFile = targetFiles[0];
+                const yeah = async () => {
+                  const url = await getS3URL(targetFile.name);
+                  // 이후에 이미지를 S3 서버에 전송, 실패하면 백엔드에 실패 및 url 삭제 요청
+                  const imgUrl = url.split('?')[0];
+                  // 업로드 실패 시
+                  if (!(await uploadImage(imgUrl, targetFile))) {
+                  } else {
+                    setImageUrl(window.URL.createObjectURL(targetFile));
+                    setImageInput(imgUrl);
+                    setLastUploadTime(now);
+                    console.log(
+                      now + ' / ' + lastUploadTime + ' / ' + uploadInterval,
+                    );
+                  }
+                };
+                yeah();
+              }
             }}
           />
         </div>
