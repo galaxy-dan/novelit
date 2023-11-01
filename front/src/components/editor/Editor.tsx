@@ -20,9 +20,9 @@ export default function Editor() {
   const searchParams = useParams();
 
   const { data: editor }: UseQueryResult<Editor> = useQuery({
-    queryKey: ['editor', searchParams.slug[1]],
-    queryFn: () => getEditor({ uuid: searchParams.slug[1] }),
-    enabled: !!searchParams.slug[1],
+    queryKey: ['editor', searchParams.slug?.[1]],
+    queryFn: () => getEditor({ uuid: searchParams.slug?.[1] }),
+    enabled: !!searchParams.slug?.[1],
   });
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function Editor() {
         <button
           onClick={() => {
             patchMutate.mutate({
-              uuid: searchParams.slug[1],
+              uuid: searchParams.slug?.[1],
               content:
                 document.getElementById('edit')?.innerHTML ??
                 '<div><br/></div>',
