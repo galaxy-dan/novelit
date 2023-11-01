@@ -19,8 +19,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public GroupDtoRes getGroup(String groupUuid) {
-        GroupEntity group = groupRepository.findByGroupUuid(groupUuid);
+    public GroupDtoRes getGroup(String groupUUID) {
+        GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
 
 //        삭제된 그룹 처리
 //        if (group.isDeleted()) {
@@ -28,12 +28,12 @@ public class GroupServiceImpl implements GroupService {
 //        }
 
         GroupDtoRes dto = new GroupDtoRes();
-        dto.setGroupUuid(group.getGroupUuid());
+        dto.setGroupUUID(group.getGroupUUID());
         dto.setGroupName(group.getGroupName());
-        dto.setChildUuid(group.getChildUuid());
-        dto.setUserUuid(group.getUserUuid());
-        dto.setParentUuid(group.getParentUuid());
-        dto.setWorkspaceUuid(group.getWorkspaceUuid());
+        dto.setChildUUID(group.getChildUUID());
+        dto.setUserUUID(group.getUserUUID());
+        dto.setParentUUID(group.getParentUUID());
+        dto.setWorkspaceUUID(group.getWorkspaceUUID());
 
         return dto;
     }
@@ -41,14 +41,14 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     @Override
     public void createGroup(GroupDtoReq dto) {
-        String groupUuid = UUID.randomUUID().toString();
+        String groupUUID = UUID.randomUUID().toString();
 
         GroupEntity newGroup = GroupEntity.builder()
-            .groupUuid(groupUuid)
+            .groupUUID(groupUUID)
             .groupName(dto.getGroupName())
-            .workspaceUuid(dto.getWorkspaceUuid())
-            .userUuid(dto.getUserUuid())
-            .parentUuid(dto.getParentUuid())
+            .workspaceUUID(dto.getWorkspaceUUID())
+            .userUUID(dto.getUserUUID())
+            .parentUUID(dto.getParentUUID())
             .build();
 
         groupRepository.save(newGroup);
@@ -56,8 +56,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void deleteGroup(String groupUuid) {
-        String groupId = groupRepository.findByGroupUuid(groupUuid).getGroupId();
+    public void deleteGroup(String groupUUID) {
+        String groupId = groupRepository.findByGroupUUID(groupUUID).getGroupId();
 
         GroupEntity newGroup = GroupEntity.builder()
             .groupId(groupId)
@@ -69,8 +69,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void updateGroupName(String groupUuid, String newName) {
-        String groupId = groupRepository.findByGroupUuid(groupUuid).getGroupId();
+    public void updateGroupName(String groupUUID, String newName) {
+        String groupId = groupRepository.findByGroupUUID(groupUUID).getGroupId();
 
         GroupEntity newGroup = GroupEntity.builder()
             .groupId(groupId)

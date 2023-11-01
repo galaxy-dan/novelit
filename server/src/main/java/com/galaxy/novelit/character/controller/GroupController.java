@@ -2,8 +2,12 @@ package com.galaxy.novelit.character.controller;
 
 
 import com.galaxy.novelit.character.dto.req.GroupDtoReq;
+import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
+import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.character.service.GroupService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +25,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
+    private final CharacterService characterService;
 
     @GetMapping
-    public ResponseEntity<Object> getGroup(@RequestParam String groupUuid) {
+    public ResponseEntity<Object> getGroup(@RequestParam String groupUUID) {
         try {
-            GroupDtoRes dto = groupService.getGroup(groupUuid);
+            GroupDtoRes dto = groupService.getGroup(groupUUID);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/character")
+    public ResponseEntity<Object> getCharacters(@RequestParam String groupUUID) {
+        try {
+            List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -43,9 +58,9 @@ public class GroupController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUuid, String newName) {
+    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUUID, String newName) {
         try {
-            groupService.updateGroupName(groupUuid, newName);
+            groupService.updateGroupName(groupUUID, newName);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -53,9 +68,9 @@ public class GroupController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Object> deleteGroup(@RequestParam String groupUuid) {
+    public ResponseEntity<Object> deleteGroup(@RequestParam String groupUUID) {
         try {
-            groupService.deleteGroup(groupUuid);
+            groupService.deleteGroup(groupUUID);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

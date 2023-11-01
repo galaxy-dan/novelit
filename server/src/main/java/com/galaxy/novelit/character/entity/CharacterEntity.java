@@ -1,5 +1,6 @@
 package com.galaxy.novelit.character.entity;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -19,20 +20,22 @@ public class CharacterEntity {
     @Id
     private String characterId;
     @Field(name = "user_uuid")
-    private String userUuid;
+    private String userUUID;
     @Field(name = "group_uuid")
-    private String groupUuid;
+    private String groupUUID;
     @Field(name = "character_uuid")
-    private String characterUuid;
+    private String characterUUID;
     @Field(name = "character_name")
     private String characterName;
     @Field(name = "description")
     private String description;
     @Field(name = "information")
-    private Map<String, String> information;
+    private List<Map<String, String>> information;
     @Field(name = "relationship")
-    private Map<String, String> relationship;
+    private List<Map<String, String>> relationship;
     @Field(name = "is_deleted")
     private boolean isDeleted;
+    @Field(name = "character_image")
+    private String characterImage;
 
 }

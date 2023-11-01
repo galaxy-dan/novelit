@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class GroupDtoReq {
-    private String userUuid;
-    private String workspaceUuid;
-    private String groupUuid;
+    private String userUUID;
+    private String workspaceUUID;
+    private String groupUUID;
     private String groupName;
-    private String parentUuid;
-    private List<GroupEntity> childUuid;
+    private String parentUUID;
+    private List<GroupEntity> childUUID;
     private boolean isDeleted;
 }

@@ -1,22 +1,19 @@
-package com.galaxy.novelit.character.dto.req;
+package com.galaxy.novelit.character.dto.res;
 
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-public class CharacterDtoReq {
-    private String userUUID;
-    private String groupUUID;
+@Setter
+@Builder
+public class CharacterSimpleDtoRes {
     private String characterUUID;
     private String characterName;
-    private String description;
     private List<Map<String, String>> information;
-    private List<Map<String, String>> relationship;
-    private boolean isDeleted;
     private String characterImage;
 }
