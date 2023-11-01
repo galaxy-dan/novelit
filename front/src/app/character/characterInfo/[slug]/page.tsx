@@ -26,11 +26,7 @@ export default function page({ params }: Props) {
       'https://novelit.s3.ap-northeast-2.amazonaws.com/0914cfe0-38e5-4a0d-a196-46ed011e6ff5%EB%AC%B4%EC%A0%9C.png',
     summary: '',
     information: [
-      {
-        id: '',
-        title: '',
-        content: '',
-      },
+      { id: '', title: '', content: '' },
       { id: '', title: '', content: '' },
       { id: '', title: '', content: '' },
     ],
@@ -45,8 +41,7 @@ export default function page({ params }: Props) {
   const [imageUrl, setImageUrl] = useState<string>(character.image);
   const imgRef = useRef<HTMLInputElement>(null);
   const [lastUploadTime, setLastUploadTime] = useState<number>(0);
-  const uploadInterval = 3000
-
+  const uploadInterval = 3000;
 
   const [width, setWidth] = useState(100);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -61,10 +56,8 @@ export default function page({ params }: Props) {
   const [relationInput, setRelationInput] = useState<relationType[]>(
     character.relation,
   );
-  
-  const [state, setState] = useState<number>(0);
 
-  ;
+  const [state, setState] = useState<number>(0);
 
   const hello = () => {
     setCharacter((prev) => ({
@@ -81,7 +74,7 @@ export default function page({ params }: Props) {
   useEffect(() => {
     const debounce = setTimeout(() => {
       return hello();
-    }, 500);
+    }, 1300);
     return () => {
       clearTimeout(debounce);
     };
@@ -101,7 +94,6 @@ export default function page({ params }: Props) {
   };
   return (
     <div className="mx-80 my-20 select-none">
-      <p>{imageInput}</p>
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
       <div className="flex items-end justify-between">
         <div className="flex items-end">
@@ -117,7 +109,6 @@ export default function page({ params }: Props) {
               style={{ width }}
               type="text"
               onChange={(e) => {
-                //setCharacter((prev) => ({ ...prev, name: e.target.value }));
                 setNameInput(e.target.value);
                 setState(1);
               }}
@@ -196,12 +187,10 @@ export default function page({ params }: Props) {
           <p className="text-xl font-bold">캐릭터 설명</p>
           <textarea
             className="border-2 border-gray-300 rounded-xl resize-none outline-none h-56 px-4 py-2 font-bold text-lg"
-            //value={summary}
             value={summaryInput}
             onChange={(e) => {
               setState(1);
               setSummaryInput(e.target.value);
-              //setCharacter((prev) => ({ ...prev, summary: e.target.value }));
             }}
           />
         </div>
@@ -218,17 +207,12 @@ export default function page({ params }: Props) {
                   <input
                     type="text"
                     className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                    //value={information[i].title}
                     value={informationInput[i].title}
                     onChange={(e) => {
                       setState(1);
                       var newItem = [...informationInput];
                       newItem[i].title = e.target.value;
                       setInformationInput(newItem);
-                      // setCharacter((prev) => ({
-                      //   ...prev,
-                      //   information: newItem,
-                      // }));
                     }}
                   />
                 </td>
@@ -237,22 +221,20 @@ export default function page({ params }: Props) {
                     <input
                       type="text"
                       className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                      //value={information[i].content}
                       value={informationInput[i].content}
                       onChange={(e) => {
                         setState(1);
                         var newItem = [...informationInput];
                         newItem[i].content = e.target.value;
                         setInformationInput(newItem);
-                        // setCharacter((prev) => ({
-                        //   ...prev,
-                        //   information: newItem,
-                        // }));
                       }}
                     />
                     <FaMinus
                       className="my-auto cursor-pointer h-10"
-                      onClick={() => {}}
+                      onClick={() => {
+                        let newInfo : informationType[] = [...character.information].splice(i, 1);
+                        setInformationInput(newInfo);
+                      }}
                     />
                   </div>
                 </td>
@@ -260,7 +242,16 @@ export default function page({ params }: Props) {
             ))}
           </tbody>
         </table>
-        <button className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block">
+        <button
+          className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
+          onClick={() => {
+            let newInfo : informationType[] = [
+              ...character.information,
+              { id: '', title: '', content: '' },
+            ];
+            setInformationInput(newInfo);
+          }}
+        >
           <HiPlus className="text-white mx-auto font-bold" />
         </button>
       </div>
@@ -276,14 +267,12 @@ export default function page({ params }: Props) {
                   <input
                     type="text"
                     className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                    //value={info.name}
                     value={relationInput[i].name}
                     onChange={(e) => {
                       setState(1);
                       var newItem = [...relationInput];
                       newItem[i].name = e.target.value;
                       setRelationInput(newItem);
-                      //setCharacter((prev) => ({ ...prev, ralation: newItem }));
                     }}
                   />
                 </td>
@@ -292,22 +281,20 @@ export default function page({ params }: Props) {
                     <input
                       type="text"
                       className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                      //value={relation[i].content}
                       value={relationInput[i].content}
                       onChange={(e) => {
                         setState(1);
                         var newItem = [...relationInput];
                         newItem[i].content = e.target.value;
                         setRelationInput(newItem);
-                        // setCharacter((prev) => ({
-                        //   ...prev,
-                        //   ralation: newItem,
-                        // }));
                       }}
                     />
                     <FaMinus
                       className="my-auto cursor-pointer h-10"
-                      onClick={() => {}}
+                      onClick={() => {
+                        let newRelation : relationType[] = [...character.relation].splice(i, 1);
+                        setRelationInput(newRelation);
+                      }}
                     />
                   </div>
                 </td>
@@ -315,7 +302,14 @@ export default function page({ params }: Props) {
             ))}
           </tbody>
         </table>
-        <button className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block">
+        <button className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
+        onClick={() => {
+          let newRelation : relationType[] = [
+            ...character.relation,
+            { id: '', name: '', content: '' },
+          ];
+          setRelationInput(newRelation);
+        }}>
           <HiPlus className="text-white mx-auto font-bold" />
         </button>
       </div>
