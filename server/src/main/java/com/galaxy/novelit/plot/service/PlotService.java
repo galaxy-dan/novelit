@@ -9,7 +9,9 @@ import java.util.Optional;
 
 public interface PlotService {
 
-    PlotListResponseDto getPlotList(PlotListRequestDto plotListRequestDto);
+    //PlotListResponseDto getPlotList(PlotListRequestDto plotListRequestDto);
+    PlotListResponseDto getPlotList(String workspaceUuid);
+    PlotListResponseDto getPlotListByKeyword(String workspaceUuid, String keyword);
     void createPlot(PlotCreateRequestDto plotCreateRequestDto);
     PlotDetailsResponseDto getPlotDetails(String plotUUID);
     void savePlot(PlotSaveRequestDto plotSaveRequestDto);
