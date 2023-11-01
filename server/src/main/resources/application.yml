@@ -104,6 +104,16 @@ spring:
     activate:
       on-profile: port_8003
     import: env.yml
+    kafka:
+      bootstrap-servers: localhost:9092
+      consumer:
+        group-id: novel
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #    security:
 #      oauth2:
 #        client:
@@ -171,6 +181,16 @@ spring:
     activate:
       on-profile: port_8001
     import: env.yml
+    kafka:
+      bootstrap-servers: localhost:9092
+      consumer:
+        group-id: novel
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #    security:
 #      oauth2:
 #        client:
@@ -234,6 +254,16 @@ spring:
     activate:
       on-profile: port_8002
     import: env.yml
+    kafka:
+      bootstrap-servers: localhost:9092
+      consumer:
+        group-id: novel
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #    security:
 #      oauth2:
 #        client:
