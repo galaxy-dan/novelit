@@ -1,5 +1,6 @@
 package com.galaxy.novelit.common.exception.advice;
 
+import com.galaxy.novelit.common.exception.IllegalUUIDException;
 import com.galaxy.novelit.common.exception.NoSuchPlotException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +35,10 @@ public class ExceptionAdvice {
 	@ExceptionHandler(NoSuchPlotException.class)
 	public ResponseEntity<ExceptionResDTO> noSuchPlotException(NoSuchPlotException e){
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(IllegalUUIDException.class)
+	public ResponseEntity<ExceptionResDTO> noSuchPlotException(IllegalUUIDException e){
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
 	}
 }

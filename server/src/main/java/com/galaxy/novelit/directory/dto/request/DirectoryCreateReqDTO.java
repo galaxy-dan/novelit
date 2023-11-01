@@ -12,4 +12,5 @@ public class DirectoryCreateReqDTO {
 	private String workspaceUUID;
 	private String parentUUID;
 	private boolean directory;
+	private String uuid;
 }
