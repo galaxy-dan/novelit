@@ -2,17 +2,14 @@ package com.galaxy.novelit.comment.domain;
 
 import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
-import com.galaxy.novelit.comment.mapper.CommentInfoMapper;
 import jakarta.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.mapping.Document;
 
