@@ -4,9 +4,12 @@ package com.galaxy.novelit.character.controller;
 import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
+import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.character.service.GroupService;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,24 +30,41 @@ public class GroupController {
     private final CharacterService characterService;
 
     @GetMapping
-    public ResponseEntity<Object> getGroup(@RequestParam String groupUUID) {
+    public ResponseEntity<Object> getGroupInfo(@RequestParam String groupUUID) {
         try {
-            GroupDtoRes dto = groupService.getGroup(groupUUID);
+            GroupDtoRes dto = groupService.getGroupInfo(groupUUID);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @GetMapping("/character")
-    public ResponseEntity<Object> getCharacters(@RequestParam String groupUUID) {
+//    @GetMapping("/character")
+//    public ResponseEntity<Object> getCharacters(@RequestParam String groupUUID) {
+//        try {
+//            List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID);
+//            return ResponseEntity.ok(dto);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
+
+    @GetMapping("/top")
+    public ResponseEntity<Object> topGroupInfo() {
         try {
-            List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID);
-            return ResponseEntity.ok(dto);
+            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup();
+            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("groups", groupDto);
+            response.put("characters", characterDto);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
 
     @PostMapping
     public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto) {

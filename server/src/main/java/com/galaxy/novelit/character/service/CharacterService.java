@@ -9,6 +9,7 @@ import java.util.List;
 public interface CharacterService {
     CharacterDtoRes getCharacterInfo(String characterUUID);
     List<CharacterSimpleDtoRes> getCharacters(String groupUUID);
+    List<CharacterSimpleDtoRes> getTopCharacter();
     void createCharacter(CharacterCreateDtoReq dto);
     void updateCharacter(CharacterDtoReq dto);
     void deleteCharacter(String characterUUID);
