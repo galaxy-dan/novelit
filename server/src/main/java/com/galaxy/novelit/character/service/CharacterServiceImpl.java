@@ -63,6 +63,25 @@ public class CharacterServiceImpl implements CharacterService {
         return dto;
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<CharacterSimpleDtoRes> getTopCharacter() {
+        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(null);
+        List<CharacterSimpleDtoRes> dto = new ArrayList<>();
+
+        for (CharacterEntity character : characters) {
+            CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterName(character.getCharacterName())
+                .information(character.getInformation())
+                .characterImage(character.getCharacterImage())
+                .build();
+            dto.add(characterSimpleDtoRes);
+        }
+
+        return dto;
+    }
+
     @Transactional
     @Override
     public void createCharacter(CharacterCreateDtoReq dto) {
