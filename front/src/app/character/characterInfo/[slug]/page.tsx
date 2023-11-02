@@ -81,6 +81,10 @@ export default function page({ params }: Props) {
   }, [nameInput, summaryInput, imageInput, informationInput, relationInput]);
 
   useEffect(() => {
+    console.log(character);
+  }, [character]);
+
+  useEffect(() => {
     if (nameRef !== null && nameRef.current !== null) {
       if (nameRef.current.offsetWidth > 100) {
         setWidth(nameRef.current.offsetWidth + 5);
