@@ -131,27 +131,14 @@ public class WorkSpaceImpl implements WorkspaceService{
         //새로운 부모 예외 처리
         String parentUUID = dto.getParentUUID();
         Directory parent = parentUUID == null ? directoryRepository.findByUuidAndDeleted(workspaceUUID, false) : directoryRepository.findByUuidAndDeleted(parentUUID, false);
-        if(parentUUID != null){
-            checkDirectoryException(parent, userUUID, workspaceUUID);
-        }else{
-            if(parent == null){
-                throw new NoSuchDirectoryException();
-            }
-        }
-
+        checkDirectoryException(parent, userUUID, workspaceUUID);
 
         checkDirectoryException(directory, userUUID, workspaceUUID);
 
         //이전 부모 예외 처리
         String lastParentUUID = directory.getParentUUID();
         Directory lastParent = lastParentUUID == null ? directoryRepository.findByUuidAndDeleted(workspaceUUID, false) : directoryRepository.findByUuidAndDeleted(lastParentUUID, false);
-        if(lastParentUUID != null){
-            checkDirectoryException(lastParent, userUUID, workspaceUUID);
-        }else{
-            if(lastParent == null){
-                throw new NoSuchDirectoryException();
-            }
-        }
+        checkDirectoryException(lastParent, userUUID, workspaceUUID);
 
         //이전 부모 children에서 삭제
         List<Directory> lastChildren = lastParent.getChildren();
@@ -160,6 +147,9 @@ public class WorkSpaceImpl implements WorkspaceService{
         directoryRepository.save(lastParent);
 
         //새로운 부모 children에 추가
+        if(lastParent.equals(parent)){
+            parent = lastParent;
+        }
         String nextUUID = dto.getNextUUID();
         List<Directory> children = parent.getChildren();
         if(nextUUID == null){
@@ -167,7 +157,7 @@ public class WorkSpaceImpl implements WorkspaceService{
         }else{
             int index = 0;
             for (Directory d : children) {
-                if(d.getUuid().equals(nextUUID)){
+                if(!d.isDeleted() && d.getUuid().equals(nextUUID)){
                     break;
                 }
                 index++;
@@ -188,7 +178,11 @@ public class WorkSpaceImpl implements WorkspaceService{
         }
 
         //권한 예외 처리
-        if(!directory.getUserUUID().equals(userUUID) && !directory.getWorkspaceUUID().equals(workspaceUUID)){
+        if(!directory.getUserUUID().equals(userUUID)){
+            throw new AccessRefusedException();
+        }
+
+        if(directory.getWorkspaceUUID() != null && !directory.getWorkspaceUUID().equals(workspaceUUID)){
             throw new AccessRefusedException();
         }
     }
