@@ -206,7 +206,7 @@ export default function Editor() {
           >
             <FaShareSquare size={20} />
           </button>
-          <Comment spaceUUID={spaceUUID} directoryUUID={searchParams.slug[1]} />
+          <Comment spaceUUID={spaceUUID} directoryUUID={searchParams.slug?.[1]} />
         </div>
       </div>
     </>
