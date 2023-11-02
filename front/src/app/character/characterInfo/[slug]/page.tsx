@@ -11,7 +11,7 @@ import {
   relationType,
 } from '@/model/charactor';
 import UploadState from '@/components/UploadState';
-
+import styles from '@/service/character/scrollbar.module.css';
 type Props = {
   params: {
     slug: string;
@@ -200,14 +200,20 @@ export default function page({ params }: Props) {
         </div>
         <div className="flex flex-col flex-grow justify-between">
           <p className="text-xl font-bold">캐릭터 설명</p>
-          <textarea
-            className="border-2 border-gray-300 rounded-xl resize-none outline-none h-56 px-4 py-2 font-bold text-lg"
-            value={summaryInput}
-            onChange={(e) => {
-              setState(1);
-              setSummaryInput(e.target.value);
-            }}
-          />
+          <div className='border-2 border-gray-300 rounded-xl h-56 p-2'>
+            <textarea
+              className={`${styles.scroll} resize-none outline-none font-bold text-lg w-full h-full`}
+              value={summaryInput}
+              onChange={(e) => {
+                setState(1);
+                if(e.target.value.length<1000){
+                  setSummaryInput(e.target.value);
+                }else{
+                  alert("글자 수 제한 1000자!");
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -308,7 +314,7 @@ export default function page({ params }: Props) {
                     }}
                   />
                   <div
-                    className={`${
+                    className={`${styles.scroll} ${
                       searchInput !== i && 'hidden'
                     } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
                   >
