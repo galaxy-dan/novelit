@@ -17,6 +17,7 @@ export type relationType = {
   id: string;
   name: string;
   content: string;
+  uuid?: string;
 };
 
 export type groupType = {
