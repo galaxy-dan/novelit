@@ -10,4 +10,12 @@ import lombok.NoArgsConstructor;
 public class FileWorkReqDTO {
 	private String uuid;
 	private String content;
+
+	@Override
+	public String toString() {
+		return "{" +
+			"\"uuid\":\"" + uuid + '\"' +
+			", \"content\":\"" + content + '\"' +
+			'}';
+	}
 }

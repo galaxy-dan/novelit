@@ -101,9 +101,12 @@ spring:
       on-profile: port_8003
     import: env.yml
     kafka:
+      topic:
+        article: testing
+        comment: comment
       bootstrap-servers: localhost:9092
       consumer:
-        group-id: novel
+        #        group-id: group-id-test
         auto-offset-reset: earliest
         key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
         value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
@@ -179,9 +182,12 @@ spring:
       on-profile: port_8001
     import: env.yml
     kafka:
+      topic:
+        article: testing
+        comment: comment
       bootstrap-servers: localhost:9092
       consumer:
-        group-id: novel
+        #        group-id: group-id-test
         auto-offset-reset: earliest
         key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
         value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
@@ -253,9 +259,12 @@ spring:
       on-profile: port_8002
     import: env.yml
     kafka:
+      topic:
+        article: testing
+        comment: comment
       bootstrap-servers: localhost:9092
       consumer:
-        group-id: novel
+        #        group-id: group-id-test
         auto-offset-reset: earliest
         key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
         value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
