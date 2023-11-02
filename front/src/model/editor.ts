@@ -12,3 +12,11 @@ export type Reply = {
   id: string;
   detail: string;
 };
+
+export type Comment = {
+  spaceUUID: string;
+  directoryUUID: string;
+  commentContent: string;
+  commentNickname: string;
+  commentPassword: string;
+};

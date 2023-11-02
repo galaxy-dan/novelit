@@ -62,13 +62,13 @@ spring:
       max-lifetime: 60000
   data:
     mongodb:
-      host: mongo
-      port: 27017
-      authentication-database: admin
-      username: ${MONGO_DATABASE_USERNAME}
-      password: ${DATABASE_PASSWORD}
-      database: novelit
-      #  uri: mongodb://localhost:27017/novelit
+      #host: mongo
+      #port: 27017
+      #authentication-database: admin
+      #username: ${MONGO_DATABASE_USERNAME}
+      #password: ${DATABASE_PASSWORD}
+      #database: novelit
+        uri: mongodb://localhost:27017/novelit
 
 ---
 
@@ -91,11 +91,7 @@ spring:
       authentication-database: admin
       username: ${MONGO_DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
-#      uri: ${MONGODB_URL}
-#      uri: mongodb://localhost:27017/novelit
       database: novelit
-
-#      uri: mongodb://localhost:27017/test
 
 ---
 
@@ -104,26 +100,26 @@ spring:
     activate:
       on-profile: port_8003
     import: env.yml
-#    security:
-#      oauth2:
-#        client:
-#          registration:
-#            kakao:
-#              client-id: ${KAKAO_CLIENT_ID}
-#              client-secret: ${KAKAO_CLIENT_SECRET}
-#              scope:
-#                - account_email
-#              client-name: Kakao
-#              authorization-grant-type: authorization_code
-#              client-authentication-method: POST
-#              # redirect-uri: ${KAKAO_REDIRECT_URL}
-#          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
-#          provider:
-#            kakao:
-#              authorization-uri: https://kauth.kakao.com/oauth/authorize
-#              token-uri: https://kauth.kakao.com/oauth/token
-#              user-info-uri: https://kapi.kakao.com/v2/user/me
-#              user-name-attribute: id
+  #    security:
+  #      oauth2:
+  #        client:
+  #          registration:
+  #            kakao:
+  #              client-id: ${KAKAO_CLIENT_ID}
+  #              client-secret: ${KAKAO_CLIENT_SECRET}
+  #              scope:
+  #                - account_email
+  #              client-name: Kakao
+  #              authorization-grant-type: authorization_code
+  #              client-authentication-method: POST
+  #              # redirect-uri: ${KAKAO_REDIRECT_URL}
+  #          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+  #          provider:
+  #            kakao:
+  #              authorization-uri: https://kauth.kakao.com/oauth/authorize
+  #              token-uri: https://kauth.kakao.com/oauth/token
+  #              user-info-uri: https://kapi.kakao.com/v2/user/me
+  #              user-name-attribute: id
   jpa:
     show-sql: true
     hibernate:
@@ -171,26 +167,26 @@ spring:
     activate:
       on-profile: port_8001
     import: env.yml
-#    security:
-#      oauth2:
-#        client:
-#          registration:
-#            kakao:
-#              client-id: ${KAKAO_CLIENT_ID}
-#              client-secret: ${KAKAO_CLIENT_SECRET}
-#              scope:
-#                - account_email
-#              client-name: Kakao
-#              authorization-grant-type: authorization_code
-#              client-authentication-method: POST
-#              # redirect-uri: ${KAKAO_REDIRECT_URL}
-#          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
-#          provider:
-#            kakao:
-#              authorization-uri: https://kauth.kakao.com/oauth/authorize
-#              token-uri: https://kauth.kakao.com/oauth/token
-#              user-info-uri: https://kapi.kakao.com/v2/user/me
-#              user-name-attribute: id
+  #    security:
+  #      oauth2:
+  #        client:
+  #          registration:
+  #            kakao:
+  #              client-id: ${KAKAO_CLIENT_ID}
+  #              client-secret: ${KAKAO_CLIENT_SECRET}
+  #              scope:
+  #                - account_email
+  #              client-name: Kakao
+  #              authorization-grant-type: authorization_code
+  #              client-authentication-method: POST
+  #              # redirect-uri: ${KAKAO_REDIRECT_URL}
+  #          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+  #          provider:
+  #            kakao:
+  #              authorization-uri: https://kauth.kakao.com/oauth/authorize
+  #              token-uri: https://kauth.kakao.com/oauth/token
+  #              user-info-uri: https://kapi.kakao.com/v2/user/me
+  #              user-name-attribute: id
   jpa:
     show-sql: true
     hibernate:
@@ -234,26 +230,26 @@ spring:
     activate:
       on-profile: port_8002
     import: env.yml
-#    security:
-#      oauth2:
-#        client:
-#          registration:
-#            kakao:
-#              client-id: ${KAKAO_CLIENT_ID}
-#              client-secret: ${KAKAO_CLIENT_SECRET}
-#              scope:
-#                - account_email
-#              client-name: Kakao
-#              authorization-grant-type: authorization_code
-#              client-authentication-method: POST
-#              # redirect-uri: ${KAKAO_REDIRECT_URL}
-#          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
-#          provider:
-#            kakao:
-#              authorization-uri: https://kauth.kakao.com/oauth/authorize
-#              token-uri: https://kauth.kakao.com/oauth/token
-#              user-info-uri: https://kapi.kakao.com/v2/user/me
-#              user-name-attribute: id
+  #    security:
+  #      oauth2:
+  #        client:
+  #          registration:
+  #            kakao:
+  #              client-id: ${KAKAO_CLIENT_ID}
+  #              client-secret: ${KAKAO_CLIENT_SECRET}
+  #              scope:
+  #                - account_email
+  #              client-name: Kakao
+  #              authorization-grant-type: authorization_code
+  #              client-authentication-method: POST
+  #              # redirect-uri: ${KAKAO_REDIRECT_URL}
+  #          #              redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+  #          provider:
+  #            kakao:
+  #              authorization-uri: https://kauth.kakao.com/oauth/authorize
+  #              token-uri: https://kauth.kakao.com/oauth/token
+  #              user-info-uri: https://kapi.kakao.com/v2/user/me
+  #              user-name-attribute: id
   jpa:
     show-sql: true
     hibernate:
@@ -302,5 +298,4 @@ server:
 #    oauth2:
 #      authorizedRedirectUris:
 #        -
-
 
