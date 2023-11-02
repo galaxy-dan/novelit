@@ -1,11 +1,13 @@
 package com.galaxy.novelit.character.controller;
 
+import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.DiagramDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.character.service.GroupService;
 import com.galaxy.novelit.words.service.WordsService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +28,9 @@ public class CharacterController {
     private final WordsService wordsService;
 
     @GetMapping
-    public ResponseEntity<Object> getCharacter(@RequestParam String characterUuid) {
+    public ResponseEntity<Object> getCharacterInfo(@RequestParam String characterUUID) {
         try {
-            CharacterDtoRes dto = characterService.getCharacter(characterUuid);;
+            CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -36,7 +38,7 @@ public class CharacterController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCharacter(@RequestBody CharacterDtoReq dto) {
+    public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto) {
         try {
             characterService.createCharacter(dto);
             return ResponseEntity.ok().build();
@@ -48,7 +50,7 @@ public class CharacterController {
     @PutMapping
     public ResponseEntity<Object> updateCharacter(@RequestBody CharacterDtoReq dto) {
         try {
-//            CharacterDtoRes characterDtoRes = characterService.getCharacter(dto.getCharacterUuid());
+//            CharacterDtoRes characterDtoRes = characterService.getCharacter(dto.getCharacterUUID());
             characterService.updateCharacter(dto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -57,9 +59,9 @@ public class CharacterController {
     }
 
     @DeleteMapping
-    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUuid) {
+    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUUID) {
         try {
-            characterService.deleteCharacter(characterUuid);
+            characterService.deleteCharacter(characterUUID);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

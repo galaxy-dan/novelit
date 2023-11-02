@@ -20,9 +20,9 @@ public class WordsController {
     private final WordsService wordsService;
 
     @PostMapping
-    public ResponseEntity<Object> createWord(@RequestParam String word) {
+    public ResponseEntity<Object> createWord(@RequestParam String workspaceUUID, String word) {
         try {
-            wordsService.createWord(word);
+            wordsService.createWord(workspaceUUID, word);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
