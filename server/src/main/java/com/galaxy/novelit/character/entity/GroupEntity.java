@@ -31,10 +31,8 @@ public class GroupEntity {
     private String parentUUID;
     @DBRef
     private List<GroupEntity> childUUID;
-    @Field(name = "characters_uuid")
-    private List<String> charactersUUID;
-//    @Field
-//    private Map<String, String>
+    @Field(name = "characters_info")
+    private List<Map<String, String>> charactersInfo;   // Map<characteUUID, characterName>
     @Field(name = "is_deleted")
     private boolean isDeleted;
 }

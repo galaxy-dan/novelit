@@ -1,5 +1,6 @@
 package com.galaxy.novelit.character.service;
 
+import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
@@ -40,6 +41,7 @@ public class CharacterServiceImpl implements CharacterService {
         dto.setRelationship(character.getRelationship());
         dto.setCharacterImage(character.getCharacterImage());
         dto.setDeleted(character.isDeleted());
+
         return dto;
     }
 
@@ -63,7 +65,7 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public void createCharacter(CharacterDtoReq dto) {
+    public void createCharacter(CharacterCreateDtoReq dto) {
         String characterUUID = UUID.randomUUID().toString();
 //        String characterName = dto.getCharacterName();
 //        String description = dto.getDescription();
@@ -72,6 +74,7 @@ public class CharacterServiceImpl implements CharacterService {
 
         CharacterEntity newCharacter = CharacterEntity.builder()
             .characterUUID(characterUUID)
+            .groupUUID(dto.getGroupUUID())
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
@@ -95,10 +98,16 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity character = characterRepository.findByCharacterUUID(dto.getCharacterUUID());
         CharacterEntity newCharacter = CharacterEntity.builder()
             .characterId(character.getCharacterId())
+            .userUUID(dto.getUserUUID())
+            .groupUUID(dto.getGroupUUID())
+            .characterUUID(dto.getCharacterUUID())
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
-            .relationship(dto.getRelationship()).build();
+            .relationship(dto.getRelationship())
+            .characterImage(dto.getCharacterImage())
+            .isDeleted(dto.isDeleted())
+            .build();
 
         characterRepository.save(newCharacter);
 
@@ -110,6 +119,14 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         CharacterEntity newCharacter = CharacterEntity.builder()
             .characterId(character.getCharacterId())
+            .userUUID(character.getUserUUID())
+            .groupUUID(character.getGroupUUID())
+            .characterUUID(character.getCharacterUUID())
+            .characterName(character.getCharacterName())
+            .description(character.getDescription())
+            .information(character.getInformation())
+            .relationship(character.getRelationship())
+            .characterImage(character.getCharacterImage())
             .isDeleted(true).build();
 
         characterRepository.save(newCharacter);

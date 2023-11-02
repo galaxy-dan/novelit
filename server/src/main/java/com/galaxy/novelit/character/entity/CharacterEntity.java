@@ -1,5 +1,7 @@
 package com.galaxy.novelit.character.entity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,5 +39,5 @@ public class CharacterEntity {
     private boolean isDeleted;
     @Field(name = "character_image")
     private String characterImage;
-
+//    List<ArrayList<Map<String, String>>>
 }

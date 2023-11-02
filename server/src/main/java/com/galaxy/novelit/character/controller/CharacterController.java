@@ -1,5 +1,6 @@
 package com.galaxy.novelit.character.controller;
 
+import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.DiagramDtoRes;
@@ -37,7 +38,7 @@ public class CharacterController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCharacter(@RequestBody CharacterDtoReq dto) {
+    public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto) {
         try {
             characterService.createCharacter(dto);
             return ResponseEntity.ok().build();

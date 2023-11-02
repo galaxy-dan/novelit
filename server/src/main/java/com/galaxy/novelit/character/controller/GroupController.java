@@ -1,12 +1,11 @@
 package com.galaxy.novelit.character.controller;
 
 
-import com.galaxy.novelit.character.dto.req.GroupDtoReq;
+import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.character.service.GroupService;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,7 +47,7 @@ public class GroupController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createGroup(@RequestBody GroupDtoReq dto) {
+    public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto) {
         try {
             groupService.createGroup(dto);
             return ResponseEntity.ok().build();
@@ -58,7 +57,7 @@ public class GroupController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUUID, String newName) {
+    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUUID, @RequestParam String newName) {
         try {
             groupService.updateGroupName(groupUUID, newName);
             return ResponseEntity.ok().build();
