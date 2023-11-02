@@ -2,6 +2,7 @@ package com.galaxy.novelit.character.service;
 
 import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
+import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
@@ -113,19 +114,19 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public void updateCharacter(CharacterDtoReq dto) {
-        CharacterEntity character = characterRepository.findByCharacterUUID(dto.getCharacterUUID());
+    public void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto) {
+        CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         CharacterEntity newCharacter = CharacterEntity.builder()
+            .userUUID(character.getUserUUID())
             .characterId(character.getCharacterId())
-            .userUUID(dto.getUserUUID())
+            .characterUUID(characterUUID)
             .groupUUID(dto.getGroupUUID())
-            .characterUUID(dto.getCharacterUUID())
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
             .relationship(dto.getRelationship())
             .characterImage(dto.getCharacterImage())
-            .isDeleted(dto.isDeleted())
+            .isDeleted(character.isDeleted())
             .build();
 
         characterRepository.save(newCharacter);

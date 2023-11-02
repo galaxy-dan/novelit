@@ -2,6 +2,7 @@ package com.galaxy.novelit.character.controller;
 
 import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
+import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.DiagramDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
@@ -48,10 +49,10 @@ public class CharacterController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateCharacter(@RequestBody CharacterDtoReq dto) {
+    public ResponseEntity<Object> updateCharacter(@RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto) {
         try {
 //            CharacterDtoRes characterDtoRes = characterService.getCharacter(dto.getCharacterUUID());
-            characterService.updateCharacter(dto);
+            characterService.updateCharacter(characterUUID, dto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
