@@ -68,9 +68,9 @@ export default function page({ params }: Props) {
       relation: relationInput,
       information: informationInput,
     }));
-    console.log(character);
     setState(2);
   };
+
   useEffect(() => {
     const debounce = setTimeout(() => {
       return hello();
@@ -89,9 +89,12 @@ export default function page({ params }: Props) {
       }
     }
   }, [nameInput]);
+
   const loaderProp = ({ src }: any) => {
     return src;
   };
+
+
   return (
     <div className="mx-80 my-20 select-none">
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
@@ -152,9 +155,6 @@ export default function page({ params }: Props) {
                 alert('이미지 업로드 간격이 너무 짧아요!');
                 return;
               } else {
-                console.log(
-                  now + ' / ' + lastUploadTime + ' / ' + uploadInterval,
-                );
               }
 
               setState(1);
@@ -173,9 +173,6 @@ export default function page({ params }: Props) {
                     setImageUrl(window.URL.createObjectURL(targetFile));
                     setImageInput(imgUrl);
                     setLastUploadTime(now);
-                    console.log(
-                      now + ' / ' + lastUploadTime + ' / ' + uploadInterval,
-                    );
                   }
                 };
                 yeah();
@@ -232,8 +229,9 @@ export default function page({ params }: Props) {
                     <FaMinus
                       className="my-auto cursor-pointer h-10"
                       onClick={() => {
-                        let newInfo : informationType[] = [...character.information].splice(i, 1);
-                        setInformationInput(newInfo);
+                        let tmpInfo = [...informationInput];
+                        let tmp = tmpInfo.splice(i, 1);
+                        setInformationInput(tmpInfo);
                       }}
                     />
                   </div>
@@ -245,8 +243,8 @@ export default function page({ params }: Props) {
         <button
           className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
           onClick={() => {
-            let newInfo : informationType[] = [
-              ...character.information,
+            let newInfo: informationType[] = [
+              ...informationInput,
               { id: '', title: '', content: '' },
             ];
             setInformationInput(newInfo);
@@ -292,8 +290,9 @@ export default function page({ params }: Props) {
                     <FaMinus
                       className="my-auto cursor-pointer h-10"
                       onClick={() => {
-                        let newRelation : relationType[] = [...character.relation].splice(i, 1);
-                        setRelationInput(newRelation);
+                        let tmpRelation = [...relationInput];
+                        let tmp = tmpRelation.splice(i, 1);
+                        setRelationInput(tmpRelation);
                       }}
                     />
                   </div>
@@ -302,14 +301,16 @@ export default function page({ params }: Props) {
             ))}
           </tbody>
         </table>
-        <button className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
-        onClick={() => {
-          let newRelation : relationType[] = [
-            ...character.relation,
-            { id: '', name: '', content: '' },
-          ];
-          setRelationInput(newRelation);
-        }}>
+        <button
+          className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
+          onClick={() => {
+            let newRelation: relationType[] = [
+              ...relationInput,
+              { id: '', name: '', content: '' },
+            ];
+            setRelationInput(newRelation);
+          }}
+        >
           <HiPlus className="text-white mx-auto font-bold" />
         </button>
       </div>
