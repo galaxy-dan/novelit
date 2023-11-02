@@ -2,6 +2,7 @@ package com.galaxy.novelit.character.dto.res;
 
 import com.galaxy.novelit.character.entity.GroupEntity;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,11 +11,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 public class GroupDtoRes {
-    private String userUuid;
-    private String workspaceUuid;
-    private String groupUuid;
+    private String workspaceUUID;
+    private String groupUUID;
     private String groupName;
-    private String parentUuid;
-    private List<GroupEntity> childUuid;
+    private String parentUUID;
+    private List<GroupEntity> childUUID;
+    private List<Map<String, String>> charactersInfo;
     private boolean isDeleted;
 }

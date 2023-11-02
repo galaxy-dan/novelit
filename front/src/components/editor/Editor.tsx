@@ -1,8 +1,8 @@
 'use client';
 
-import { Reply } from '@/model/editor';
+import { Editor, Reply } from '@/model/editor';
 import { fontFamily, fontSize } from '@/service/editor/editor';
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
@@ -11,14 +11,44 @@ import sanitizeHtml, { IOptions } from 'sanitize-html';
 import { BiSolidPencil, BiBold, BiSolidTrashAlt } from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
+import { useParams } from 'next/navigation';
+import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
+import { getEditor, patchEditor } from '@/service/api/editor';
+import { toast } from 'react-toastify';
+import Comment from './Comment';
 
 export default function Editor() {
+  const searchParams = useParams();
+
+  const { data: editor }: UseQueryResult<Editor> = useQuery({
+    queryKey: ['editor', searchParams.slug?.[1]],
+    queryFn: () => getEditor({ uuid: searchParams.slug?.[1] }),
+    enabled: !!searchParams.slug?.[1],
+  });
+
+  useEffect(() => {
+    // document.getElementById("editor")?.innerText =
+
+    let content = editor?.content ?? '';
+    content = content.length === 0 ? '<div><br/></div>' : content;
+    setHtml(content);
+  }, [editor?.content]);
+
+  const patchMutate = useMutation({
+    mutationFn: patchEditor,
+    onSuccess: () => {
+      toast('저장 성공');
+    },
+  });
+
   const [html, setHtml] = useState<string>('<div><br/></div>');
 
   const [editable, setEditable] = useState<boolean>(true);
   const [fontIndex, setFontIndex] = useState<number>(2);
   const [fontFamilyIndex, setFontFamilyIndex] = useState<number>(0);
 
+  const [spaceUUID, setSpaceUUID] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const comment = useRef<Reply[]>([]);
 
   const handleChange = (e: ContentEditableEvent) => {
@@ -53,7 +83,8 @@ export default function Editor() {
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
-
+    
+    setSpaceUUID(wrapper.id);
     // 버블링 안되게
     // wrapper.onclick = '
     wrapper.appendChild(range.extractContents());
@@ -99,7 +130,19 @@ export default function Editor() {
       <div
         className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
       >
-        <div className="w-[924px]">제목입니다.</div>
+        <div className="w-[924px]">{editor?.title}</div>
+        <button
+          onClick={() => {
+            patchMutate.mutate({
+              uuid: searchParams.slug?.[1],
+              content:
+                document.getElementById('edit')?.innerHTML ??
+                '<div><br/></div>',
+            });
+          }}
+        >
+          임시저장
+        </button>
       </div>
       <div className="flex gap-6 justify-center items-center">
         <div className="flex flex-col justify-center items-center">
@@ -145,15 +188,25 @@ export default function Editor() {
           >
             <BiBold size={20} />
           </button>
-          <button className="p-4 bg-green-50 bg-opacity-40 rounded-lg" onClick={addReply}>
+          <button
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
+            onClick={addReply}
+          >
             <FaCheck size={20} />
           </button>
-          <button className="p-4 bg-green-50 bg-opacity-40 rounded-lg" onClick={addReply2}>
+          <button
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
+            onClick={addReply2}
+          >
             <BiSolidTrashAlt size={20} />
           </button>
-          <button className="p-4 bg-green-50 bg-opacity-40 rounded-lg" onClick={shareDoc}>
+          <button
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
+            onClick={shareDoc}
+          >
             <FaShareSquare size={20} />
           </button>
+          <Comment spaceUUID={spaceUUID} directoryUUID={searchParams.slug?.[1]} />
         </div>
       </div>
     </>

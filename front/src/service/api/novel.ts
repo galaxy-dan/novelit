@@ -1,5 +1,5 @@
-import { PatchDirectory, PostDirectory } from '@/model/novel';
-import { patch, post } from './http';
+import { DeleteDirectory, PatchDirectory, PostDirectory } from '@/model/novel';
+import { del, patch, post } from './http';
 
 
 export const getDirectory = async () => {
@@ -15,4 +15,9 @@ export const postDirectory = async (req: PostDirectory) => {
 export const patchDirectory = async (req: PatchDirectory) => {
     const data = await patch("/directory", req);
     return data;
+}
+
+export const deleteDirectory = async (req: DeleteDirectory) => {
+  const data = await del("/directory", req);
+  return data;
 }

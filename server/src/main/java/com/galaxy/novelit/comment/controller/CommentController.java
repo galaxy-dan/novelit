@@ -1,11 +1,11 @@
 package com.galaxy.novelit.comment.controller;
 
+import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import com.galaxy.novelit.comment.dto.request.CommentDeleteRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
-import com.galaxy.novelit.comment.dto.request.CommentGetRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentUpdateRequestDto;
-import com.galaxy.novelit.comment.dto.response.CommentGetResponseDto;
 import com.galaxy.novelit.comment.service.CommentService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +33,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<CommentGetResponseDto> getAllComments(@RequestParam("directoryUUID") String directoryUUID, @RequestParam("spaceId") Long spaceId) {
-        return ResponseEntity.ok(commentService.getAllComments(directoryUUID, spaceId));
+    public ResponseEntity<List<CommentInfoDto>> getAllComments(@RequestParam("spaceUUID") String spaceUUID) {
+        return ResponseEntity.ok(commentService.getAllComments(spaceUUID));
     }
 
     @PutMapping

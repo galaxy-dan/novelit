@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
+import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
 import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.common.exception.dto.ExceptionResDTO;
 
@@ -38,7 +39,12 @@ public class ExceptionAdvice {
 	}
 
 	@ExceptionHandler(IllegalUUIDException.class)
-	public ResponseEntity<ExceptionResDTO> noSuchPlotException(IllegalUUIDException e){
+	public ResponseEntity<ExceptionResDTO> IllegalUUIDException(IllegalUUIDException e){
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(NoSuchWorkspaceException.class)
+	public ResponseEntity<ExceptionResDTO> NoSuchWorkspaceException(NoSuchWorkspaceException e){
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
 	}
 }

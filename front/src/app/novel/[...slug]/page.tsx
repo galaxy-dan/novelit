@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 export default function NovelPage() {
-
   return (
     <div className="pl-48 font-melody">
       <CardList />

@@ -26,6 +26,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
+import CreateButton from '@/components/CreateButton';
 
 const schema = yup
   .object({
@@ -63,10 +64,14 @@ export default function MainPage() {
     resolver: yupResolver(schema),
   });
 
+  const buttonClick = () => {
+    setIsOpen((prev) => !prev);
+  };
+
   return (
     <>
       <div className="flex">
-        <div className="w-1/2 min-h-screen flex items-end justify-center">
+        <div className="w-[200px] min-h-screen flex items-end justify-center">
           <div className="flex flex-col gap-4 justify-center items-start font-bold text-lg mb-6">
             <div className="flex items-center gap-2">
               <AiOutlineSearch size={25} />
@@ -82,23 +87,14 @@ export default function MainPage() {
             </div>
           </div>
         </div>
-        <div className="flex justify-center flex-grow">
-          <div className="flex flex-col text-2xl font-extrabold gap-14 mt-10">
+        {/* <div className="flex justify-center flex-grow"> */}
+          <div className="flex flex-grow flex-col text-2xl font-extrabold gap-14 mt-10">
             <div className="flex justify-between items-center">
               <div className="flex flex-col gap-2">
-                <div className="font-normal">김채원님 안녕하세요.</div>
+                <div className="font-normal">{`${user?.nickname}님 안녕하세요.`}</div>
                 <div>노벨릿에 오신 것을 환영합니다.</div>
               </div>
-
-              <button
-                className="flex items-center justify-center text-sm border-2 rounded-md p-1 mr-5"
-                onClick={() => {
-                  setIsOpen((prev) => !prev);
-                }}
-              >
-                <BiPencil />
-                <div>새 작품</div>
-              </button>
+              <CreateButton onClick={buttonClick} content="새 작품" />
             </div>
             <div>
               <div className="text-base mb-2">내 작품</div>
@@ -139,7 +135,7 @@ export default function MainPage() {
             </div>
           </div>
         </div>
-      </div>
+      {/* </div> */}
       {isOpen && <NewWorkspaceModal setIsOpen={setIsOpen} form={form} />}
     </>
   );
