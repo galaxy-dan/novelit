@@ -68,7 +68,7 @@ spring:
       #username: ${MONGO_DATABASE_USERNAME}
       #password: ${DATABASE_PASSWORD}
       #database: novelit
-      uri: mongodb://localhost:27017/novelit
+        uri: mongodb://localhost:27017/novelit
 
 ---
 

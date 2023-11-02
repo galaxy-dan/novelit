@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import { Directory, Novel, Novels } from '@/model/workspace';
 import { getWorkspace } from '@/service/api/workspace';
+import CardListHeader from './CardListHeader';
 
 export default function CardList() {
   const searchParams = useParams();
@@ -14,20 +15,24 @@ export default function CardList() {
     : searchParams.slug;
 
   const { data: workspace }: UseQueryResult<Novel> = useQuery({
-    queryKey: ['workspace'],
+    queryKey: ['workspace', slug],
     queryFn: () => getWorkspace({ workspaceUUID: slug }),
     enabled: !!slug,
   });
 
   return (
     <>
-      <div className="font-extrabold text-4xl my-32">{workspace?.title}</div>
+      <CardListHeader title={workspace?.title ?? ''} />
       <div className="flex flex-wrap gap-6">
-        {workspace?.directories?.map((el: Novels, index: number) => (
-          <Link key={index} href={`/editor/${slug}/${el.id}`}>
-            <Card subject={`${el.name}`} />
-          </Link>
-        ))}
+        {workspace?.directories?.map((el: Novels, index: number) =>
+          el.children ? (
+            <Card subject={`${el.name}`} isDirectory={true} />
+          ) : (
+            <Link key={index} href={`/editor/${slug}/${el.id}`}>
+              <Card subject={`${el.name}`} isDirectory={false} />
+            </Link>
+          ),
+        )}
       </div>
     </>
   );

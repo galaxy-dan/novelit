@@ -1,5 +1,8 @@
 package com.galaxy.novelit.comment.domain;
 
+import com.galaxy.novelit.comment.dto.CommentInfoDto;
+import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +17,29 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Builder
 public class CommentInfo {
-    private Long commentOrder;
+    private String commentUUID;
     private String commentContent;
-    private String commentId;
+    private String commentNickname;
     private String commentPassword;
+
+    public static CommentInfo dtoToInfo(CommentInfoDto commentInfoDto) {
+        UUID commentUUID = UUID.randomUUID();
+
+        String strUUID = commentUUID.toString();
+
+        return CommentInfo.builder()
+            .commentUUID(strUUID)
+            .commentContent(commentInfoDto.getCommentContent())
+            .commentNickname(commentInfoDto.getCommentNickname())
+            .commentPassword(commentInfoDto.getCommentPassword())
+            .build();
+    }
+
+    public static CommentInfo create(CommentAddRequestDto commentAddRequestDto) {
+        return dtoToInfo(CommentInfoDto.addDtoToDto(commentAddRequestDto));
+    }
+
+    public void updateCommentContent(String commentContent) {
+        this.commentContent = commentContent;
+    }
 }

@@ -25,7 +25,7 @@ import {
 } from '@/service/api/novel';
 import { getWorkspace } from '@/service/api/workspace';
 import { Directory, Novel } from '@/model/workspace';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 
 const temp = {
@@ -95,7 +95,7 @@ export default function SideMenu() {
     : searchParams.slug;
 
   const { data: workspace }: UseQueryResult<Novel> = useQuery({
-    queryKey: ['workspace'],
+    queryKey: ['workspace', slug],
     queryFn: () => getWorkspace({ workspaceUUID: slug }),
     enabled: !!slug,
   });
@@ -110,7 +110,7 @@ export default function SideMenu() {
       </button>
 
       {isOpen && (
-        <div className="fixed left-0 top-0 bg-violet-50 w-64 font-melody">
+        <div className="min-h-screen z-50 fixed left-0 top-0 bg-violet-50 w-64 font-melody">
           <div>
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
@@ -191,6 +191,7 @@ export default function SideMenu() {
 function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
   const searchParams = useParams();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const slug = Array.isArray(searchParams.slug)
     ? searchParams.slug[0]
@@ -226,7 +227,14 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
           node.isSelected ? 'bg-slate-50' : 'bg-violet-50'
         }`}
         ref={dragHandle}
-        onClick={() => node.toggle()}
+        onClick={() => {
+          node.toggle();
+        }}
+        onDoubleClick={() => {
+          if (node.isLeaf) {
+            router.push(`/editor/${slug}/${node.id}`);
+          }
+        }}
       >
         <div className="text-black">
           {node.isEditing ? (

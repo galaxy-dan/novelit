@@ -1,27 +1,19 @@
 package com.galaxy.novelit.comment.dto.request;
 
-import com.galaxy.novelit.comment.dto.CommentInfoDto;
-import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CommentUpdateRequestDto {
-    private String directoryUUID;
-    private Long spaceId;
-
-    private Long commentOrder;
-
-    private String updateContent;
-
-    private String userUUID;
-
-    private String commentId;
+    private String spaceUUID;
+    private String commentUUID;
+    private String commentContent;
+    private String commentNickname;
     private String commentPassword;
 }
