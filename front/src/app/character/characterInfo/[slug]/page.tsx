@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { FaRegTrashAlt, FaMinus } from 'react-icons/fa';
-import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/ai';
 import { HiPlus } from 'react-icons/hi';
 import Image from 'next/image';
 import { getS3URL, uploadImage } from '@/service/character/image';
@@ -22,8 +21,7 @@ export default function page({ params }: Props) {
   const [character, setCharacter] = useState<characterType>({
     id: '',
     name: '배트맨',
-    image:
-      'https://novelit.s3.ap-northeast-2.amazonaws.com/0914cfe0-38e5-4a0d-a196-46ed011e6ff5%EB%AC%B4%EC%A0%9C.png',
+    image: '',
     summary: '',
     information: [
       { id: '', title: '', content: '' },
@@ -31,9 +29,9 @@ export default function page({ params }: Props) {
       { id: '', title: '', content: '' },
     ],
     relation: [
-      { id: '', name: '', content: '' },
-      { id: '', name: '', content: '' },
-      { id: '', name: '', content: '' },
+      { id: '', name: '', content: '', uuid: '' },
+      { id: '', name: '', content: '', uuid: '' },
+      { id: '', name: '', content: '', uuid: '' },
     ],
   });
 
@@ -57,6 +55,8 @@ export default function page({ params }: Props) {
     character.relation,
   );
 
+  const [searchInput, setSearchInput] = useState<number>(-1);
+
   const [state, setState] = useState<number>(0);
 
   const hello = () => {
@@ -68,7 +68,6 @@ export default function page({ params }: Props) {
       relation: relationInput,
       information: informationInput,
     }));
-    setState(2);
   };
 
   useEffect(() => {
@@ -82,6 +81,7 @@ export default function page({ params }: Props) {
 
   useEffect(() => {
     console.log(character);
+    setState(2);
   }, [character]);
 
   useEffect(() => {
@@ -98,12 +98,11 @@ export default function page({ params }: Props) {
     return src;
   };
 
-
   return (
-    <div className="mx-80 my-20 select-none">
+    <div className="px-80 py-20 select-none" onClick={() => setSearchInput(-1)}>
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
       <div className="flex items-end justify-between">
-        <div className="flex items-end">
+        <div className="flex items-center">
           <div>
             <span
               ref={nameRef}
@@ -134,19 +133,34 @@ export default function page({ params }: Props) {
       {/* 캐릭터 이미지 및 설명 */}
       <div className="flex h-64 mt-6">
         <div className="relative w-56 h-56 mr-10 place-self-end">
-          <Image
-            src={imageUrl}
-            alt="캐릭터 상세 이미지"
-            priority={true}
-            className="object-cover w-full h-full cursor-pointer"
-            height={100}
-            width={100}
-            onClick={() => {
-              imgRef?.current?.click();
-            }}
-            loader={loaderProp}
-            unoptimized={true}
-          />
+          {imageUrl !== '' ? (
+            <Image
+              src={imageUrl}
+              alt="캐릭터 상세 이미지"
+              priority={true}
+              className="object-cover w-full h-full cursor-pointer"
+              height={1000}
+              width={1000}
+              onClick={() => {
+                imgRef?.current?.click();
+              }}
+              loader={loaderProp}
+              unoptimized={true}
+            />
+          ) : (
+            <Image
+              src="/images/default_character.png"
+              alt="캐릭터 상세 이미지"
+              priority={true}
+              className="object-contain w-full h-full cursor-pointer"
+              height={1000}
+              width={1000}
+              onClick={() => {
+                imgRef?.current?.click();
+              }}
+            />
+          )}
+
           <input
             type="file"
             className="hidden"
@@ -200,11 +214,15 @@ export default function page({ params }: Props) {
       {/* 기본 정보 */}
       <div className="mt-8">
         <p className="text-xl font-extrabold">기본 정보</p>
-        <table className="text-xl border w-full border-gray-300 rounded-xl overflow-hidden border-separate border-spacing-0">
+        <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
           <tbody>
             {informationInput.map((info, i) => (
-              <tr className="h-16" key={i}>
-                <td className="border border-gray-300 w-1/5 px-2 py-1 text-center">
+              <tr className="h-16  relative" key={i}>
+                <td
+                  className={`${i === 0 && 'rounded-tl-xl'} ${
+                    i === informationInput.length - 1 && 'rounded-bl-xl'
+                  } border border-gray-300 w-1/5 px-2 py-1 text-center`}
+                >
                   <input
                     type="text"
                     className="w-full resize-none outline-none truncate my-auto text-center font-bold"
@@ -217,7 +235,11 @@ export default function page({ params }: Props) {
                     }}
                   />
                 </td>
-                <td className="border h-full border-gray-300 w-4/5 px-2 pt-1">
+                <td
+                  className={`${i === 0 && 'rounded-tr-xl'} ${
+                    i === informationInput.length - 1 && 'rounded-br-xl'
+                  } border h-full border-gray-300 w-4/5 px-2 pt-1`}
+                >
                   <div className="flex">
                     <input
                       type="text"
@@ -233,6 +255,7 @@ export default function page({ params }: Props) {
                     <FaMinus
                       className="my-auto cursor-pointer h-10"
                       onClick={() => {
+                        setState(1);
                         let tmpInfo = [...informationInput];
                         let tmp = tmpInfo.splice(i, 1);
                         setInformationInput(tmpInfo);
@@ -252,6 +275,7 @@ export default function page({ params }: Props) {
               { id: '', title: '', content: '' },
             ];
             setInformationInput(newInfo);
+            setState(1);
           }}
         >
           <HiPlus className="text-white mx-auto font-bold" />
@@ -261,11 +285,15 @@ export default function page({ params }: Props) {
       {/* 관계 */}
       <div className="mt-8">
         <p className="text-xl font-extrabold">관계</p>
-        <table className="text-xl border w-full border-gray-300 rounded-xl overflow-hidden border-separate border-spacing-0">
+        <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
           <tbody>
             {relationInput.map((info, i) => (
-              <tr className="h-16" key={i}>
-                <td className="border border-gray-300 w-1/5 px-2 py-1 text-center">
+              <tr className="h-16 relative" key={i}>
+                <td
+                  className={`${i === 0 && 'rounded-tl-xl'} ${
+                    i === relationInput.length - 1 && 'rounded-bl-xl'
+                  } border border-gray-300 w-1/5 px-2 py-1 text-center`}
+                >
                   <input
                     type="text"
                     className="w-full resize-none outline-none truncate my-auto text-center font-bold"
@@ -275,10 +303,106 @@ export default function page({ params }: Props) {
                       var newItem = [...relationInput];
                       newItem[i].name = e.target.value;
                       setRelationInput(newItem);
+                      setSearchInput(i);
+                      //UUID null로 초기화
                     }}
                   />
+                  <div
+                    className={`${
+                      searchInput !== i && 'hidden'
+                    } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
+                  >
+                    <div
+                      className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setState(1);
+                        var newItem = [...relationInput];
+                        newItem[i].name = '이름이름이름이름';
+                        setRelationInput(newItem);
+                        setSearchInput(-1);
+                        //UUID
+                      }}
+                    >
+                      <Image
+                        src="/images/default_character.png"
+                        alt="관계 캐릭터 이미지"
+                        priority={true}
+                        className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                        height={1000}
+                        width={1000}
+                      />
+                      <p className="truncate">이름이름이름이름이름이름</p>
+                    </div>
+                    <div
+                      className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setState(1);
+                        var newItem = [...relationInput];
+                        newItem[i].name = '이름이름이름이름';
+                        setRelationInput(newItem);
+                        setSearchInput(-1);
+                        //UUID
+                      }}
+                    >
+                      <Image
+                        src="/images/default_character.png"
+                        alt="관계 캐릭터 이미지"
+                        priority={true}
+                        className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                        height={1000}
+                        width={1000}
+                      />
+                      <p className="truncate">이름이름이름이름이름이름</p>
+                    </div>
+                    <div
+                      className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setState(1);
+                        var newItem = [...relationInput];
+                        newItem[i].name = '이름이름이름이름';
+                        setRelationInput(newItem);
+                        setSearchInput(-1);
+                        //UUID
+                      }}
+                    >
+                      <Image
+                        src="/images/default_character.png"
+                        alt="관계 캐릭터 이미지"
+                        priority={true}
+                        className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                        height={1000}
+                        width={1000}
+                      />
+                      <p className="truncate">이름이름이름이름이름이름</p>
+                    </div>
+                    <div
+                      className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setState(1);
+                        var newItem = [...relationInput];
+                        newItem[i].name = '이름이름이름이름';
+                        setRelationInput(newItem);
+                        setSearchInput(-1);
+                        //UUID
+                      }}
+                    >
+                      <Image
+                        src="/images/default_character.png"
+                        alt="관계 캐릭터 이미지"
+                        priority={true}
+                        className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                        height={1000}
+                        width={1000}
+                      />
+                      <p className="truncate">이름이름이름이름이름이름</p>
+                    </div>
+                  </div>
                 </td>
-                <td className="border h-full border-gray-300 w-4/5 px-2 pt-1">
+                <td
+                  className={`${i === 0 && 'rounded-tr-xl'} ${
+                    i === relationInput.length - 1 && 'rounded-br-xl'
+                  } border h-full border-gray-300 w-4/5 px-2 pt-1`}
+                >
                   <div className="flex">
                     <input
                       type="text"
@@ -294,6 +418,7 @@ export default function page({ params }: Props) {
                     <FaMinus
                       className="my-auto cursor-pointer h-10"
                       onClick={() => {
+                        setState(1);
                         let tmpRelation = [...relationInput];
                         let tmp = tmpRelation.splice(i, 1);
                         setRelationInput(tmpRelation);
@@ -313,6 +438,7 @@ export default function page({ params }: Props) {
               { id: '', name: '', content: '' },
             ];
             setRelationInput(newRelation);
+            setState(1);
           }}
         >
           <HiPlus className="text-white mx-auto font-bold" />
