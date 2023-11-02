@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.UUID;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -36,32 +35,24 @@ public class DirectoryServiceImpl implements DirectoryService{
 	@Transactional
 	@Override
 	public void createDirectory(DirectoryCreateReqDTO dto, String userUUID) {
-		/* dto의 workspaceUUID로 작품을 얻어오고 작가의 uuid와 인자로 받은 userUUID 비교해야함
-
-
-		if(userUUID != ){
-
-		}
-		*/
+		String workspaceUUID = dto.getWorkspaceUUID();
 		String parentUUID = dto.getParentUUID();
 		boolean isDirectory = dto.isDirectory();
 
 		Directory parent = directoryRepository.findByUuidAndDeleted(parentUUID, false);
-		//부모 예외 처리
-		if(parentUUID != null){
-			checkDirectoryException(parent, userUUID);
-		}
+		checkDirectoryException(parent, userUUID);
 
 		String directoryUUID = dto.getUuid();
 		if(directoryUUID == null){
 			throw new IllegalUUIDException();
 		}
+
 		Directory.DirectoryBuilder builder = Directory.builder()
 			.uuid(directoryUUID)
 			.name(dto.getName())
 			.directory(isDirectory)
+			.workspaceUUID(workspaceUUID)
 			.parentUUID(parentUUID)
-			.workspaceUUID(dto.getWorkspaceUUID())
 			.userUUID(userUUID)
 			.deleted(false);
 		if(isDirectory){
@@ -73,24 +64,16 @@ public class DirectoryServiceImpl implements DirectoryService{
 
 		directoryRepository.save(directory);
 
-		//상위 디렉토리 있으면 children으로 추가
-		if(parentUUID != null) {
-			parent.getChildren().add(directory);
-			directoryRepository.save(parent);
-		}
+		//상위 디렉토리 children으로 추가
+		parent.getChildren().add(directory);
+		directoryRepository.save(parent);
+
 
 	}
 
 	@Transactional
 	@Override
 	public void editDirectoryName(DirectoryNameEditReqDTO dto, String userUUID) {
-		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함 (DB 2번)
-			=> 디렉토리 테이블 내에 작가 uuid 박아넣으면 DB 조회 1번으로 가능? 나중에 생각
-
-		if(userUUID != ){
-
-		}
-		*/
 		Directory directory = directoryRepository.findByUuidAndDeleted(dto.getUuid(), false);
 
 		checkDirectoryException(directory, userUUID);
@@ -102,12 +85,6 @@ public class DirectoryServiceImpl implements DirectoryService{
 	@Transactional(readOnly = true)
 	@Override
 	public DirectoryResDTO getDirectory(String directoryUUID, String userUUID) {
-		/* dto의 uuid로 디렉토리의 uuid 얻어오고 이로 작품 uuid 얻고, 작가의 uuid와 인자로 받은 userUUID 비교해야함
-
-		if(userUUID != ){
-
-		}
-		*/
 
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
 		//예외 처리

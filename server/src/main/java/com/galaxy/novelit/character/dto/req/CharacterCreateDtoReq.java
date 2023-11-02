@@ -9,14 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class CharacterDtoReq {
-    private String userUUID;
+public class CharacterCreateDtoReq {
     private String groupUUID;
-    private String characterUUID;
     private String characterName;
     private String description;
     private List<Map<String, String>> information;
     private List<Map<String, String>> relationship;
     private String characterImage;
-    private boolean isDeleted;
 }
