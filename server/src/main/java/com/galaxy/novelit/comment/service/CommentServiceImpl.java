@@ -5,13 +5,13 @@ import com.galaxy.novelit.comment.domain.Comment;
 import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentDeleteRequestDto;
-import com.galaxy.novelit.comment.dto.request.CommentGetRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentUpdateRequestDto;
-import com.galaxy.novelit.comment.dto.response.CommentGetResponseDto;
-import com.galaxy.novelit.comment.mapper.CommentInfoMapper;
+import com.galaxy.novelit.comment.repository.CommentInfoRepository;
 import com.galaxy.novelit.comment.repository.CommentRepository;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,148 +22,137 @@ import org.springframework.stereotype.Service;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final CommentInfoMapper commentInfoMapper;
+    private final CommentInfoRepository commentInfoRepository;
+    //private final CommentInfoMapper commentInfoMapper;
     @Override
     public void addComment(CommentAddRequestDto commentAddRequestDto) {
+        // spaceUUID get
+        Comment comment = commentRepository.findCommentBySpaceUUID(commentAddRequestDto.getSpaceUUID());
 
-        List<CommentInfo> commentInfoList = new ArrayList<>();
-
-        for (CommentInfoDto infoRequestDto: commentAddRequestDto.getCommentList()) {
-            CommentInfo commentInfo = CommentInfo.builder()
-                .commentOrder(infoRequestDto.getCommentOrder())
-                .commentContent(infoRequestDto.getCommentContent())
-                .commentId(infoRequestDto.getCommentId())
-                .commentPassword(infoRequestDto.getCommentPassword())
-                .build();
-
-            commentInfoList.add(commentInfo);
+        // 새롭게 들어갈때
+        if (comment == null) {
+            log.info("create");
+            comment = Comment.create(commentAddRequestDto);
         }
-
-        Comment comment = Comment.builder()
-            .spaceId(commentAddRequestDto.getSpaceId())
-            .content(commentAddRequestDto.getContent())
-            .userUUID(commentAddRequestDto.getUserUUID())
-            .directoryUUID(commentAddRequestDto.getDirectoryUUID())
-            .commentInfoList(commentInfoList)
-            .build();
-
+        // 이미 있으면
+        else {
+            // list에 넣어주기
+            List<CommentInfo> commentInfoList = comment.getCommentInfoList();
+            commentInfoList.add(CommentInfo.create(commentAddRequestDto));
+            // save
+            comment = Comment.create(comment, commentInfoList);
+        }
         commentRepository.save(comment);
     }
 
     @Override
-    public CommentGetResponseDto getAllComments(String directoryUUID, Long spaceId) {
+    public List<CommentInfoDto> getAllComments(String spaceUUID) {
+        Comment comment = commentRepository.findCommentBySpaceUUID(spaceUUID);
 
-        Comment comment = commentRepository.findByDirectoryUUIDAndSpaceId(directoryUUID, spaceId);
-
-        List<CommentInfoDto> infoDtoList = new ArrayList<>();
-
-        for (CommentInfo info : comment.getCommentInfoList()) {
-           infoDtoList.add(commentInfoMapper.infoToDto(info));
-        }
-
-        CommentGetResponseDto commentGetResponseDto = new CommentGetResponseDto(
-            comment.getDirectoryUUID(),
-            comment.getSpaceId(),
-            infoDtoList
-        );
-
-        return commentGetResponseDto;
+        return CommentInfoDto.infoListToDtoList(comment.getCommentInfoList());
     }
 
 
 
     @Override
     public void updateComment(CommentUpdateRequestDto commentUpdateRequestDto) {
-        String directoryUUID = commentUpdateRequestDto.getDirectoryUUID();
-        Long spaceId = commentUpdateRequestDto.getSpaceId();
-
         // 코멘트 서치
-        Comment comment = commentRepository.findByDirectoryUUIDAndSpaceId(directoryUUID, spaceId);
+        Comment comment = commentRepository.findCommentBySpaceUUID(
+            commentUpdateRequestDto.getSpaceUUID());
+        List<CommentInfo> commentInfoList = comment.getCommentInfoList();
 
-        // 해당 코멘트 서치
-        for (CommentInfo info: comment.getCommentInfoList()) {
+        // 세부 코멘트 서치
+        for (CommentInfo info :commentInfoList) {
             // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
-            if (info.getCommentId().equals(commentUpdateRequestDto.getUserUUID())){
-                info.setCommentContent(commentUpdateRequestDto.getUpdateContent());
-                commentRepository.save(comment);
-                log.info("novelist");
-                return;
-            }
-            // 편집자인 경우 : 아이디 비번 둘다 확인
-            if (info.getCommentId().equals(commentUpdateRequestDto.getCommentId())
-                && info.getCommentPassword().equals(commentUpdateRequestDto.getCommentPassword())){
-                info.setCommentContent(commentUpdateRequestDto.getUpdateContent());
-                commentRepository.save(comment);
-                log.info("editor");
-                return;
+            if (info.getCommentUUID().equals(commentUpdateRequestDto.getCommentUUID())) {
+                if (info.getCommentUUID().equals(commentUpdateRequestDto.getCommentUUID())) {
+                    // 내용 업데이트
+                    info.updateCommentContent(commentUpdateRequestDto.getCommentContent());
+                    comment.updateCommentInfoList(commentInfoList);
+                    commentRepository.save(comment);
+                    log.info("novelist");
+                    break;
+                }
+                // 편집자인 경우 : 아이디 비번 둘다 확인
+                if (info.getCommentNickname().equals(commentUpdateRequestDto.getCommentNickname()) &&
+                     info.getCommentPassword().equals(commentUpdateRequestDto.getCommentPassword())) {
+                    // 내용 업데이트
+                    info.updateCommentContent(commentUpdateRequestDto.getCommentContent());
+                    comment.updateCommentInfoList(commentInfoList);
+                    commentRepository.save(comment);
+                    break;
+                }
             }
         }
+
+  /*      commentInfo.get().updateCommentContent(commentUpdateRequestDto.getCommentContent());
+        comment.
+        commentRepository.save(commentInfo);
+
+        // NoSuchCommentInfoException으로 바꾸기
+
+
+        if (commentInfo.getCommentUUID().equals(commentInfoDto.getCommentUUID())){
+
+        }
+
+        if (commentInfo.getCommentNickname().equals(commentInfoDto.getCommentNickname())
+            && commentInfo.getCommentPassword().equals(commentInfoDto.getCommentPassword())){
+            commentInfo.updateCommentContent(commentInfoDto.getCommentContent());
+            commentInfoRepository.save(commentInfo);
+            log.info("editor");
+        }*/
 
     }
 
     @Override
     public void deleteComment(CommentDeleteRequestDto commentDeleteRequestDto) {
-        String directoryUUID = commentDeleteRequestDto.getDirectoryUUID();
-        Long spaceId = commentDeleteRequestDto.getSpaceId();
-
         // 코멘트 서치
-        Comment comment = commentRepository.findByDirectoryUUIDAndSpaceId(directoryUUID, spaceId);
-
-        // 해당 코멘트 서치
-        for (CommentInfo info: comment.getCommentInfoList()) {
-            // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
-            if (info.getCommentId().equals(commentDeleteRequestDto.getUserUUID())){
-                comment.getCommentInfoList().remove(info);
-                commentRepository.save(comment);
-                log.info("novelist");
-                return;
-            }
-            // 편집자인 경우 : 아이디 비번 둘다 확인
-            if (info.getCommentId().equals(commentDeleteRequestDto.getCommentId())
-                && info.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())){
-                comment.getCommentInfoList().remove(info);
-                commentRepository.save(comment);
-                log.info("editor");
-                return;
-            }
-        }
-
-        /*// commentOrder 서치
+        Comment comment = commentRepository.findCommentBySpaceUUID(
+            commentDeleteRequestDto.getSpaceUUID());
         List<CommentInfo> commentInfoList = comment.getCommentInfoList();
-        CommentInfo info = getCommentInfo(commentDeleteRequestDto.getCommentOrder(), commentInfoList);
 
-        if (info == null) return;
-
-        // 소설가인 경우 : 비밀번호 없음
-        if (info.getCommentId().equals(commentDeleteRequestDto.getUserUUID())){
-            log.info("novelist");
-            commentInfoList.remove(commentDeleteRequestDto.getCommentOrder());
-        }
-
-        // 편집자인 경우
-        else if (info.getCommentId().equals(commentDeleteRequestDto.getCommentId())
-        && info.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())){
-            log.info("editor");
-            commentInfoList.remove(commentDeleteRequestDto.getCommentOrder());
-            //log.info("{}",commentInfoList.get(1).getCommentId());
-        }
-
-        Comment comment1 = Comment.builder()
-            ._id(comment.get_id())
-            .spaceId(comment.getSpaceId())
-            .content(comment.getContent())
-            .userUUID(comment.getUserUUID())
-            .directoryUUID(comment.getDirectoryUUID())
-            .commentInfoList(commentInfoList)
-            .build();*/
-    }
-
-    public CommentInfo getCommentInfo(Long commentOrder, List<CommentInfo> infoList){
-        for (CommentInfo info: infoList) {
-            if (info.getCommentOrder() == commentOrder){
-                return info;
+        // 세부 코멘트 서치
+        for (CommentInfo info :commentInfoList) {
+            // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
+            if (info.getCommentUUID().equals(commentDeleteRequestDto.getCommentUUID())) {
+                if (info.getCommentUUID().equals(commentDeleteRequestDto.getCommentUUID())) {
+                    // 삭제
+                    commentInfoList.remove(info);
+                    comment.updateCommentInfoList(commentInfoList);
+                    commentRepository.save(comment);
+                    log.info("novelist");
+                    break;
+                }
+                // 편집자인 경우 : 아이디 비번 둘다 확인
+                if (info.getCommentNickname().equals(commentDeleteRequestDto.getCommentNickname()) &&
+                    info.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())) {
+                    // 내용 업데이트
+                    commentInfoList.remove(info);
+                    comment.updateCommentInfoList(commentInfoList);
+                    commentRepository.save(comment);
+                    break;
+                }
             }
         }
-        return null;
+        /*// 코멘트 서치
+        CommentInfo commentInfo = commentInfoRepository.findCommentInfoByCommentUUID(
+            commentDeleteRequestDto.getCommentUUID())
+            .orElseThrow(() -> new NoSuchElementException());
+        // NoSuchCommentInfoException으로 바꾸기
+
+        // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
+        if (commentInfo.getCommentUUID().equals(commentDeleteRequestDto.getCommentUUID())){
+            commentInfoRepository.deleteCommentInfoByCommentUUID(
+                commentDeleteRequestDto.getCommentUUID());
+            log.info("novelist");
+        }
+        // 편집자인 경우 : 아이디 비번 둘다 확인
+        if (commentInfo.getCommentNickname().equals(commentDeleteRequestDto.getCommentNickname())
+            && commentInfo.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())){
+            commentInfoRepository.deleteCommentInfoByCommentUUID(commentDeleteRequestDto.getCommentUUID());
+            log.info("editor");
+        }*/
+
     }
 }
