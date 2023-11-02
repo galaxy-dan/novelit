@@ -3,6 +3,7 @@ package com.galaxy.novelit.comment.dto.request;
 import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class CommentAddRequestDto {
-    private Long spaceId;
-    private String content;
-    private String userUUID;
+    private String spaceUUID;
     private String directoryUUID;
-    private List<CommentInfoDto> commentList;
+    private String commentContent;
+    private String commentNickname;
+    private String commentPassword;
 }
