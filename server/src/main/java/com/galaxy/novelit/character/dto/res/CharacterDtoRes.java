@@ -1,5 +1,6 @@
 package com.galaxy.novelit.character.dto.res;
 
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,12 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 public class CharacterDtoRes {
-    private String userUuid;
-    private String groupUuid;
-    private String characterUuid;
+    private String groupUUID;
+    private String characterUUID;
     private String characterName;
     private String description;
-    private Map<String, String> information;
-    private Map<String, String> relationship;
+    private List<Map<String, String>> information;
+    private List<Map<String, String>> relationship;
     private boolean isDeleted;
+    private String characterImage;
 }
