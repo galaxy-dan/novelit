@@ -1,7 +1,8 @@
 package com.galaxy.novelit.common.exception.advice;
 
 import com.galaxy.novelit.common.exception.IllegalUUIDException;
-import com.galaxy.novelit.common.exception.NoSuchPlotException;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import com.galaxy.novelit.common.exception.NonUniqueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,11 +33,7 @@ public class ExceptionAdvice {
 	public ResponseEntity<ExceptionResDTO> wrongDirectoryTypeException(WrongDirectoryTypeException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
 	}
-
-	@ExceptionHandler(NoSuchPlotException.class)
-	public ResponseEntity<ExceptionResDTO> noSuchPlotException(NoSuchPlotException e){
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
-	}
+	
 
 	@ExceptionHandler(IllegalUUIDException.class)
 	public ResponseEntity<ExceptionResDTO> IllegalUUIDException(IllegalUUIDException e){
@@ -46,5 +43,15 @@ public class ExceptionAdvice {
 	@ExceptionHandler(NoSuchWorkspaceException.class)
 	public ResponseEntity<ExceptionResDTO> NoSuchWorkspaceException(NoSuchWorkspaceException e){
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(NoSuchElementFoundException.class)
+	public ResponseEntity<ExceptionResDTO> NoSuchElementException(NoSuchElementFoundException e) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(NonUniqueException.class)
+	public ResponseEntity<ExceptionResDTO> NonUniqueException(NonUniqueException e) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
 	}
 }

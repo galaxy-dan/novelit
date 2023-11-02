@@ -36,7 +36,16 @@ public class CommentInfo {
     }
 
     public static CommentInfo create(CommentAddRequestDto commentAddRequestDto) {
-        return dtoToInfo(CommentInfoDto.addDtoToDto(commentAddRequestDto));
+        UUID uuid = UUID.randomUUID();
+
+        String str = uuid.toString();
+
+        return CommentInfo.builder()
+            .commentUUID(str)
+            .commentContent(commentAddRequestDto.getCommentContent())
+            .commentNickname(commentAddRequestDto.getCommentNickname())
+            .commentPassword(commentAddRequestDto.getCommentPassword())
+            .build();
     }
 
     public void updateCommentContent(String commentContent) {
