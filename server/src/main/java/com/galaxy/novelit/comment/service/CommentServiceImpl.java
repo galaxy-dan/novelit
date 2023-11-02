@@ -8,6 +8,8 @@ import com.galaxy.novelit.comment.dto.request.CommentDeleteRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentUpdateRequestDto;
 import com.galaxy.novelit.comment.repository.CommentInfoRepository;
 import com.galaxy.novelit.comment.repository.CommentRepository;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import com.galaxy.novelit.common.exception.NonUniqueException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -22,27 +24,27 @@ import org.springframework.stereotype.Service;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final CommentInfoRepository commentInfoRepository;
-    //private final CommentInfoMapper commentInfoMapper;
+
     @Override
     public void addComment(CommentAddRequestDto commentAddRequestDto) {
         // spaceUUID get
-        Comment comment = commentRepository.findCommentBySpaceUUID(commentAddRequestDto.getSpaceUUID());
+        Comment comment = commentRepository.findCommentBySpaceUUID(
+            commentAddRequestDto.getSpaceUUID());
 
         // 새롭게 들어갈때
         if (comment == null) {
-            log.info("create");
-            comment = Comment.create(commentAddRequestDto);
+            commentRepository.save(Comment.create(commentAddRequestDto));
         }
         // 이미 있으면
         else {
             // list에 넣어주기
             List<CommentInfo> commentInfoList = comment.getCommentInfoList();
             commentInfoList.add(CommentInfo.create(commentAddRequestDto));
+
+            comment.updateCommentInfoList(commentInfoList);
             // save
-            comment = Comment.create(comment, commentInfoList);
+            commentRepository.save(comment);
         }
-        commentRepository.save(comment);
     }
 
     @Override
@@ -59,6 +61,11 @@ public class CommentServiceImpl implements CommentService {
         // 코멘트 서치
         Comment comment = commentRepository.findCommentBySpaceUUID(
             commentUpdateRequestDto.getSpaceUUID());
+
+        if (comment == null) {
+            throw new NoSuchElementFoundException("해당 코멘트가 없습니다.");
+        }
+
         List<CommentInfo> commentInfoList = comment.getCommentInfoList();
 
         // 세부 코멘트 서치
@@ -70,8 +77,7 @@ public class CommentServiceImpl implements CommentService {
                     info.updateCommentContent(commentUpdateRequestDto.getCommentContent());
                     comment.updateCommentInfoList(commentInfoList);
                     commentRepository.save(comment);
-                    log.info("novelist");
-                    break;
+                    return;
                 }
                 // 편집자인 경우 : 아이디 비번 둘다 확인
                 if (info.getCommentNickname().equals(commentUpdateRequestDto.getCommentNickname()) &&
@@ -80,29 +86,12 @@ public class CommentServiceImpl implements CommentService {
                     info.updateCommentContent(commentUpdateRequestDto.getCommentContent());
                     comment.updateCommentInfoList(commentInfoList);
                     commentRepository.save(comment);
-                    break;
+                    return;
                 }
             }
         }
 
-  /*      commentInfo.get().updateCommentContent(commentUpdateRequestDto.getCommentContent());
-        comment.
-        commentRepository.save(commentInfo);
-
-        // NoSuchCommentInfoException으로 바꾸기
-
-
-        if (commentInfo.getCommentUUID().equals(commentInfoDto.getCommentUUID())){
-
-        }
-
-        if (commentInfo.getCommentNickname().equals(commentInfoDto.getCommentNickname())
-            && commentInfo.getCommentPassword().equals(commentInfoDto.getCommentPassword())){
-            commentInfo.updateCommentContent(commentInfoDto.getCommentContent());
-            commentInfoRepository.save(commentInfo);
-            log.info("editor");
-        }*/
-
+        throw new NoSuchElementFoundException("해당하는 코멘트 UUID가 없습니다.");
     }
 
     @Override
@@ -110,6 +99,11 @@ public class CommentServiceImpl implements CommentService {
         // 코멘트 서치
         Comment comment = commentRepository.findCommentBySpaceUUID(
             commentDeleteRequestDto.getSpaceUUID());
+
+        if (comment == null) {
+            throw new NoSuchElementFoundException("해당 코멘트가 없습니다.");
+        }
+
         List<CommentInfo> commentInfoList = comment.getCommentInfoList();
 
         // 세부 코멘트 서치
@@ -121,8 +115,7 @@ public class CommentServiceImpl implements CommentService {
                     commentInfoList.remove(info);
                     comment.updateCommentInfoList(commentInfoList);
                     commentRepository.save(comment);
-                    log.info("novelist");
-                    break;
+                    return;
                 }
                 // 편집자인 경우 : 아이디 비번 둘다 확인
                 if (info.getCommentNickname().equals(commentDeleteRequestDto.getCommentNickname()) &&
@@ -131,28 +124,11 @@ public class CommentServiceImpl implements CommentService {
                     commentInfoList.remove(info);
                     comment.updateCommentInfoList(commentInfoList);
                     commentRepository.save(comment);
-                    break;
+                    return;
                 }
             }
         }
-        /*// 코멘트 서치
-        CommentInfo commentInfo = commentInfoRepository.findCommentInfoByCommentUUID(
-            commentDeleteRequestDto.getCommentUUID())
-            .orElseThrow(() -> new NoSuchElementException());
-        // NoSuchCommentInfoException으로 바꾸기
 
-        // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
-        if (commentInfo.getCommentUUID().equals(commentDeleteRequestDto.getCommentUUID())){
-            commentInfoRepository.deleteCommentInfoByCommentUUID(
-                commentDeleteRequestDto.getCommentUUID());
-            log.info("novelist");
-        }
-        // 편집자인 경우 : 아이디 비번 둘다 확인
-        if (commentInfo.getCommentNickname().equals(commentDeleteRequestDto.getCommentNickname())
-            && commentInfo.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())){
-            commentInfoRepository.deleteCommentInfoByCommentUUID(commentDeleteRequestDto.getCommentUUID());
-            log.info("editor");
-        }*/
-
+        throw new NoSuchElementFoundException("해당하는 코멘트 UUID가 없습니다.");
     }
 }
