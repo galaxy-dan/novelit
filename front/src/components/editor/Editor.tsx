@@ -15,6 +15,7 @@ import { useParams } from 'next/navigation';
 import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
 import { getEditor, patchEditor } from '@/service/api/editor';
 import { toast } from 'react-toastify';
+import Comment from './Comment';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -46,6 +47,8 @@ export default function Editor() {
   const [fontIndex, setFontIndex] = useState<number>(2);
   const [fontFamilyIndex, setFontFamilyIndex] = useState<number>(0);
 
+  const [spaceUUID, setSpaceUUID] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const comment = useRef<Reply[]>([]);
 
   const handleChange = (e: ContentEditableEvent) => {
@@ -80,7 +83,8 @@ export default function Editor() {
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
-
+    
+    setSpaceUUID(wrapper.id);
     // 버블링 안되게
     // wrapper.onclick = '
     wrapper.appendChild(range.extractContents());
@@ -202,6 +206,7 @@ export default function Editor() {
           >
             <FaShareSquare size={20} />
           </button>
+          <Comment spaceUUID={spaceUUID} directoryUUID={searchParams.slug[1]} />
         </div>
       </div>
     </>
