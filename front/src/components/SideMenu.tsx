@@ -27,6 +27,7 @@ import { getWorkspace } from '@/service/api/workspace';
 import { Directory, Novel } from '@/model/workspace';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
+import { AiOutlineMenu } from 'react-icons/ai';
 
 const temp = {
   name: 'root',
@@ -105,14 +106,14 @@ export default function SideMenu() {
   return (
     <>
       <button
-        className="fixed top-0 left-0"
+        className="fixed top-2 left-2"
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        열기
+        <AiOutlineMenu size={25} />
       </button>
 
       {isOpen && (
-        <div className="min-h-screen z-50 fixed left-0 top-0 bg-violet-50 w-64 font-melody">
+        <div className="min-h-screen z-50 fixe left-0 top-0 bg-violet-50 min-w-[220px] font-melody">
           <div>
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
