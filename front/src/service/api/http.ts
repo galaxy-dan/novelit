@@ -11,7 +11,7 @@ const axios = Axios.create({
   // },
 });
 
-export const getConfig = (params = {}) => {
+export const getConfig = (params = {}, data = {}) => {
   return {
     headers: {
       Authorization:
@@ -22,6 +22,9 @@ export const getConfig = (params = {}) => {
     },
     params: {
       ...params,
+    },
+    data: {
+      ...data,
     },
   };
 };
@@ -56,8 +59,13 @@ export const put = async (url: string, body?: any) => {
   return res.data;
 };
 
-export const del = async (url: string) => {
-  const res = await axios.delete<Response>(getUrl(url), getConfig());
+export const del = async (url: string, query = {}) => {
+  const res = await axios.delete<Response>(getUrl(url), getConfig(query));
+  return res.data;
+};
+
+export const delData = async (url: string, data = {}) => {
+  const res = await axios.delete<Response>(getUrl(url), getConfig({}, data));
   return res.data;
 };
 

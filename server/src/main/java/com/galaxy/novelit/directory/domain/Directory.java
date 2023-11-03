@@ -26,18 +26,35 @@ public class Directory {
 	private boolean directory;
 	@Field(name = "parent_uuid")
 	private String parentUUID;
-	@Field(name = "prev_uuid")
-	private String prevUUID;
-	@Field(name = "next_uuid")
-	private String nextUUID;
-	@DBRef
+	@DBRef(lazy = true)
 	private List<Directory> children;
+	private String content;
 	@Field(name = "workspace_uuid")
 	private String workspaceUUID;
+	@Field(name = "user_uuid")
+	private String userUUID;
 	@Field(name = "deleted")
 	private boolean deleted;
 
 	public void editName(String name){
 		this.name = name;
+	}
+	public void updateContent(String content){
+		this.content = content;
+	}
+	public void updateChildren(List<Directory> children){
+		this.children = children;
+	}
+	public void updateParentUUID(String parentUUID){
+		this.parentUUID = parentUUID;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		Directory d = (Directory) obj;
+		if(d.getUuid().equals(uuid)){
+			return true;
+		}
+		return super.equals(obj);
 	}
 }
