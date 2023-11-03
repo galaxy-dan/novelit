@@ -22,7 +22,7 @@ export default function page({ params }: Props) {
       characterUUID: 'character1',
       characterName: '배트맨',
       characterImage:
-        'https://characterImages.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
       description: '',
       information: [
         {
@@ -36,8 +36,6 @@ export default function page({ params }: Props) {
     {
       characterUUID: 'character2',
       characterName: '배트맨',
-      characterImage:
-        'https://characterImages.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
       description: '',
       information: [
         {
@@ -62,7 +60,7 @@ export default function page({ params }: Props) {
       characterUUID: 'character3',
       characterName: '배트맨',
       characterImage:
-        'https://characterImages.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
       description: '',
       information: [
         {
@@ -87,7 +85,7 @@ export default function page({ params }: Props) {
       characterUUID: 'character4',
       characterName: '배트맨',
       characterImage:
-        'https://characterImages.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
       description: '',
       information: [
         {
@@ -109,6 +107,7 @@ export default function page({ params }: Props) {
       relationship: [],
     },
   ]);
+
   const [group, setGroup] = useState<groupType>({
     groupUUID: 'group1',
     groupName: '그룹 1',
@@ -159,7 +158,7 @@ export default function page({ params }: Props) {
             style={{ width }}
             type="text"
             onChange={(e) => {
-              setGroup((prev) => ({ ...prev, characterName: e.target.value }));
+              setGroup((prev) => ({ ...prev, groupName: e.target.value }));
             }}
             value={group.groupName}
           />
