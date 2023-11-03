@@ -1,5 +1,7 @@
 'use client';
 
+import { MouseEvent } from 'react';
+
 import { Editor, Reply } from '@/model/editor';
 import { fontFamily, fontSize } from '@/service/editor/editor';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
@@ -12,19 +14,57 @@ import { BiSolidPencil, BiBold, BiSolidTrashAlt } from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
 import { useParams } from 'next/navigation';
-import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
-import { getEditor, patchEditor } from '@/service/api/editor';
+import {
+  UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { getComment, getEditor, patchEditor } from '@/service/api/editor';
 import { toast } from 'react-toastify';
 import Comment from './Comment';
 
 export default function Editor() {
   const searchParams = useParams();
+  const queryClient = useQueryClient();
+
+  const [html, setHtml] = useState<string>('<div><br/></div>');
+
+  const [editable, setEditable] = useState<boolean>(true);
+  const [fontIndex, setFontIndex] = useState<number>(2);
+  const [fontFamilyIndex, setFontFamilyIndex] = useState<number>(0);
+
+  const [spaceUUID, setSpaceUUID] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const comment = useRef<Reply[]>([]);
 
   const { data: editor }: UseQueryResult<Editor> = useQuery({
     queryKey: ['editor', searchParams.slug?.[1]],
     queryFn: () => getEditor({ uuid: searchParams.slug?.[1] }),
     enabled: !!searchParams.slug?.[1],
   });
+
+  useEffect(() => {
+    const edit = document.getElementById('edit');
+    if (edit) {
+      edit.onclick = (e: any) => {
+        const id = e.target.id;
+        if (!id || id === 'edit') {
+          setSpaceUUID('');
+          setIsOpen(false);
+        } else {
+          // const id = e.target.id;
+          setSpaceUUID(id);
+          // console.log(e.target.id);
+          setIsOpen(true);
+          toast('버블');
+        }
+      };
+    }
+    // document.getElementById('edit')?.addEventListener('click', () => {
+    //   toast('버블');
+    // });
+  }, []);
 
   useEffect(() => {
     // document.getElementById("editor")?.innerText =
@@ -37,19 +77,10 @@ export default function Editor() {
   const patchMutate = useMutation({
     mutationFn: patchEditor,
     onSuccess: () => {
+      queryClient.invalidateQueries(['editor']);
       toast('저장 성공');
     },
   });
-
-  const [html, setHtml] = useState<string>('<div><br/></div>');
-
-  const [editable, setEditable] = useState<boolean>(true);
-  const [fontIndex, setFontIndex] = useState<number>(2);
-  const [fontFamilyIndex, setFontFamilyIndex] = useState<number>(0);
-
-  const [spaceUUID, setSpaceUUID] = useState<string>('');
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const comment = useRef<Reply[]>([]);
 
   const handleChange = (e: ContentEditableEvent) => {
     setHtml(e.target.value);
@@ -83,14 +114,20 @@ export default function Editor() {
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
-    
-    setSpaceUUID(wrapper.id);
+
+    //임시
+    // setSpaceUUID(wrapper.id);
     // 버블링 안되게
-    // wrapper.onclick = '
+    // wrapper.onclick = () => {
+    //   alert('되');
+    //   setSpaceUUID('aa');
+    // };
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
 
     setHtml(document.getElementById('edit')?.innerHTML ?? html);
+    setSpaceUUID(wrapper.id);
+    setIsOpen(true);
   };
 
   const addReply2 = () => {
@@ -206,7 +243,13 @@ export default function Editor() {
           >
             <FaShareSquare size={20} />
           </button>
-          <Comment spaceUUID={spaceUUID} directoryUUID={searchParams.slug?.[1]} />
+          {isOpen && (
+            <Comment
+              spaceUUID={spaceUUID}
+              directoryUUID={searchParams.slug?.[1]}
+              setIsOpen={setIsOpen}
+            />
+          )}
         </div>
       </div>
     </>

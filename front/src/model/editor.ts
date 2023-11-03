@@ -15,8 +15,9 @@ export type Reply = {
 
 export type Comment = {
   spaceUUID: string;
-  directoryUUID: string;
-  commentContent: string;
+  commentUUID?: string;
+  directoryUUID?: string;
+  commentContent?: string;
   commentNickname: string;
   commentPassword: string;
 };
