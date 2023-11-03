@@ -6,9 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -20,21 +19,17 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping(value = "/subscribe/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@PathVariable Long id)
+    // 처음 구독
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> subscribe(@RequestParam("subscriberUUID") String subscriberUUID)
     {
-        return notificationService.subscribe(id);
+        return ResponseEntity.ok(notificationService.subscribe(subscriberUUID));
     }
 
-    @PostMapping("/send-data/{id}")
-    public void sendData(@PathVariable Long id)
-    {
-        notificationService.notify(id, "data");
-    }
-
-    @PostMapping("/test/{id}")
-    public ResponseEntity<Void> test(@PathVariable Long id){
-        notificationService.notify(id, "테스트다 이놈들아");
+    // 코멘트 알람 테스트
+    /*@PostMapping("/send")
+    public ResponseEntity<Void> alertComment(@RequestBody NotificationRequestDto notificationRequestDto) {
+        notificationService.alertComment(notificationRequestDto);
         return ResponseEntity.ok().build();
-    }
+    }*/
 }
