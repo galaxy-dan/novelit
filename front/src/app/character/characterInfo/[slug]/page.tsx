@@ -120,6 +120,16 @@ export default function page({ params }: Props) {
     return src;
   };
 
+  window.onbeforeunload = function(e) {
+    if( state!==1 ) {
+      return;
+    }
+    //메시지는 사용할 수 없다. 커스텀 메세지를 막아놓음..
+    var dialogText = '아직 저장이 완료되지 않았습니다. 페이지를 정말로 이동하시겠습니까?';
+    e.returnValue = dialogText;
+    return dialogText;
+  };
+
   return (
     <div className="px-80 py-20 select-none" onClick={() => setSearchInput(-1)}>
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
