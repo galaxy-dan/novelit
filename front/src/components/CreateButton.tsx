@@ -9,7 +9,7 @@ type Props = {
 export default function CreateButton({ onClick, content }: Props) {
   return (
     <button
-      className="flex items-center justify-center text-sm border-2 rounded-md p-1 mr-5"
+      className="flex items-center justify-center text-sm border-2 rounded-md p-1"
       onClick={onClick}
     >
       <BiPencil />
