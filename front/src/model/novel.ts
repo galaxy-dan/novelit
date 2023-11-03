@@ -14,3 +14,13 @@ export type PatchDirectory = {
 export type DeleteDirectory = {
   uuid: string;
 };
+
+export type Directory = {
+  uuid: string;
+  name: string;
+};
+
+export type DirectoryList = {
+  directories: Directory[];
+  files: Directory[];
+};
