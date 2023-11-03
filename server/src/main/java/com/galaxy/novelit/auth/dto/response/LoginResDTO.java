@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class LoginResDTO {
-	private String nickname;
 	private String accessToken;
 	private String refreshToken;
 }

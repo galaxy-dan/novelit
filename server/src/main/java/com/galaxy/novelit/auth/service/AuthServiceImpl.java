@@ -80,7 +80,7 @@ public class AuthServiceImpl implements AuthService{
 		String accessToken = jwtUtils.generateAccessToken(authenticate);
 		String refreshToken = jwtUtils.generateRefreshToken(authenticate);
 
-		return new LoginResDTO(nickname, accessToken, refreshToken);
+		return new LoginResDTO(accessToken, refreshToken);
 	}
 
 	private KaKaoAccessTokenDTO getAccessToken(String code) {
