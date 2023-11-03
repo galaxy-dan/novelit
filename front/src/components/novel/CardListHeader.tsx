@@ -30,7 +30,7 @@ export default function CardListHeader({ title }: Props) {
       <div className="flex justify-between my-32">
         <div className="font-extrabold text-4xl">{title}</div>
 
-        <div className="flex">
+        <div className="flex font-extrabold py-2 gap-2 mr-2">
           <CreateButton onClick={() => buttonClick(false)} content="파일" />
           <CreateButton onClick={() => buttonClick(true)} content="폴더" />
         </div>
