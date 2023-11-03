@@ -81,3 +81,6 @@ Temporary Items
 
 ### sjyoon docker-compose ###
 docker-compose/
+
+### sjyoon kafka 주석처리
+src/main/java/com/galaxy/novelit/common/kafka/
