@@ -28,9 +28,9 @@ public class CharacterServiceImpl implements CharacterService {
     public CharacterDtoRes getCharacterInfo(String characterUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
 
-//        삭제된 캐릭터 처리
-//        if (character.isDeleted()) {
-//            return null;
+//        characterUUID가 db에 없을 때
+//        if (character == null) {
+//            throw new CharacterNotFoundException("Character not found for UUID: " + characterUUID);
 //        }
 
         CharacterDtoRes dto = new CharacterDtoRes();
@@ -87,10 +87,6 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public void createCharacter(CharacterCreateDtoReq dto) {
         String characterUUID = UUID.randomUUID().toString();
-//        String characterName = dto.getCharacterName();
-//        String description = dto.getDescription();
-//        Map<String, String> information = dto.getInformation();
-//        Map<String, String> relationship = dto.getRelationship();
 
         CharacterEntity newCharacter = CharacterEntity.builder()
             .characterUUID(characterUUID)
@@ -99,15 +95,6 @@ public class CharacterServiceImpl implements CharacterService {
             .description(dto.getDescription())
             .information(dto.getInformation())
             .relationship(dto.getRelationship()).build();
-
-
-//        CharacterEntity.CharacterEntityBuilder builder = CharacterEntity.builder()
-//            .characterUUID(characterUUID)
-//            .characterName(characterName)
-//            .description(description)
-//            .information(information)
-//            .relationship(relationship);
-//        CharacterEntity character = builder.build();
 
         characterRepository.save(newCharacter);
     }
