@@ -20,7 +20,7 @@ type Props = {
 };
 export default function page({ params }: Props) {
   const [character, setCharacter] = useState<characterType>({
-    characterUUID: '',
+    characterUUID: params.slug,
     characterName: '배트맨',
     characterImage: '',
     description: '',
@@ -72,7 +72,7 @@ export default function page({ params }: Props) {
   const hello = () => {
     setCharacter((prev) => ({
       ...prev,
-      name: nameInput,
+      characterName: nameInput,
       description: descriptionInput,
       characterImage: characterImageInput,
       relationship: relationshipInput,
@@ -121,7 +121,8 @@ export default function page({ params }: Props) {
   };
 
   window.onbeforeunload = function(e) {
-    if( state!==1 ) {
+    // 입력 중이거나 저장 중일때는 나갈지 묻는다.
+    if( state!== 1 && state !== 2 ) {
       return;
     }
     //메시지는 사용할 수 없다. 커스텀 메세지를 막아놓음..
