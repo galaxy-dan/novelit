@@ -30,12 +30,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={nanumFont.className}>
-      <body className="w-full">
+      <body className="w-full flex">
         <QueryProvider>
           <RecoilProvider>
             <ToastContainer pauseOnFocusLoss={false} />
             <SideMenu />
-            <main>{children}</main>
+            <main className='flex-grow'>{children}</main>
           </RecoilProvider>
         </QueryProvider>
       </body>

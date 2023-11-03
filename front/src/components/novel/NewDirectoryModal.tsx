@@ -28,9 +28,10 @@ type Modal = {
 type Props = {
   setModal: Dispatch<SetStateAction<Modal>>;
   isDirectory: boolean;
+  parentUUID: string;
 };
 
-export default function NewDirectoryModal({ setModal, isDirectory }: Props) {
+export default function NewDirectoryModal({ setModal, isDirectory, parentUUID }: Props) {
   const queryClient = useQueryClient();
   const {
     register,
@@ -63,7 +64,7 @@ export default function NewDirectoryModal({ setModal, isDirectory }: Props) {
       name: watch('name'),
       workspaceUUID: slug,
       directory: isDirectory,
-      parentUUID: slug,
+      parentUUID,
       uuid,
     });
   };
