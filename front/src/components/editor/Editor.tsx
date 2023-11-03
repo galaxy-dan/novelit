@@ -60,7 +60,22 @@ export default function Editor() {
           toast('버블');
         }
       };
+
+      edit.onpaste = (e) => {
+        const paste = e.clipboardData?.getData('text');
+
+        if (!paste) return;
+        const reversed = Array.from(paste).reverse().join('');
+
+        const selection = window.getSelection();
+        if (!selection?.rangeCount) return false;
+        selection.deleteFromDocument();
+        selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+
+        e.preventDefault();
+      };
     }
+
     // document.getElementById('edit')?.addEventListener('click', () => {
     //   toast('버블');
     // });

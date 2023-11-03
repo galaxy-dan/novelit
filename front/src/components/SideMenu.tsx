@@ -88,6 +88,8 @@ export default function SideMenu() {
   const [term, setTerm] = useState<string>('');
   const queryClient = useQueryClient();
 
+  const router = useRouter();
+
   const searchParams = useParams();
 
   const slug = Array.isArray(searchParams.slug)
@@ -114,8 +116,10 @@ export default function SideMenu() {
           <div>
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
-                <BiSolidHome size={30} />
-                <div className="font-bold text-xl">소설 제목</div>
+                <button onClick={() => router.push('/')}>
+                  <BiSolidHome size={30} />
+                </button>
+                <div className="font-bold text-xl">{workspace?.title}</div>
               </div>
               <button onClick={() => setIsOpen((prev) => !prev)}>
                 <FiChevronsLeft size={20} />
