@@ -62,14 +62,13 @@ spring:
       max-lifetime: 60000
   data:
     mongodb:
-      host: mongo
-      port: 27017
-      authentication-database: admin
-      username: ${DATABASE_USERNAME}
-      password: ${DATABASE_PASSWORD}
-      uri: ${MONGODB_URL}
-      database: novelit
-  #      uri: mongodb://localhost:27017/test
+      #host: mongo
+      #port: 27017
+      #authentication-database: admin
+      #username: ${MONGO_DATABASE_USERNAME}
+      #password: ${DATABASE_PASSWORD}
+      #database: novelit
+        uri: mongodb://localhost:27017/novelit
 
 ---
 
@@ -90,13 +89,9 @@ spring:
       host: mongo
       port: 27017
       authentication-database: admin
-      username: ${DATABASE_USERNAME}
+      username: ${MONGO_DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
-      uri: ${MONGODB_URL}
-#      uri: mongodb://localhost:27017/novelit
       database: novelit
-
-#      uri: mongodb://localhost:27017/test
 
 ---
 
@@ -105,6 +100,19 @@ spring:
     activate:
       on-profile: port_8003
     import: env.yml
+    kafka:
+      topic:
+        article: testing
+        comment: comment
+      bootstrap-servers: localhost:9092
+      consumer:
+        #        group-id: group-id-test
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #    security:
 #      oauth2:
 #        client:
@@ -125,6 +133,7 @@ spring:
 #              token-uri: https://kauth.kakao.com/oauth/token
 #              user-info-uri: https://kapi.kakao.com/v2/user/me
 #              user-name-attribute: id
+
   jpa:
     show-sql: true
     hibernate:
@@ -172,6 +181,19 @@ spring:
     activate:
       on-profile: port_8001
     import: env.yml
+    kafka:
+      topic:
+        article: testing
+        comment: comment
+      bootstrap-servers: localhost:9092
+      consumer:
+        #        group-id: group-id-test
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #    security:
 #      oauth2:
 #        client:
@@ -192,6 +214,7 @@ spring:
 #              token-uri: https://kauth.kakao.com/oauth/token
 #              user-info-uri: https://kapi.kakao.com/v2/user/me
 #              user-name-attribute: id
+
   jpa:
     show-sql: true
     hibernate:
@@ -235,6 +258,19 @@ spring:
     activate:
       on-profile: port_8002
     import: env.yml
+    kafka:
+      topic:
+        article: testing
+        comment: comment
+      bootstrap-servers: localhost:9092
+      consumer:
+        #        group-id: group-id-test
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #    security:
 #      oauth2:
 #        client:
@@ -303,5 +339,4 @@ server:
 #    oauth2:
 #      authorizedRedirectUris:
 #        -
-
 

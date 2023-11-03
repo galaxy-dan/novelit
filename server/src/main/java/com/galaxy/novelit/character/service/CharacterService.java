@@ -1,9 +1,17 @@
 package com.galaxy.novelit.character.service;
 
+import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
+import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
+import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
-import org.springframework.stereotype.Service;
+import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
+import java.util.List;
 
 public interface CharacterService {
-    public CharacterDtoRes getCharacter(String characterUuid);
-    public void createCharacter();
+    CharacterDtoRes getCharacterInfo(String characterUUID);
+    List<CharacterSimpleDtoRes> getCharacters(String groupUUID);
+    List<CharacterSimpleDtoRes> getTopCharacter();
+    void createCharacter(CharacterCreateDtoReq dto);
+    void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto);
+    void deleteCharacter(String characterUUID);
 }

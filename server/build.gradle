@@ -35,6 +35,12 @@ dependencies {
 //	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation "org.springframework.boot:spring-boot-starter-actuator"
+
+	implementation "org.springframework.kafka:spring-kafka"
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+//	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 //	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
@@ -68,6 +74,7 @@ tasks.named('test') {
 }
 
 def querydslDir = "src/main/generated"
+def querydslDirBuild = "$buildDir/generated/querydsl"
 
 configurations {
 	compileOnly {
@@ -77,11 +84,14 @@ configurations {
 
 clean {
 	delete file(querydslDir)
+	delete file(querydslDirBuild)
+
 }
 
 // querydsl QClass 파일 생성 위치를 지정
 tasks.withType(JavaCompile) {
 	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDirBuild))
 }
 
 //querydsl {

@@ -20,8 +20,27 @@ const config: Config = {
         melody: ['"Hi Melody"'],
       },
     },
+    screens: {
+      f: { min: '2400px' },
+      // => @media (max-width: 1279px) { ... }
+
+      e: { max: '2400px' },
+      // => @media (max-width: 1279px) { ... }
+
+      d: { max: '1900px' },
+      // => @media (max-width: 1279px) { ... }
+
+      c: { max: '1420px' },
+      // => @media (max-width: 1023px) { ... }
+
+      b: { max: '1150px' },
+      // => @media (max-width: 767px) { ... }
+
+      a: { max: '639px' },
+      // => @media (max-width: 639px) { ... }
+    },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
   purge: {
     content: [
       './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -37,6 +56,10 @@ const config: Config = {
         'text-xl',
         'text-2xl',
         'text-3xl',
+        'font-nanum',
+        'font-noto',
+        'font-nanumPen',
+        'font-melody',
       ],
     },
   },
