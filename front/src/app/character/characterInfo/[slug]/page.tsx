@@ -34,6 +34,7 @@ export default function page({ params }: Props) {
       { id: '', name: '', content: '', uuid: '' },
     ],
   });
+  const ref = useRef<characterType|null>(null);
 
   const [imageInput, setImageInput] = useState<string>(character.image);
   const [imageUrl, setImageUrl] = useState<string>(character.image);
@@ -80,8 +81,11 @@ export default function page({ params }: Props) {
   }, [nameInput, summaryInput, imageInput, informationInput, relationInput]);
 
   useEffect(() => {
-    console.log(character);
-    setState(2);
+    if(ref.current && JSON.stringify(ref.current) !== JSON.stringify(character)){
+      //변한 부분이 있으면 upload
+      setState(2);
+    }
+    ref.current = JSON.parse(JSON.stringify(character));
   }, [character]);
 
   useEffect(() => {
