@@ -33,24 +33,29 @@ export default function CardList() {
 
   return (
     <>
-      <CardListHeader title={workspace?.title ?? ''} />
-      <button
-        className="border-2 px-2 py-1 rounded-lg my-4"
-        onClick={() => {
-          if (directory.length <= 1) return;
-          setDirectory((prev) => {
-            const newData = [...prev];
-            newData.pop();
-            return newData;
-          });
-        }}
-      >
-        뒤로 가기
-      </button>
+      <CardListHeader title={workspace?.title ?? ''} parentUUID={directory[directory.length - 1]} />
+      {directory.length > 1 && (
+        <button
+          className="border-2 px-2 py-1 rounded-lg my-4"
+          onClick={() => {
+            if (directory.length <= 1) return;
+            setDirectory((prev) => {
+              const newData = [...prev];
+              newData.pop();
+              return newData;
+            });
+          }}
+        >
+          뒤로 가기
+        </button>
+      )}
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap gap-6">
           {directoryList?.directories?.map((el, index) => (
-            <div className='cursor-pointer' onClick={() => setDirectory((prev) => [...prev, el.uuid])}>
+            <div
+              className="cursor-pointer"
+              onClick={() => setDirectory((prev) => [...prev, el.uuid])}
+            >
               <Card subject={`${el.name}`} isDirectory={true} />
             </div>
           ))}
