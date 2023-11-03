@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthService{
 
 	private final UserRepository userRepository;
 	private final JwtUtils jwtUtils;
-	//private final AuthenticationManager authenticationManager;
+
 	@Override
 	public LoginResDTO kakaoLogin(String code) {
 		KaKaoAccessTokenDTO kakaoAccessToken = getAccessToken(code);
