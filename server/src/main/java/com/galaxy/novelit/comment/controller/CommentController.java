@@ -5,6 +5,7 @@ import com.galaxy.novelit.comment.dto.request.CommentDeleteRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentUpdateRequestDto;
 import com.galaxy.novelit.comment.service.CommentService;
+import com.galaxy.novelit.notification.service.NotificationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
     private final CommentService commentService;
+    private final NotificationService notificationService;
 
     @PostMapping
     public ResponseEntity<Void> addComment(@RequestBody CommentAddRequestDto commentAddRequestDto){
         commentService.addComment(commentAddRequestDto);
+        notificationService.alertComment(commentAddRequestDto.getCommentNickname()
+            , commentAddRequestDto.getDirectoryUUID());
         return ResponseEntity.ok().build();
     }
 

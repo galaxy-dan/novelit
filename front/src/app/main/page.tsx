@@ -89,7 +89,7 @@ export default function MainPage() {
         </div>
         {/* <div className="flex justify-center flex-grow"> */}
           <div className="flex flex-grow flex-col text-2xl font-extrabold gap-14 mt-10">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center pr-2">
               <div className="flex flex-col gap-2">
                 <div className="font-normal">{`${user?.nickname}님 안녕하세요.`}</div>
                 <div>노벨릿에 오신 것을 환영합니다.</div>
