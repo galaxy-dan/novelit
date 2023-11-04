@@ -1,33 +1,28 @@
-export type characterType = {
-  id: string;
-  name: string;
-  image: string;
-  summary: string;
-  information: informationType[];
-  relation: relationType[];
-};
-
-export type informationType = {
-  id: string;
-  title: string;
-  content: string;
-};
-
-export type relationType = {
-  id: string;
-  name: string;
-  content: string;
-  uuid?: string;
-};
-
 export type groupType = {
-  id: string;
-  name: string;
-  subGroups?: subGroupType[];
-  characters?: characterType[];
+  workspaceUUID?: string;
+  groupUUID?: string;
+  groupName?: string;
+  parentUUID?: string;
+  userUUID?: string;
 };
 
 export type subGroupType = {
   id: string;
   name: string;
+};
+
+export type characterType = {
+  characterUUID?: string;
+  groupUUID?: string;
+  characterName?: string;
+  description?: string;
+  characterImage?: string;
+  information?: informationType[];
+  relationship?: relationshipType[];
+};
+export type informationType = {
+  [key: string]: string;
+};
+export type relationshipType = {
+  [key: string]: string;
 };

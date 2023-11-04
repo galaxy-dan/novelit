@@ -4,14 +4,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaRegTrashAlt, FaMinus } from 'react-icons/fa';
 import { HiPlus } from 'react-icons/hi';
 import Image from 'next/image';
-import { getS3URL, uploadImage } from '@/service/character/image';
+import { getS3URL, uploadImage } from '@/service/image/image';
 import {
   characterType,
   informationType,
-  relationType,
+  relationshipType,
 } from '@/model/charactor';
-import UploadState from '@/components/UploadState';
-import styles from '@/service/character/scrollbar.module.css';
+import UploadState from '@/components/state/UploadState';
+import styles from '@/service/cssStyle/scrollbar.module.css';
+
 type Props = {
   params: {
     slug: string;
@@ -19,41 +20,50 @@ type Props = {
 };
 export default function page({ params }: Props) {
   const [character, setCharacter] = useState<characterType>({
-    id: '',
-    name: '배트맨',
-    image: '',
-    summary: '',
+    characterUUID: params.slug,
+    characterName: '배트맨',
+    characterImage: '',
+    description: '',
     information: [
       { id: '', title: '', content: '' },
       { id: '', title: '', content: '' },
       { id: '', title: '', content: '' },
     ],
-    relation: [
+    relationship: [
       { id: '', name: '', content: '', uuid: '' },
       { id: '', name: '', content: '', uuid: '' },
       { id: '', name: '', content: '', uuid: '' },
     ],
   });
+  const ref = useRef<characterType | null>(null);
 
-  const [imageInput, setImageInput] = useState<string>(character.image);
-  const [imageUrl, setImageUrl] = useState<string>(character.image);
+  const [characterImageInput, setImageInput] = useState<string | undefined>(
+    character.characterImage,
+  );
+  const [characterImageUrl, setImageUrl] = useState<string | undefined>(
+    character.characterImage,
+  );
   const imgRef = useRef<HTMLInputElement>(null);
   const [lastUploadTime, setLastUploadTime] = useState<number>(0);
   const uploadInterval = 3000;
 
   const [width, setWidth] = useState(100);
   const nameRef = useRef<HTMLInputElement>(null);
-  const [nameInput, setNameInput] = useState<string>(character.name);
-
-  const [summaryInput, setSummaryInput] = useState<string>(character.summary);
-
-  const [informationInput, setInformationInput] = useState<informationType[]>(
-    character.information,
+  const [nameInput, setNameInput] = useState<string | undefined>(
+    character.characterName,
   );
 
-  const [relationInput, setRelationInput] = useState<relationType[]>(
-    character.relation,
+  const [descriptionInput, setdescriptionInput] = useState<string | undefined>(
+    character.description,
   );
+
+  const [informationInput, setInformationInput] = useState<
+    informationType[] | undefined
+  >(character.information);
+
+  const [relationshipInput, setRelationInput] = useState<
+    relationshipType[] | undefined
+  >(character.relationship);
 
   const [searchInput, setSearchInput] = useState<number>(-1);
 
@@ -62,10 +72,10 @@ export default function page({ params }: Props) {
   const hello = () => {
     setCharacter((prev) => ({
       ...prev,
-      name: nameInput,
-      summary: summaryInput,
-      image: imageInput,
-      relation: relationInput,
+      characterName: nameInput,
+      description: descriptionInput,
+      characterImage: characterImageInput,
+      relationship: relationshipInput,
       information: informationInput,
     }));
   };
@@ -77,11 +87,23 @@ export default function page({ params }: Props) {
     return () => {
       clearTimeout(debounce);
     };
-  }, [nameInput, summaryInput, imageInput, informationInput, relationInput]);
+  }, [
+    nameInput,
+    descriptionInput,
+    characterImageInput,
+    informationInput,
+    relationshipInput,
+  ]);
 
   useEffect(() => {
-    console.log(character);
-    setState(2);
+    if (
+      ref.current &&
+      JSON.stringify(ref.current) !== JSON.stringify(character)
+    ) {
+      //변한 부분이 있으면 upload
+      setState(2);
+    }
+    ref.current = JSON.parse(JSON.stringify(character));
   }, [character]);
 
   useEffect(() => {
@@ -96,6 +118,17 @@ export default function page({ params }: Props) {
 
   const loaderProp = ({ src }: any) => {
     return src;
+  };
+
+  window.onbeforeunload = function(e) {
+    // 입력 중이거나 저장 중일때는 나갈지 묻는다.
+    if( state!== 1 && state !== 2 ) {
+      return;
+    }
+    //메시지는 사용할 수 없다. 커스텀 메세지를 막아놓음..
+    var dialogText = '아직 저장이 완료되지 않았습니다. 페이지를 정말로 이동하시겠습니까?';
+    e.returnValue = dialogText;
+    return dialogText;
   };
 
   return (
@@ -133,9 +166,9 @@ export default function page({ params }: Props) {
       {/* 캐릭터 이미지 및 설명 */}
       <div className="flex h-64 mt-6">
         <div className="relative w-56 h-56 mr-10 place-self-end">
-          {imageUrl !== '' ? (
+          {characterImageUrl !== '' && characterImageUrl !== undefined ? (
             <Image
-              src={imageUrl}
+              src={characterImageUrl}
               alt="캐릭터 상세 이미지"
               priority={true}
               className="object-cover w-full h-full cursor-pointer"
@@ -165,7 +198,7 @@ export default function page({ params }: Props) {
             type="file"
             className="hidden"
             ref={imgRef}
-            accept="image/*"
+            accept="characterImage/*"
             onChange={(e) => {
               const now = Date.now();
 
@@ -200,16 +233,16 @@ export default function page({ params }: Props) {
         </div>
         <div className="flex flex-col flex-grow justify-between">
           <p className="text-xl font-bold">캐릭터 설명</p>
-          <div className='border-2 border-gray-300 rounded-xl h-56 p-2'>
+          <div className="border-2 border-gray-300 rounded-xl h-56 p-2">
             <textarea
               className={`${styles.scroll} resize-none outline-none font-bold text-lg w-full h-full`}
-              value={summaryInput}
+              value={descriptionInput}
               onChange={(e) => {
                 setState(1);
-                if(e.target.value.length<1000){
-                  setSummaryInput(e.target.value);
-                }else{
-                  alert("글자 수 제한 1000자!");
+                if (e.target.value.length < 1000) {
+                  setdescriptionInput(e.target.value);
+                } else {
+                  alert('글자 수 제한 1000자!');
                 }
               }}
             />
@@ -222,7 +255,7 @@ export default function page({ params }: Props) {
         <p className="text-xl font-extrabold">기본 정보</p>
         <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
           <tbody>
-            {informationInput.map((info, i) => (
+            {informationInput?.map((info, i) => (
               <tr className="h-16  relative" key={i}>
                 <td
                   className={`${i === 0 && 'rounded-tl-xl'} ${
@@ -277,7 +310,7 @@ export default function page({ params }: Props) {
           className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
           onClick={() => {
             let newInfo: informationType[] = [
-              ...informationInput,
+              ...(informationInput || []),
               { id: '', title: '', content: '' },
             ];
             setInformationInput(newInfo);
@@ -293,20 +326,20 @@ export default function page({ params }: Props) {
         <p className="text-xl font-extrabold">관계</p>
         <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
           <tbody>
-            {relationInput.map((info, i) => (
+            {relationshipInput?.map((info, i) => (
               <tr className="h-16 relative" key={i}>
                 <td
                   className={`${i === 0 && 'rounded-tl-xl'} ${
-                    i === relationInput.length - 1 && 'rounded-bl-xl'
+                    i === relationshipInput.length - 1 && 'rounded-bl-xl'
                   } border border-gray-300 w-1/5 px-2 py-1 text-center`}
                 >
                   <input
                     type="text"
                     className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                    value={relationInput[i].name}
+                    value={relationshipInput[i].name}
                     onChange={(e) => {
                       setState(1);
-                      var newItem = [...relationInput];
+                      var newItem = [...relationshipInput];
                       newItem[i].name = e.target.value;
                       setRelationInput(newItem);
                       setSearchInput(i);
@@ -322,7 +355,7 @@ export default function page({ params }: Props) {
                       className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
                       onClick={() => {
                         setState(1);
-                        var newItem = [...relationInput];
+                        var newItem = [...relationshipInput];
                         newItem[i].name = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
@@ -330,7 +363,7 @@ export default function page({ params }: Props) {
                       }}
                     >
                       <Image
-                        src="/images/default_character.png"
+                        src="/characterImages/default_character.png"
                         alt="관계 캐릭터 이미지"
                         priority={true}
                         className="object-contain w-1/6 cursor-pointer mr-1 items-center"
@@ -343,7 +376,7 @@ export default function page({ params }: Props) {
                       className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
                       onClick={() => {
                         setState(1);
-                        var newItem = [...relationInput];
+                        var newItem = [...relationshipInput];
                         newItem[i].name = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
@@ -351,7 +384,7 @@ export default function page({ params }: Props) {
                       }}
                     >
                       <Image
-                        src="/images/default_character.png"
+                        src="/characterImages/default_character.png"
                         alt="관계 캐릭터 이미지"
                         priority={true}
                         className="object-contain w-1/6 cursor-pointer mr-1 items-center"
@@ -364,7 +397,7 @@ export default function page({ params }: Props) {
                       className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
                       onClick={() => {
                         setState(1);
-                        var newItem = [...relationInput];
+                        var newItem = [...relationshipInput];
                         newItem[i].name = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
@@ -372,7 +405,7 @@ export default function page({ params }: Props) {
                       }}
                     >
                       <Image
-                        src="/images/default_character.png"
+                        src="/characterImages/default_character.png"
                         alt="관계 캐릭터 이미지"
                         priority={true}
                         className="object-contain w-1/6 cursor-pointer mr-1 items-center"
@@ -385,7 +418,7 @@ export default function page({ params }: Props) {
                       className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
                       onClick={() => {
                         setState(1);
-                        var newItem = [...relationInput];
+                        var newItem = [...relationshipInput];
                         newItem[i].name = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
@@ -393,7 +426,7 @@ export default function page({ params }: Props) {
                       }}
                     >
                       <Image
-                        src="/images/default_character.png"
+                        src="/characterImages/default_character.png"
                         alt="관계 캐릭터 이미지"
                         priority={true}
                         className="object-contain w-1/6 cursor-pointer mr-1 items-center"
@@ -406,17 +439,17 @@ export default function page({ params }: Props) {
                 </td>
                 <td
                   className={`${i === 0 && 'rounded-tr-xl'} ${
-                    i === relationInput.length - 1 && 'rounded-br-xl'
+                    i === relationshipInput.length - 1 && 'rounded-br-xl'
                   } border h-full border-gray-300 w-4/5 px-2 pt-1`}
                 >
                   <div className="flex">
                     <input
                       type="text"
                       className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                      value={relationInput[i].content}
+                      value={relationshipInput[i].content}
                       onChange={(e) => {
                         setState(1);
-                        var newItem = [...relationInput];
+                        var newItem = [...relationshipInput];
                         newItem[i].content = e.target.value;
                         setRelationInput(newItem);
                       }}
@@ -425,7 +458,7 @@ export default function page({ params }: Props) {
                       className="my-auto cursor-pointer h-10"
                       onClick={() => {
                         setState(1);
-                        let tmpRelation = [...relationInput];
+                        let tmpRelation = [...relationshipInput];
                         let tmp = tmpRelation.splice(i, 1);
                         setRelationInput(tmpRelation);
                       }}
@@ -439,8 +472,8 @@ export default function page({ params }: Props) {
         <button
           className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
           onClick={() => {
-            let newRelation: relationType[] = [
-              ...relationInput,
+            let newRelation: relationshipType[] = [
+              ...(relationshipInput || []),
               { id: '', name: '', content: '' },
             ];
             setRelationInput(newRelation);
