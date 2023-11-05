@@ -121,7 +121,7 @@ export default function page() {
   }, [group.name]);
 
   return (
-    <div className="ml-80 mr-60 my-20 select-none">
+    <div className="ml-10 my-20 select-none">
       {/* 제목 */}
       <div className="flex items-end text-5xl">
         <BsFillPersonFill className="mr-2" />
@@ -143,12 +143,12 @@ export default function page() {
         {/* 캐릭터 카드 그룹 */}
         <p className="text-4xl font-extrabold">전체</p>
 
-        <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
+        <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {group.subGroups?.map((subGroup, i) => (
             <SubGroupCard subGroup={subGroup} />
           ))}
         </div>
-        <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
+        <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {group.characters?.map((character, i) => (
             <CharacterCard character={character} />
           ))}
