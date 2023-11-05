@@ -12,17 +12,19 @@ export type subGroupType = {
 };
 
 export type characterType = {
-  characterUUID?: string;
-  groupUUID?: string;
-  characterName?: string;
-  description?: string;
-  characterImage?: string;
-  information?: informationType[];
-  relationship?: relationshipType[];
+  characterUUID?: string|null;
+  groupUUID?: string|null;
+  characterName?: string|null;
+  description?: string|null;
+  characterImage?: string|null;
+  information?: informationType[]|null;
+  relationship?: relationshipType[]|null;
+  deleted?: boolean|null;
 };
 export type informationType = {
   [key: string]: string;
 };
 export type relationshipType = {
-  [key: string]: string;
+  uuid: string;
+  description: string;
 };
