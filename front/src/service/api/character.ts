@@ -11,8 +11,8 @@ export const postCharacter = async (body : characterType) => {
     return data;
 };
   
-export const putCharacter = async (body : characterType) => {
-    const data = await put(`/character`, body);
+export const putCharacter = async (params:string, body: characterType) => {
+    const data = await put(`/character?characterUUID=${params}`, body);
     return data;
 };
 
