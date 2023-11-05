@@ -1,15 +1,18 @@
 function test() {
+
+  const senderUUID = "chamhwag1"
+
   const eventSource = new EventSource(
-      "http://localhost:8003/notifications/subscribe/1"
+      `http://localhost:8003/notifications/subscribe?senderUUID=${senderUUID}`
   );
 
-  eventSource.addEventListener("SSE", (event) => {
+  eventSource.addEventListener("alertComment", (event) => {
     console.log(event);
 
     //const data = JSON.parse(event.data);
 
     // 크롬 알림
-    (async () => {
+   /* (async () => {
       const showNotification = () => {
         const notification = new Notification("header : 응 헤더야", {
           body: data.content,
@@ -36,6 +39,18 @@ function test() {
       if (granted) {
         showNotification();
       }
-    })();
+    })();*/
+  });
+}
+
+function test2(){
+  const senderUUID = "chamhwag1"
+
+  const eventSource = new EventSource(
+      `http://localhost:8003/notifications/send-data?senderUUID=${senderUUID}`
+  );
+
+  eventSource.addEventListener("alertComment", (event) => {
+    console.log(event);
   });
 }

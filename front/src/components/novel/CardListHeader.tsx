@@ -4,6 +4,7 @@ import NewDirectoryModal from './NewDirectoryModal';
 
 type Props = {
   title: string;
+  parentUUID: string;
 };
 
 type Modal = {
@@ -11,7 +12,7 @@ type Modal = {
   isDirectory: boolean;
 };
 
-export default function CardListHeader({ title }: Props) {
+export default function CardListHeader({ title, parentUUID }: Props) {
   const [modal, setModal] = useState<Modal>({
     isOpen: false,
     isDirectory: false,
@@ -30,13 +31,13 @@ export default function CardListHeader({ title }: Props) {
       <div className="flex justify-between my-32">
         <div className="font-extrabold text-4xl">{title}</div>
 
-        <div className="flex">
+        <div className="flex font-extrabold py-2 gap-2 mr-2">
           <CreateButton onClick={() => buttonClick(false)} content="파일" />
           <CreateButton onClick={() => buttonClick(true)} content="폴더" />
         </div>
       </div>
       {modal.isOpen && (
-        <NewDirectoryModal setModal={setModal} isDirectory={modal.isDirectory} />
+        <NewDirectoryModal setModal={setModal} isDirectory={modal.isDirectory} parentUUID={parentUUID} />
       )}
     </>
   );

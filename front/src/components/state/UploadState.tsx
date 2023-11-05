@@ -1,10 +1,11 @@
 import React from 'react';
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { BiErrorCircle } from 'react-icons/bi'
 import Image from 'next/image';
 type Props = {
   state: number;
 };
-const text = ['입력전', '입력중', '저장중', '저장완료'];
+const text = ['입력전', '입력중', '저장중', '저장완료','에러발생'];
 export default function UploadState({ state }: Props) {
   return (
     <div className='flex items-center'>
@@ -23,7 +24,7 @@ export default function UploadState({ state }: Props) {
         <AiOutlineLoading3Quarters className="animate-spin text-xl " />
       )}
       {state === 3 && <AiOutlineCheck className="text-2xl" />}
-
+      {state === 4 && <BiErrorCircle className="text-2xl" />}
     </div>
   );
 }

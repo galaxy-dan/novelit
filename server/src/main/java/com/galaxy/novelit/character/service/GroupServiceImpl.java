@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.mapping.Collection;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,20 +65,28 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void createGroup(GroupCreateDtoReq dto) {
         String groupUUID = UUID.randomUUID().toString();
-
-        // parentUUID가 db에 있는지 확인
         String parentUUID = dto.getParentUUID();
-        if (groupRepository.findByGroupUUID(parentUUID) == null) {
-            return ;
-        }
+        GroupEntity newGroup = new GroupEntity();
 
-        GroupEntity newGroup = GroupEntity.builder()
-            .groupUUID(groupUUID)
-            .groupName(dto.getGroupName())
-            .workspaceUUID(dto.getWorkspaceUUID())
-            .userUUID(dto.getUserUUID())
-            .parentUUID(parentUUID)
-            .build();
+        // 최상단 계층일 경우 (부모UUID가 없을 때)
+        if (parentUUID == null) {
+            newGroup = GroupEntity.builder()
+                .parentUUID(null)
+                .groupUUID(groupUUID)
+                .groupName(dto.getGroupName())
+                .workspaceUUID(dto.getWorkspaceUUID())
+                .userUUID(dto.getUserUUID())
+                .build();
+        }
+        else {
+            newGroup = GroupEntity.builder()
+                .groupUUID(groupUUID)
+                .groupName(dto.getGroupName())
+                .workspaceUUID(dto.getWorkspaceUUID())
+                .userUUID(dto.getUserUUID())
+                .parentUUID(parentUUID)
+                .build();
+        }
 
         groupRepository.save(newGroup);
     }
@@ -100,6 +109,8 @@ public class GroupServiceImpl implements GroupService {
             .build();
 
         groupRepository.save(newGroup);
+
+
     }
 
     @Transactional

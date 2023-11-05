@@ -1,23 +1,22 @@
 import { DeleteDirectory, PatchDirectory, PostDirectory } from '@/model/novel';
-import { del, patch, post } from './http';
+import { del, get, patch, post } from './http';
 
-
-export const getDirectory = async () => {
-    
-}
+export const getDirectory = async (req: { uuid: string }) => {
+  const data = await get('/directory', req);
+  return data;
+};
 
 export const postDirectory = async (req: PostDirectory) => {
   const data = await post('/directory', req);
   return data;
 };
 
-
 export const patchDirectory = async (req: PatchDirectory) => {
-    const data = await patch("/directory", req);
-    return data;
-}
+  const data = await patch('/directory', req);
+  return data;
+};
 
 export const deleteDirectory = async (req: DeleteDirectory) => {
-  const data = await del("/directory", req);
+  const data = await del('/directory', req);
   return data;
-}
+};

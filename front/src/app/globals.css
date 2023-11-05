@@ -5,6 +5,7 @@
 span[id] {
   background-color: rgba(255, 236, 213, 0.568);
   border-left: 2px solid black;
+  cursor: pointer;
   /* border-left-color: rgba(192, 192, 192, 0.111); */
 }
 
