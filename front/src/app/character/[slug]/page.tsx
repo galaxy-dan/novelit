@@ -2,7 +2,6 @@
 import CharacterCard from '@/components/character/CharacterCard';
 import SubGroupCard from '@/components/character/SubGroupCard';
 import { characterType, groupType, subGroupType } from '@/model/charactor';
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
 

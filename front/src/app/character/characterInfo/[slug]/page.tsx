@@ -12,6 +12,14 @@ import {
 } from '@/model/charactor';
 import UploadState from '@/components/state/UploadState';
 import styles from '@/service/cssStyle/scrollbar.module.css';
+import { deleteCharacter, getCharacter, putCharacter } from '@/service/api/character';
+import {
+  UseMutationResult,
+  UseQueryResult,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   params: {
@@ -19,54 +27,88 @@ type Props = {
   };
 };
 export default function page({ params }: Props) {
+  const router = useRouter();
+
+  const [isFetched, setIsFetched] = useState<boolean>(false);
+
+  const { data: characterData }: UseQueryResult<characterType> = useQuery({
+    queryKey: ['character', params.slug],
+    queryFn: () => getCharacter(params.slug),
+    onSuccess: (data) => {
+      setImageUrl(data?.characterImage || '');
+      setNameInput(data?.characterName || '');
+      setInformationInput(data?.information || []);
+      setRelationInput(data?.relationship || []);
+      setdescriptionInput(data?.description || '');
+      setGroupUUID(data?.groupUUID || null);
+    },
+    onError: () => {
+      router.push('/character');
+    },
+    enabled: !isFetched,
+  });
+
+  const putCharacterMutation = useMutation({
+    mutationFn: () => putCharacter(params.slug, character),
+    onSuccess: () => {
+      setState(3);
+    },
+    onError: () => {
+      setState(4);
+    },
+    onMutate: () => {
+      setState(2);
+    },
+  });
+
+  const deleteCharacterMutation = useMutation({
+    mutationFn: () => deleteCharacter(params.slug),
+    onSuccess: () => {
+      if (groupUUID) {
+        router.push(`/character/${groupUUID}`);
+      } else { 
+        router.push('/character');
+      }
+    },
+    onError: () => {
+      setState(4);
+    },
+  });
+
   const [character, setCharacter] = useState<characterType>({
-    characterUUID: params.slug,
-    characterName: '배트맨',
+    characterUUID: '',
+    characterName: '',
     characterImage: '',
     description: '',
-    information: [
-      { id: '', title: '', content: '' },
-      { id: '', title: '', content: '' },
-      { id: '', title: '', content: '' },
-    ],
-    relationship: [
-      { id: '', name: '', content: '', uuid: '' },
-      { id: '', name: '', content: '', uuid: '' },
-      { id: '', name: '', content: '', uuid: '' },
-    ],
+    information: [],
+    relationship: [],
   });
+
   const ref = useRef<characterType | null>(null);
 
-  const [characterImageInput, setImageInput] = useState<string | undefined>(
-    character.characterImage,
-  );
-  const [characterImageUrl, setImageUrl] = useState<string | undefined>(
-    character.characterImage,
-  );
+  const [characterImageInput, setImageInput] = useState<string | null>('');
+  const [characterImageUrl, setImageUrl] = useState<string | null>('');
   const imgRef = useRef<HTMLInputElement>(null);
   const [lastUploadTime, setLastUploadTime] = useState<number>(0);
   const uploadInterval = 3000;
 
   const [width, setWidth] = useState(100);
   const nameRef = useRef<HTMLInputElement>(null);
-  const [nameInput, setNameInput] = useState<string | undefined>(
-    character.characterName,
-  );
+  const [nameInput, setNameInput] = useState<string | null>('');
 
-  const [descriptionInput, setdescriptionInput] = useState<string | undefined>(
-    character.description,
-  );
+  const [descriptionInput, setdescriptionInput] = useState<string | null>('');
 
   const [informationInput, setInformationInput] = useState<
-    informationType[] | undefined
-  >(character.information);
+    informationType[] | null
+  >([]);
 
   const [relationshipInput, setRelationInput] = useState<
-    relationshipType[] | undefined
-  >(character.relationship);
+    relationshipType[] | null
+  >([]);
+  
+  const [groupUUID, setGroupUUID] = useState<string|null>('');
 
   const [searchInput, setSearchInput] = useState<number>(-1);
-
   const [state, setState] = useState<number>(0);
 
   const hello = () => {
@@ -100,8 +142,11 @@ export default function page({ params }: Props) {
       ref.current &&
       JSON.stringify(ref.current) !== JSON.stringify(character)
     ) {
-      //변한 부분이 있으면 upload
-      setState(2);
+      if (isFetched) {
+        putCharacterMutation.mutate();
+      } else {
+        setIsFetched(true);
+      }
     }
     ref.current = JSON.parse(JSON.stringify(character));
   }, [character]);
@@ -120,16 +165,19 @@ export default function page({ params }: Props) {
     return src;
   };
 
-  window.onbeforeunload = function(e) {
-    // 입력 중이거나 저장 중일때는 나갈지 묻는다.
-    if( state!== 1 && state !== 2 ) {
-      return;
-    }
-    //메시지는 사용할 수 없다. 커스텀 메세지를 막아놓음..
-    var dialogText = '아직 저장이 완료되지 않았습니다. 페이지를 정말로 이동하시겠습니까?';
-    e.returnValue = dialogText;
-    return dialogText;
-  };
+  if (typeof window !== 'undefined') {
+    window.onbeforeunload = function (e) {
+      // 입력 중이거나 저장 중일때는 나갈지 묻는다.
+      if (state !== 1 && state !== 2) {
+        return;
+      }
+      //메시지는 사용할 수 없다. 커스텀 메세지를 막아놓음..
+      var dialogText =
+        '아직 저장이 완료되지 않았습니다. 페이지를 정말로 이동하시겠습니까?';
+      e.returnValue = dialogText;
+      return dialogText;
+    };
+  }
 
   return (
     <div className="px-80 py-20 select-none" onClick={() => setSearchInput(-1)}>
@@ -151,13 +199,15 @@ export default function page({ params }: Props) {
                 setNameInput(e.target.value);
                 setState(1);
               }}
-              value={nameInput}
+              value={nameInput || ''}
             />
           </div>
 
           <FaRegTrashAlt
             className="text-2xl mb-1 cursor-pointer"
-            onClick={() => {}}
+            onClick={() => {
+              deleteCharacterMutation.mutate();
+            }}
           />
         </div>
 
@@ -166,7 +216,9 @@ export default function page({ params }: Props) {
       {/* 캐릭터 이미지 및 설명 */}
       <div className="flex h-64 mt-6">
         <div className="relative w-56 h-56 mr-10 place-self-end">
-          {characterImageUrl !== '' && characterImageUrl !== undefined ? (
+          {characterImageUrl !== '' &&
+          characterImageUrl !== undefined &&
+          characterImageUrl !== null ? (
             <Image
               src={characterImageUrl}
               alt="캐릭터 상세 이미지"
@@ -206,28 +258,28 @@ export default function page({ params }: Props) {
                 alert('이미지 업로드 간격이 너무 짧아요!');
                 return;
               } else {
+                //이미지 업로드
+                const targetFiles = (e.target as HTMLInputElement)
+                  .files as FileList;
+                if (targetFiles[0]) {
+                  const targetFile = targetFiles[0];
+                  const yeah = async () => {
+                    const url = await getS3URL(targetFile.name);
+                    // 이후에 이미지를 S3 서버에 전송, 실패하면 백엔드에 실패 및 url 삭제 요청
+                    const imgUrl = url.split('?')[0];
+                    // 업로드 실패 시
+                    if (!(await uploadImage(imgUrl, targetFile))) {
+                    } else {
+                      setImageUrl(window.URL.createObjectURL(targetFile));
+                      setImageInput(imgUrl);
+                      setLastUploadTime(now);
+                    }
+                  };
+                  yeah();
+                }
               }
 
               setState(1);
-
-              const targetFiles = (e.target as HTMLInputElement)
-                .files as FileList;
-              if (targetFiles[0]) {
-                const targetFile = targetFiles[0];
-                const yeah = async () => {
-                  const url = await getS3URL(targetFile.name);
-                  // 이후에 이미지를 S3 서버에 전송, 실패하면 백엔드에 실패 및 url 삭제 요청
-                  const imgUrl = url.split('?')[0];
-                  // 업로드 실패 시
-                  if (!(await uploadImage(imgUrl, targetFile))) {
-                  } else {
-                    setImageUrl(window.URL.createObjectURL(targetFile));
-                    setImageInput(imgUrl);
-                    setLastUploadTime(now);
-                  }
-                };
-                yeah();
-              }
             }}
           />
         </div>
@@ -236,7 +288,7 @@ export default function page({ params }: Props) {
           <div className="border-2 border-gray-300 rounded-xl h-56 p-2">
             <textarea
               className={`${styles.scroll} resize-none outline-none font-bold text-lg w-full h-full`}
-              value={descriptionInput}
+              value={descriptionInput || ''}
               onChange={(e) => {
                 setState(1);
                 if (e.target.value.length < 1000) {
@@ -255,55 +307,66 @@ export default function page({ params }: Props) {
         <p className="text-xl font-extrabold">기본 정보</p>
         <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
           <tbody>
-            {informationInput?.map((info, i) => (
-              <tr className="h-16  relative" key={i}>
-                <td
-                  className={`${i === 0 && 'rounded-tl-xl'} ${
-                    i === informationInput.length - 1 && 'rounded-bl-xl'
-                  } border border-gray-300 w-1/5 px-2 py-1 text-center`}
-                >
-                  <input
-                    type="text"
-                    className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                    value={informationInput[i].title}
-                    onChange={(e) => {
-                      setState(1);
-                      var newItem = [...informationInput];
-                      newItem[i].title = e.target.value;
-                      setInformationInput(newItem);
-                    }}
-                  />
-                </td>
-                <td
-                  className={`${i === 0 && 'rounded-tr-xl'} ${
-                    i === informationInput.length - 1 && 'rounded-br-xl'
-                  } border h-full border-gray-300 w-4/5 px-2 pt-1`}
-                >
-                  <div className="flex">
+            {informationInput?.map((info, i) => {
+              let objkey: string = '';
+              let objvalue: string = '';
+
+              Object.entries(info).forEach(([key, value]) => {
+                objkey = key;
+                objvalue = value;
+              });
+
+              return (
+                <tr className="h-16  relative" key={i}>
+                  <td
+                    className={`${i === 0 && 'rounded-tl-xl'} ${
+                      i === informationInput.length - 1 && 'rounded-bl-xl'
+                    } border border-gray-300 w-1/5 px-2 py-1 text-center`}
+                  >
                     <input
                       type="text"
                       className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                      value={informationInput[i].content}
+                      value={objkey}
                       onChange={(e) => {
                         setState(1);
                         var newItem = [...informationInput];
-                        newItem[i].content = e.target.value;
+                        let str: string = e.target.value;
+                        newItem[i] = { [str]: objvalue };
                         setInformationInput(newItem);
                       }}
                     />
-                    <FaMinus
-                      className="my-auto cursor-pointer h-10"
-                      onClick={() => {
-                        setState(1);
-                        let tmpInfo = [...informationInput];
-                        let tmp = tmpInfo.splice(i, 1);
-                        setInformationInput(tmpInfo);
-                      }}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td
+                    className={`${i === 0 && 'rounded-tr-xl'} ${
+                      i === informationInput.length - 1 && 'rounded-br-xl'
+                    } border h-full border-gray-300 w-4/5 px-2 pt-1`}
+                  >
+                    <div className="flex">
+                      <input
+                        type="text"
+                        className="w-full resize-none outline-none truncate my-auto text-center font-bold"
+                        value={objvalue}
+                        onChange={(e) => {
+                          setState(1);
+                          var newItem = [...informationInput];
+                          newItem[i][objkey] = e.target.value;
+                          setInformationInput(newItem);
+                        }}
+                      />
+                      <FaMinus
+                        className="my-auto cursor-pointer h-10"
+                        onClick={() => {
+                          setState(1);
+                          let tmpInfo = [...informationInput];
+                          let tmp = tmpInfo.splice(i, 1);
+                          setInformationInput(tmpInfo);
+                        }}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         <button
@@ -311,7 +374,7 @@ export default function page({ params }: Props) {
           onClick={() => {
             let newInfo: informationType[] = [
               ...(informationInput || []),
-              { id: '', title: '', content: '' },
+              { '': '' },
             ];
             setInformationInput(newInfo);
             setState(1);
@@ -336,11 +399,11 @@ export default function page({ params }: Props) {
                   <input
                     type="text"
                     className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                    value={relationshipInput[i].name}
+                    value={relationshipInput[i].uuid}
                     onChange={(e) => {
                       setState(1);
                       var newItem = [...relationshipInput];
-                      newItem[i].name = e.target.value;
+                      newItem[i].uuid = e.target.value;
                       setRelationInput(newItem);
                       setSearchInput(i);
                       //UUID null로 초기화
@@ -356,7 +419,7 @@ export default function page({ params }: Props) {
                       onClick={() => {
                         setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].name = '이름이름이름이름';
+                        newItem[i].uuid = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
                         //UUID
@@ -377,7 +440,7 @@ export default function page({ params }: Props) {
                       onClick={() => {
                         setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].name = '이름이름이름이름';
+                        newItem[i].uuid = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
                         //UUID
@@ -398,7 +461,7 @@ export default function page({ params }: Props) {
                       onClick={() => {
                         setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].name = '이름이름이름이름';
+                        newItem[i].uuid = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
                         //UUID
@@ -419,7 +482,7 @@ export default function page({ params }: Props) {
                       onClick={() => {
                         setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].name = '이름이름이름이름';
+                        newItem[i].uuid = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
                         //UUID
@@ -446,11 +509,11 @@ export default function page({ params }: Props) {
                     <input
                       type="text"
                       className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                      value={relationshipInput[i].content}
+                      value={relationshipInput[i].description}
                       onChange={(e) => {
                         setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].content = e.target.value;
+                        newItem[i].description = e.target.value;
                         setRelationInput(newItem);
                       }}
                     />
@@ -474,7 +537,7 @@ export default function page({ params }: Props) {
           onClick={() => {
             let newRelation: relationshipType[] = [
               ...(relationshipInput || []),
-              { id: '', name: '', content: '' },
+              { uuid: '', description: '' },
             ];
             setRelationInput(newRelation);
             setState(1);
