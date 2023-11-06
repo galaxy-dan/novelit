@@ -1,9 +1,9 @@
 function test() {
 
-  const senderUUID = "chamhwag1"
+  const senderUUID = "f72a8efc-99dc-4afd-a658-6f42073fb7a3"
 
   const eventSource = new EventSource(
-      `http://localhost:8003/notifications/subscribe?senderUUID=${senderUUID}`
+      `http://localhost:8003/notifications/subscribe?subscriberUUID=${senderUUID}`
   );
 
   eventSource.addEventListener("alertComment", (event) => {
@@ -44,10 +44,10 @@ function test() {
 }
 
 function test2(){
-  const senderUUID = "chamhwag1"
+  const senderUUID = "f72a8efc-99dc-4afd-a658-6f42073fb7a3"
 
   const eventSource = new EventSource(
-      `http://localhost:8003/notifications/send-data?senderUUID=${senderUUID}`
+      `http://localhost:8003/notifications/send-data?subscriberUUID=${senderUUID}`
   );
 
   eventSource.addEventListener("alertComment", (event) => {
