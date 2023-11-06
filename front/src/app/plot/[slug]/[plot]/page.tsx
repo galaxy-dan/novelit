@@ -43,7 +43,6 @@ export default function page({ params }: Props) {
     queryKey: ['plot', params.plot],
     queryFn: () => getPlot(params.plot),
     onSuccess: (data) => {
-      setPlot((prev) => ({ ...prev, plotUuid: params.plot }));
       setPlotTitleInput(data?.plotTitle || '');
       setStoryInput(data?.story || '');
       setBeginningInput(data?.beginning || '');
@@ -187,6 +186,7 @@ export default function page({ params }: Props) {
     if (risingRef.current) {
       risingRef.current.style.height = 'auto';
       risingRef.current.style.height = risingRef.current.scrollHeight + 'px';
+      console.log(risingRef.current.scrollHeight);
     }
   }, [risingInput, windowSize]);
 
@@ -286,16 +286,17 @@ export default function page({ params }: Props) {
         <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
           <tbody>
             <tr className="relative" key="발단">
-              <td className="rounded-tl-xl rounded-bl-xl border border-gray-300 w-1/5 px-2 py-1 text-center">
+              <td className="rounded-tl-xl rounded-bl-xl border border-gray-300 w-1/5 text-center">
                 <p className="w-full my-auto text-center font-bold">발단</p>
               </td>
-              <td className="rounded-tr-xl rounded-br-xl border border-gray-300 w-4/5 px-2">
+              <td className="rounded-tr-xl rounded-br-xl border border-gray-300 w-4/5">
                 <textarea
-                  className="w-full resize-none outline-none text-center font-bold"
+                  className="w-full resize-none outline-none text-center font-bold whitespace-pre-wrap h-full"
                   value={beginningInput || ''}
                   ref={beginningRef}
                   rows={1}
                   onChange={(e) => {
+                    setState(1);
                     setBeginningInput(e.target.value);
                   }}
                 ></textarea>
@@ -313,6 +314,7 @@ export default function page({ params }: Props) {
                   ref={risingRef}
                   rows={1}
                   onChange={(e) => {
+                    setState(1);
                     setRisingInput(e.target.value);
                   }}
                 ></textarea>
@@ -330,6 +332,7 @@ export default function page({ params }: Props) {
                   ref={crisisRef}
                   rows={1}
                   onChange={(e) => {
+                    setState(1);
                     setCrisisInput(e.target.value);
                   }}
                 ></textarea>
@@ -347,6 +350,7 @@ export default function page({ params }: Props) {
                   ref={climaxRef}
                   rows={1}
                   onChange={(e) => {
+                    setState(1);
                     setClimaxInput(e.target.value);
                   }}
                 ></textarea>
@@ -364,6 +368,7 @@ export default function page({ params }: Props) {
                   ref={endingRef}
                   rows={1}
                   onChange={(e) => {
+                    setState(1);
                     setEndingInput(e.target.value);
                   }}
                 ></textarea>
