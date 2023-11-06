@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@Getter
 public class CharacterDtoRes {
     private String groupUUID;
     private String characterUUID;
