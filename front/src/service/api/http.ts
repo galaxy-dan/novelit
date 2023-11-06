@@ -2,13 +2,13 @@ import Axios from 'axios';
 import { toast } from 'react-toastify';
 const axios = Axios.create({
   // withCredentials: true,
-  // headers: {
-  // Authorization:
-  //   localStorage && localStorage.getItem('accessToken')
-  //     ? `Bearer ${localStorage.getItem('accessToken')}`
-  //     : null,
-  // 'Content-Type': 'application/json',
-  // },
+  headers: {
+  Authorization:
+    localStorage && localStorage.getItem('accessToken')
+      ? `Bearer ${localStorage.getItem('accessToken')}`
+      : null,
+  'Content-Type': 'application/json',
+  },
 });
 
 export const getConfig = (params = {}, data = {}) => {
