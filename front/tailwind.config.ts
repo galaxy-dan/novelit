@@ -38,10 +38,10 @@ const config: Config = {
 
       a: { max: '839px' },
       // => @media (max-width: 639px) { ... }
-      f2: {min: '2284px' },
-      e2: {max: '2284px' },
-      d2: {max: '1900px' },
-      c2: {max: '1515px' },
+      f2: {min: '3840px' },
+      e2: {max: '3190px' },
+      d2: {max: '2550px' },
+      c2: {max: '1915px' },
       b2: {max: '1134px' },
       a2: {max: '750px' },
     },
