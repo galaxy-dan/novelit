@@ -1,125 +1,107 @@
 'use client';
 import CharacterCard from '@/components/character/CharacterCard';
 import SubGroupCard from '@/components/character/SubGroupCard';
-import { groupType } from '@/model/charactor';
+import { characterType, groupType, subGroupType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
 
 export default function page() {
-  const [group, setGroup] = useState<groupType>({
-    id: 'group1',
-    name: '그룹 1',
-    subGroups: [
-      { id: 'subgroup1', name: '서브그룹 1' },
-      { id: 'subgroup2', name: '서브그룹 2' },
-    ],
-    characters: [
-      {
-        id: 'character1',
-        name: '배트맨',
-        image:
-          'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-        summary: '',
-        information: [
-          {
-            id: '',
-            title: '나이',
-            content: '24',
-          },
-        ],
-        relation: [],
-      },
-      {
-        id: 'character2',
-        name: '배트맨',
-        image:
-          'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-        summary: '',
-        information: [
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-        ],
-        relation: [],
-      },
-      {
-        id: 'character3',
-        name: '배트맨',
-        image:
-          'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-        summary: '',
-        information: [
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-        ],
-        relation: [],
-      },
-      {
-        id: 'character4',
-        name: '배트맨',
-        image:
-          'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-        summary: '',
-        information: [
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-          {
-            id: '',
-            title: '',
-            content: '',
-          },
-        ],
-        relation: [],
-      },
-    ],
-  });
-
-  const [width, setWidth] = useState(100);
-  const nameRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (nameRef !== null && nameRef.current !== null) {
-      if (nameRef.current.offsetWidth > 100) {
-        setWidth(nameRef.current.offsetWidth + 5);
-      } else {
-        setWidth(100);
-      }
-    }
-  }, [group.name]);
-
+  const [subGroups, setSubgroups] = useState<subGroupType[]>([
+    { id: 'subgroup1', name: '서브그룹 1' },
+    { id: 'subgroup2', name: '서브그룹 2' },
+  ]);
+  const [characters, setCharacters] = useState<characterType[]>([
+    {
+      characterUUID: 'character1',
+      characterName: '배트맨',
+      characterImage:
+        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+      description: '',
+      information: [
+        {
+          characterUUID: '',
+          title: '나이',
+          content: '24',
+        },
+      ],
+      relationship: [],
+    },
+    {
+      characterUUID: 'character2',
+      characterName: '배트맨',
+      description: '',
+      information: [
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+      ],
+      relationship: [],
+    },
+    {
+      characterUUID: 'character3',
+      characterName: '배트맨',
+      characterImage:
+        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+      description: '',
+      information: [
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+      ],
+      relationship: [],
+    },
+    {
+      characterUUID: 'character4',
+      characterName: '배트맨',
+      characterImage:
+        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
+      description: '',
+      information: [
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+        {
+          characterUUID: '',
+          title: '',
+          content: '',
+        },
+      ],
+      relationship: [],
+    },
+  ]);
+  
   return (
     <div className="ml-10 my-20 select-none">
       {/* 제목 */}
@@ -141,15 +123,19 @@ export default function page() {
       {/* 캐릭터 카드 전체 모음 */}
       <div className="mt-6">
         {/* 캐릭터 카드 그룹 */}
-        <p className="text-4xl font-extrabold">전체</p>
+        <div>
+          <p
+            className="text-4xl font-extrabold max-w-[30rem] truncate"
+          >전체</p>
+        </div>
 
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
-          {group.subGroups?.map((subGroup, i) => (
+          {subGroups?.map((subGroup, i) => (
             <SubGroupCard subGroup={subGroup} />
           ))}
         </div>
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
-          {group.characters?.map((character, i) => (
+          {characters?.map((character, i) => (
             <CharacterCard character={character} />
           ))}
         </div>
