@@ -9,3 +9,7 @@ export type plotType = {
   climax?: string | null;
   ending?: string | null;
 };
+
+export type plotListType = {
+  plotInfoDtoList?: plotType[]
+}
