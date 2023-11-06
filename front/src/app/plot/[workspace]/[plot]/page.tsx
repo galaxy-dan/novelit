@@ -34,8 +34,6 @@ type Props = {
   };
 };
 
-
-
 export default function page({ params }: Props) {
   const router = useRouter();
 
@@ -55,7 +53,7 @@ export default function page({ params }: Props) {
       setEndingInput(data?.ending || '');
     },
     onError: () => {
-      router.push('/character');
+      router.push(`/plot/${params.workspace}`);
     },
     enabled: !isFetched,
   });
@@ -175,7 +173,7 @@ export default function page({ params }: Props) {
     window.addEventListener('resize', handleResize);
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (beginningRef.current) {
@@ -183,41 +181,35 @@ export default function page({ params }: Props) {
       beginningRef.current.style.height =
         beginningRef.current.scrollHeight + 'px';
     }
-  }, [beginningInput,windowSize]);
+  }, [beginningInput, windowSize]);
 
   useEffect(() => {
     if (risingRef.current) {
       risingRef.current.style.height = 'auto';
-      risingRef.current.style.height =
-        risingRef.current.scrollHeight + 'px';
+      risingRef.current.style.height = risingRef.current.scrollHeight + 'px';
     }
-  }, [risingInput,windowSize]);
+  }, [risingInput, windowSize]);
 
   useEffect(() => {
     if (crisisRef.current) {
       crisisRef.current.style.height = 'auto';
-      crisisRef.current.style.height =
-        crisisRef.current.scrollHeight + 'px';
+      crisisRef.current.style.height = crisisRef.current.scrollHeight + 'px';
     }
-  }, [crisisInput,windowSize]);
+  }, [crisisInput, windowSize]);
 
   useEffect(() => {
     if (climaxRef.current) {
       climaxRef.current.style.height = 'auto';
-      climaxRef.current.style.height =
-        climaxRef.current.scrollHeight + 'px';
+      climaxRef.current.style.height = climaxRef.current.scrollHeight + 'px';
     }
-  }, [climaxInput,windowSize]);
+  }, [climaxInput, windowSize]);
 
   useEffect(() => {
     if (endingRef.current) {
       endingRef.current.style.height = 'auto';
-      endingRef.current.style.height =
-        endingRef.current.scrollHeight + 'px';
+      endingRef.current.style.height = endingRef.current.scrollHeight + 'px';
     }
-  }, [endingInput,windowSize]);
-
-  
+  }, [endingInput, windowSize]);
 
   if (typeof window !== 'undefined') {
     window.onbeforeunload = function (e) {
