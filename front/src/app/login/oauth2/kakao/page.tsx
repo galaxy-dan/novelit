@@ -10,8 +10,8 @@ export default function KaKaoPage() {
   useEffect(() => {
     const code = searchParams.get('code');
     get('/login/oauth2/kakao', { code }).then((data: any) => {
-      console.log(data);
       localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
       router.replace('/main');
     });
   }, []);
