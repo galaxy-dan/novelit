@@ -180,7 +180,7 @@ export default function page({ params }: Props) {
   }
 
   return (
-    <div className="px-80 py-20 select-none" onClick={() => setSearchInput(-1)}>
+    <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem] select-none" onClick={() => setSearchInput(-1)}>
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
       <div className="flex items-end justify-between">
         <div className="flex items-center">
