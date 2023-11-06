@@ -9,7 +9,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.galaxy.novelit.auth.util.JwtUtils;
-import com.galaxy.novelit.common.exception.InvalidTokenException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,8 +30,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		} else {
-			System.out.println("xhxh");
-			throw new InvalidTokenException("토큰 확인");
+			// System.out.println("xhxh");
+			// throw new InvalidTokenException("토큰 확인");
 		}
 		filterChain.doFilter(request, response);
 	}
