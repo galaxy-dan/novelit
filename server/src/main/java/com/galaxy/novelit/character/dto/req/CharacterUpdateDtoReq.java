@@ -14,6 +14,6 @@ public class CharacterUpdateDtoReq {
     private String characterName;
     private String description;
     private List<Map<String, String>> information;
-    private List<Map<String, String>> relationship;
+    private List<Map<Map<String, String>,String>> relationship;
     private String characterImage;
 }

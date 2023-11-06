@@ -17,7 +17,7 @@ public class CharacterDtoRes {
     private String characterName;
     private String description;
     private List<Map<String, String>> information;
-    private List<Map<String, String>> relationship;
+    private List<Map<Map<String, String>,String>> relationship;
     private boolean isDeleted;
     private String characterImage;
 }
