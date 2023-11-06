@@ -29,7 +29,7 @@ import { getPlot, putPlot } from '@/service/api/plot';
 
 type Props = {
   params: {
-    workspace: string;
+    slug: string;
     plot: string;
   };
 };
@@ -53,7 +53,7 @@ export default function page({ params }: Props) {
       setEndingInput(data?.ending || '');
     },
     onError: () => {
-      router.push(`/plot/${params.workspace}`);
+      router.push(`/plot/${params.slug}`);
     },
     enabled: !isFetched,
   });
@@ -74,7 +74,7 @@ export default function page({ params }: Props) {
   const deleteCharacterMutation = useMutation({
     mutationFn: () => deleteCharacter(params.plot),
     onSuccess: () => {
-      router.push(`/plot/${params.workspace}`);
+      router.push(`/plot/${params.slug}`);
     },
     onError: () => {
       setState(4);

@@ -7,7 +7,7 @@ import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
 
 type Props = {
   params: {
-    slug: string;
+    group: string;
   };
 };
 
