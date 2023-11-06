@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.mapping.Collection;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
@@ -25,7 +27,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupDtoRes getGroupInfo(String groupUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
-
+        log.info("groupId:{}", group.getGroupId());
 //        삭제된 그룹 처리
 //        if (group.isDeleted()) {
 //            return ;
@@ -39,6 +41,9 @@ public class GroupServiceImpl implements GroupService {
         dto.setWorkspaceUUID(group.getWorkspaceUUID());
         dto.setCharactersInfo(group.getCharactersInfo());
         dto.setDeleted(group.isDeleted());
+
+        System.out.println(group.getGroupId());
+        System.out.println(group.getGroupName());
 
         return dto;
     }
@@ -95,41 +100,15 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void deleteGroup(String groupUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
-
-        GroupEntity newGroup = GroupEntity.builder()
-            .groupId(group.getGroupId())
-            .groupUUID(group.getGroupUUID())
-            .userUUID(group.getUserUUID())
-            .workspaceUUID(group.getWorkspaceUUID())
-            .groupName(group.getGroupName())
-            .parentUUID(group.getParentUUID())
-            .childUUID(group.getChildUUID())
-            .charactersInfo(group.getCharactersInfo())
-            .isDeleted(true)
-            .build();
-
-        groupRepository.save(newGroup);
-
-
+        group.deleteGroup();
+        groupRepository.save(group);
     }
 
     @Transactional
     @Override
     public void updateGroupName(String groupUUID, String newName) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
-
-        GroupEntity newGroup = GroupEntity.builder()
-            .groupId(group.getGroupId())
-            .groupUUID(group.getGroupUUID())
-            .userUUID(group.getUserUUID())
-            .workspaceUUID(group.getWorkspaceUUID())
-            .groupName(newName)
-            .parentUUID(group.getParentUUID())
-            .childUUID(group.getChildUUID())
-            .charactersInfo(group.getCharactersInfo())
-            .isDeleted(group.isDeleted())
-            .build();
-
-        groupRepository.save(newGroup);
+        group.updateGroupName(newName);
+        groupRepository.save(group);
     }
 }

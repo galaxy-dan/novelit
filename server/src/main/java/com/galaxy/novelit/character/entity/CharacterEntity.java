@@ -41,4 +41,9 @@ public class CharacterEntity {
     @Field(name = "character_image")
     private String characterImage;
 //    List<ArrayList<Map<String, String>>>
+
+    public void deleteCharacter() {
+        this.isDeleted = true;
+    }
+
 }

@@ -1,21 +1,21 @@
 package com.galaxy.novelit.character.entity;
 
-import jakarta.persistence.Id;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+@Document(collection = "groups")
 @Getter
 @AllArgsConstructor
-@Builder
 @NoArgsConstructor
-@Document(collection = "groups")
+@Builder
 public class GroupEntity {
     @Id
     private String groupId;
@@ -35,4 +35,13 @@ public class GroupEntity {
     private List<Map<String, String>> charactersInfo;   // Map<characteUUID, characterName>
     @Field(name = "is_deleted")
     private boolean isDeleted;
+
+    public void updateGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public void deleteGroup() {
+        this.isDeleted = true;
+    }
+
 }
