@@ -2,7 +2,6 @@ package com.galaxy.novelit.comment.domain;
 
 import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
-import jakarta.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Slf4j
