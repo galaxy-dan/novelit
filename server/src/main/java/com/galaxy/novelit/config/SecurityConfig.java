@@ -24,9 +24,21 @@ public class SecurityConfig {
 	private final JwtFilter jwtFilter;
 	private final JwtExceptionFilter jwtExceptionFilter;
 
+	//
+	// @Bean
+	// CorsConfigurationSource corsConfigurationSource() {
+	// 	CorsConfiguration configuration = new CorsConfiguration();
+	// 	configuration.setAllowedOrigins(List.of("*"));
+	// 	configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+	// 	configuration.setAllowedHeaders(List.of("*"));
+	// 	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	// 	source.registerCorsConfiguration("/**", configuration);
+	// 	return source;
+	// }
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
+			//.cors(withDefaults())
 			// http basic을 통한 인증은 하지 않으므로 설정 해제
 			.httpBasic(AbstractHttpConfigurer::disable)
 
@@ -35,7 +47,7 @@ public class SecurityConfig {
 
 			// 사용자 로그인이 필요한 API는 필터가 적용되도록 별도 설정해준다.
 			.authorizeHttpRequests(r -> r
-				.requestMatchers(new AntPathRequestMatcher("/login/**")).permitAll()
+				.requestMatchers(new AntPathRequestMatcher("/login/**"), new AntPathRequestMatcher("/util/**"), new AntPathRequestMatcher("/actuator/**")).permitAll()
 				//.anyRequest().authenticated()
 				.anyRequest().permitAll()
 			)

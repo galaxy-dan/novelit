@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.galaxy.novelit.auth.util.JwtUtils;
+import com.galaxy.novelit.common.exception.InvalidTokenException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,14 +25,15 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
-		String accessToken = resolveToken(request);
-		if (accessToken != null && jwtUtils.validateToken(accessToken)) {
-			Authentication authentication = jwtUtils.getAuthentication(accessToken);
+		if(!request.getRequestURI().startsWith("/login") || !request.getRequestURI().startsWith("/util") || !request.getRequestURI().startsWith("/actuator")) {
+			String accessToken = resolveToken(request);
+			if (accessToken != null && jwtUtils.validateToken(accessToken)) {
+				Authentication authentication = jwtUtils.getAuthentication(accessToken);
 
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-		} else {
-			// System.out.println("xhxh");
-			// throw new InvalidTokenException("토큰 확인");
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			} else {
+				throw new InvalidTokenException("토큰 확인");
+			}
 		}
 		filterChain.doFilter(request, response);
 	}
