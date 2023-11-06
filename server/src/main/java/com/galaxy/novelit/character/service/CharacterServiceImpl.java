@@ -1,15 +1,15 @@
 package com.galaxy.novelit.character.service;
 
 import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
-import com.galaxy.novelit.character.dto.req.CharacterDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
+import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
+import com.galaxy.novelit.character.repository.RelationRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CharacterServiceImpl implements CharacterService {
 
     private final CharacterRepository characterRepository;
-    private final MongoTemplate mongoTemplate;
+    private final RelationRepository relationRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -128,5 +128,12 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         character.deleteCharacter();
         characterRepository.save(character);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<RelationDtoRes> getRelationships() {
+
+        return null;
     }
 }

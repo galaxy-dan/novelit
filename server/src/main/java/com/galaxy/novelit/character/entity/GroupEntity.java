@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "groups")
+@Document(collection = "group")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,11 +28,13 @@ public class GroupEntity {
     @Field(name = "group_name")
     private String groupName;
     @Field(name = "parent_uuid")
-    private String parentUUID;
+    private String parentGroupUUID;
     @DBRef
-    private List<GroupEntity> childUUID;
-    @Field(name = "characters_info")
-    private List<Map<String, String>> charactersInfo;   // Map<characteUUID, characterName>
+    private List<GroupEntity> childGroups;
+    @DBRef
+    private List<CharacterEntity> childCharacters;
+//    @DBRef
+//    private List<Map<String, String>> charactersInfo;   // Map<characteUUID, characterName>
     @Field(name = "is_deleted")
     private boolean isDeleted;
 

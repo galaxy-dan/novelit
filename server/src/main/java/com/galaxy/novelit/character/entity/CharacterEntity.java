@@ -26,6 +26,8 @@ public class CharacterEntity {
     private String userUUID;
     @Field(name = "group_uuid")
     private String groupUUID;
+    @Field(name = "workspace_uuid")
+    private String workspaceUUID;
     @Field(name = "character_uuid")
     private String characterUUID;
     @Field(name = "character_name")
@@ -35,7 +37,7 @@ public class CharacterEntity {
     @Field(name = "information")
     private List<Map<String, String>> information;
     @Field(name = "relationship")
-    private List<Map<String, String>> relationship;
+    private List<Map<Map<String, String>,String>> relationship;     // Map<Map<타겟캐릭터UUID, 타겟캐릭터이름>, 내용>
     @Field(name = "is_deleted")
     private boolean isDeleted;
     @Field(name = "character_image")
