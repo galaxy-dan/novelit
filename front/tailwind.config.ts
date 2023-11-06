@@ -36,8 +36,14 @@ const config: Config = {
       b: { max: '1150px' },
       // => @media (max-width: 767px) { ... }
 
-      a: { max: '639px' },
+      a: { max: '839px' },
       // => @media (max-width: 639px) { ... }
+      f2: {min: '2284px' },
+      e2: {max: '2284px' },
+      d2: {max: '1900px' },
+      c2: {max: '1515px' },
+      b2: {max: '1134px' },
+      a2: {max: '750px' },
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],
