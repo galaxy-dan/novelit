@@ -38,6 +38,7 @@ public class WordsServiceImpl implements WordsService {
     }
 
     @Override
+    @Transactional
     public void updateWord(WordsUpdateReqDTO dto) {
         WordsEntity wordsEntity = wordsRepository.findByWordUuid(dto.getWordUUID())
             .orElseThrow(() -> new NoSuchElementFoundException("없는 단어 입니다."));
