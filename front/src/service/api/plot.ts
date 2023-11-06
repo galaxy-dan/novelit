@@ -16,7 +16,7 @@ export const postPlot = async (body : plotType) => {
 };
   
 export const putPlot = async (params:string, body: plotType) => {
-    const data = await put(`/plot?plotUuid=${params}`, body);
+    const data = await put(`/plot?plotUuid=${params}`, {...body, plotUuid: params});
     return data;
 };
 
