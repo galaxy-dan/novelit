@@ -25,7 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
 		@NonNull FilterChain filterChain) throws ServletException, IOException {
-		if(!request.getRequestURI().startsWith("/login") || !request.getRequestURI().startsWith("/util") || !request.getRequestURI().startsWith("/actuator")) {
+		if(!request.getRequestURI().startsWith("/login") && !request.getRequestURI().startsWith("/util") && !request.getRequestURI().startsWith("/actuator")) {
 			String accessToken = resolveToken(request);
 			if (accessToken != null && jwtUtils.validateToken(accessToken)) {
 				Authentication authentication = jwtUtils.getAuthentication(accessToken);
