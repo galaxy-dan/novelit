@@ -1,13 +1,11 @@
 package com.galaxy.novelit.notification.service;
 
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
-import com.galaxy.novelit.notification.dto.request.NotificationRequestDto;
+import com.galaxy.novelit.directory.domain.Directory;
+import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.notification.dto.response.NotificationResponseDto;
 import com.galaxy.novelit.notification.repository.EmitterRepository;
-import com.galaxy.novelit.workspace.domain.Workspace;
-import com.galaxy.novelit.workspace.repository.WorkspaceRepository;
 import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -21,7 +19,7 @@ public class NotificationServiceImpl implements NotificationService{
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
     private final EmitterRepository emitterRepository;
-    private final WorkspaceRepository workspaceRepository;
+    private final DirectoryRepository directoryRepository;
 
     public SseEmitter subscribe(String subscriberUUID)
     {
@@ -31,11 +29,6 @@ public class NotificationServiceImpl implements NotificationService{
         return emitter;
     }
 
-    // 코멘트 알람
-    /*public void alertComment(NotificationRequestDto notificationRequestDto)
-    {
-       sseAlertComment(notificationRequestDto);
-    }*/
 
     @Override
     public void alertComment(String commentNickname, String directoryUUID) {
@@ -44,11 +37,11 @@ public class NotificationServiceImpl implements NotificationService{
 
     private void sseAlertComment(String commentNickname, String directoryUUID) {
         // directoryUUID == workspaceUUID
-        Workspace workspace = workspaceRepository.findByWorkspaceUUID(
-            directoryUUID)
+        Directory directory = directoryRepository.findDirectoryByUuid(
+                directoryUUID)
             .orElseThrow(() -> new NoSuchElementFoundException("작품이 없습니다!"));
 
-        String subscriberUUID = workspace.getUserUUID();
+        String subscriberUUID = directory.getUserUUID();
 
         SseEmitter emitter = emitterRepository.get(subscriberUUID);
 

@@ -1,19 +1,14 @@
 package com.galaxy.novelit.comment.service;
 
-import com.galaxy.novelit.comment.domain.CommentInfo;
 import com.galaxy.novelit.comment.domain.Comment;
+import com.galaxy.novelit.comment.domain.CommentInfo;
 import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentDeleteRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentUpdateRequestDto;
-import com.galaxy.novelit.comment.repository.CommentInfoRepository;
 import com.galaxy.novelit.comment.repository.CommentRepository;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
-import com.galaxy.novelit.common.exception.NonUniqueException;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,6 +40,8 @@ public class CommentServiceImpl implements CommentService {
             // save
             commentRepository.save(comment);
         }
+
+        log.info(comment.get_id());
     }
 
     @Override
