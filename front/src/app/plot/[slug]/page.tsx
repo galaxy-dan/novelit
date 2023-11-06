@@ -3,12 +3,12 @@ import PlotCard from '@/components/plot/PlotCard';
 import { plotListType, plotType } from '@/model/plot';
 import { getPlotList } from '@/service/api/plot';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import { GoBook } from 'react-icons/go';
 type Props = {
   params: {
-    workspace: string;
+    slug: string;
   };
 };
 export default function page({ params }: Props) {
@@ -17,7 +17,7 @@ export default function page({ params }: Props) {
 
   const { data: plotInfoDtoList }: UseQueryResult<plotListType> = useQuery({
     queryKey: ['plotList', title],
-    queryFn: () => getPlotList(params.workspace, title),
+    queryFn: () => getPlotList(params.slug, title),
   });
 
   useEffect(() => {
@@ -51,13 +51,9 @@ export default function page({ params }: Props) {
           }}
         />
       </div>
-      <div className="grid b2:grid-cols-1 c2:grid-cols-2 d2:grid-cols-3 e2:grid-cols-4 f2:grid-cols-5 grid-flow-row gap-4 ">
+      <div className=" grid gap-4 a1:grid-cols-1 b2:grid-cols-1 c2:grid-cols-2 d2:grid-cols-3 e2:grid-cols-4 f2:grid-cols-5 ">
         {plotInfoDtoList?.plotInfoDtoList?.map((plot) => (
-          <PlotCard
-            plot={plot}
-            workspace={params.workspace}
-            key={plot.plotUuid}
-          />
+          <PlotCard plot={plot} workspace={params.slug} key={plot.plotUuid} />
         ))}
       </div>
     </div>
