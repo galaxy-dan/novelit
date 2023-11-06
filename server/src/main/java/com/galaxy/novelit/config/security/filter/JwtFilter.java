@@ -36,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} else {
-				throw new InvalidTokenException("토큰 확인");
+				throw new InvalidTokenException(request.getRequestURI());
 			}
 		}
 		filterChain.doFilter(request, response);
