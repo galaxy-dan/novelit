@@ -1,31 +1,13 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { FaRegTrashAlt, FaMinus } from 'react-icons/fa';
-import { HiPlus } from 'react-icons/hi';
-import Image from 'next/image';
-import { getS3URL, uploadImage } from '@/service/image/image';
-import {
-  characterType,
-  informationType,
-  relationshipType,
-} from '@/model/charactor';
+import { FaRegTrashAlt } from 'react-icons/fa';
 import UploadState from '@/components/state/UploadState';
 import styles from '@/service/cssStyle/scrollbar.module.css';
-import {
-  deleteCharacter,
-  getCharacter,
-  putCharacter,
-} from '@/service/api/character';
-import {
-  UseMutationResult,
-  UseQueryResult,
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query';
+import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { plotType } from '@/model/plot';
-import { getPlot, putPlot } from '@/service/api/plot';
+import { deletePlot, getPlot, putPlot } from '@/service/api/plot';
 
 type Props = {
   params: {
@@ -38,7 +20,6 @@ export default function page({ params }: Props) {
   const router = useRouter();
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
-
   const { data: plotData }: UseQueryResult<plotType> = useQuery({
     queryKey: ['plot', params.plot],
     queryFn: () => getPlot(params.plot),
@@ -71,7 +52,7 @@ export default function page({ params }: Props) {
   });
 
   const deleteCharacterMutation = useMutation({
-    mutationFn: () => deleteCharacter(params.plot),
+    mutationFn: () => deletePlot(params.plot),
     onSuccess: () => {
       router.push(`/plot/${params.slug}`);
     },
@@ -91,7 +72,7 @@ export default function page({ params }: Props) {
     ending: '',
   });
 
-  const ref = useRef<characterType | null>(null);
+  const ref = useRef<plotType | null>(null);
 
   const [plotTitleInput, setPlotTitleInput] = useState<string | null>('');
   const [storyInput, setStoryInput] = useState<string | null>('');
@@ -150,6 +131,9 @@ export default function page({ params }: Props) {
       } else {
         setIsFetched(true);
       }
+    } else {
+      console.log("이전이랑 같음");
+      setState(0);
     }
     ref.current = JSON.parse(JSON.stringify(plot));
   }, [plot]);
@@ -165,20 +149,22 @@ export default function page({ params }: Props) {
   }, [plotTitleInput]);
 
   const [windowSize, setWindowSize] = useState<number>(0);
+
   useEffect(() => {
     function handleResize() {
       setWindowSize(window.innerWidth);
     }
     window.addEventListener('resize', handleResize);
     handleResize();
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
     if (beginningRef.current) {
+      console.log(beginningRef.current.value.length + " / "+ beginningRef.current.style.height);
       beginningRef.current.style.height = 'auto';
-      beginningRef.current.style.height =
-        beginningRef.current.scrollHeight + 'px';
+      beginningRef.current.style.height = beginningRef.current.scrollHeight + 'px';
     }
   }, [beginningInput, windowSize]);
 
@@ -186,7 +172,6 @@ export default function page({ params }: Props) {
     if (risingRef.current) {
       risingRef.current.style.height = 'auto';
       risingRef.current.style.height = risingRef.current.scrollHeight + 'px';
-      console.log(risingRef.current.scrollHeight);
     }
   }, [risingInput, windowSize]);
 
@@ -226,7 +211,7 @@ export default function page({ params }: Props) {
   }
 
   return (
-    <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem] select-none">
+    <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem]">
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
       <div className="flex items-end justify-between">
         <div className="flex items-center">
@@ -265,7 +250,7 @@ export default function page({ params }: Props) {
           <p className="text-xl font-bold">캐릭터 설명</p>
           <div className="border-2 border-gray-300 rounded-xl h-56 p-2">
             <textarea
-              className={`${styles.scroll} resize-none outline-none font-bold text-lg w-full h-full`}
+              className={`${styles.scroll}  resize-none outline-none font-bold text-lg w-full h-full`}
               value={storyInput || ''}
               onChange={(e) => {
                 if (e.target.value.length < 1000) {
@@ -283,15 +268,15 @@ export default function page({ params }: Props) {
       {/* 기본 정보 */}
       <div className="mt-8">
         <p className="text-xl font-extrabold">기본 정보</p>
-        <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
+        <table className="text-xl border border-gray-300 rounded-xl border-separate border-spacing-0 w-full">
           <tbody>
-            <tr className="relative" key="발단">
-              <td className="rounded-tl-xl rounded-bl-xl border border-gray-300 w-1/5 text-center">
+            <tr className="w-full" key="발단">
+              <td className="rounded-tl-xl border border-gray-300 text-center w-1/6">
                 <p className="w-full my-auto text-center font-bold">발단</p>
               </td>
-              <td className="rounded-tr-xl rounded-br-xl border border-gray-300 w-4/5">
+              <td className="rounded-tr-xl border border-gray-300 w-5/6 px-2 pt-3 pb-1">
                 <textarea
-                  className="w-full resize-none outline-none text-center font-bold whitespace-pre-wrap h-full"
+                  className={`${styles.nonScroll} resize-none outline-none font-bold w-full whitespace-pre-wrap overflow-hidden`}
                   value={beginningInput || ''}
                   ref={beginningRef}
                   rows={1}
@@ -304,12 +289,12 @@ export default function page({ params }: Props) {
             </tr>
 
             <tr className="relative" key="전개">
-              <td className="border border-gray-300 w-1/5 px-2 py-1 text-center">
+              <td className="border border-gray-300 px-2 py-1 text-center">
                 <p className="w-full my-auto text-center font-bold">전개</p>
               </td>
-              <td className="border border-gray-300 w-4/5 px-2">
+              <td className="border border-gray-300 w-full px-2 pt-3 pb-1">
                 <textarea
-                  className="w-full resize-none outline-none text-center font-bold"
+                  className={`${styles.nonScroll} resize-none outline-none font-bold w-full whitespace-pre-wrap overflow-hidden`}
                   value={risingInput || ''}
                   ref={risingRef}
                   rows={1}
@@ -322,12 +307,12 @@ export default function page({ params }: Props) {
             </tr>
 
             <tr className="relative" key="위기">
-              <td className="border border-gray-300 w-1/5 px-2 py-1 text-center">
+              <td className="border border-gray-300 px-2 py-1 text-center">
                 <p className="w-full my-auto text-center font-bold">위기</p>
               </td>
-              <td className="border border-gray-300 w-4/5 px-2">
+              <td className="border border-gray-300 px-2 pt-3 pb-1">
                 <textarea
-                  className="w-full resize-none outline-none text-center font-bold"
+                  className={`${styles.nonScroll} resize-none outline-none font-bold w-full whitespace-pre-wrap overflow-hidden`}
                   value={crisisInput || ''}
                   ref={crisisRef}
                   rows={1}
@@ -343,9 +328,9 @@ export default function page({ params }: Props) {
               <td className="border border-gray-300 w-1/5 px-2 py-1 text-center">
                 <p className="w-full my-auto text-center font-bold">절정</p>
               </td>
-              <td className="border border-gray-300 w-4/5 px-2">
+              <td className="border border-gray-300 w-4/5 px-2 pt-3 pb-1">
                 <textarea
-                  className="w-full resize-none outline-none text-center font-bold"
+                  className={`${styles.nonScroll} resize-none outline-none font-bold w-full whitespace-pre-wrap overflow-hidden`}
                   value={climaxInput || ''}
                   ref={climaxRef}
                   rows={1}
@@ -358,12 +343,12 @@ export default function page({ params }: Props) {
             </tr>
 
             <tr className="relative" key="결말">
-              <td className="rounded-bl-xl border border-gray-300 w-1/5 px-2 py-1 text-center">
+              <td className="rounded-bl-xl border border-gray-300 px-2 py-1 text-center">
                 <p className="w-full my-auto text-center font-bold">결말</p>
               </td>
-              <td className="rounded-br-xl border border-gray-300 w-4/5 px-2">
+              <td className="rounded-br-xl border border-gray-300 px-2 pt-3 pb-1">
                 <textarea
-                  className="w-full resize-none outline-none text-center font-bold"
+                  className={`${styles.nonScroll} resize-none outline-none font-bold w-full whitespace-pre-wrap overflow-hidden`}
                   value={endingInput || ''}
                   ref={endingRef}
                   rows={1}
