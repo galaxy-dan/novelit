@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayDeque;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,9 +34,8 @@ public class Workspace {
     @Column(name = "workspace_uuid", length = 36, nullable = false)
     private String workspaceUUID;
 
-    @Column(name = "title", length = 60,nullable = false)
+    @Column(name = "title", length = 100,nullable = false)
     private String title;
-
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
