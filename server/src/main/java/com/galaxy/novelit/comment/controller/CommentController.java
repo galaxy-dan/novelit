@@ -31,8 +31,11 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<Void> addComment(@RequestBody CommentAddRequestDto commentAddRequestDto){
         commentService.addComment(commentAddRequestDto);
+
         notificationService.alertComment(commentAddRequestDto.getCommentNickname()
             , commentAddRequestDto.getDirectoryUUID());
+
+
         return ResponseEntity.ok().build();
     }
 
