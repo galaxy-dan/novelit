@@ -10,6 +10,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,11 +28,12 @@ public class WorkspaceController {
     private final WorkspaceService workspaceService;
 
     @PostMapping
-    public ResponseEntity<?> createWorkspace(@RequestBody WorkSpaceCreateReqDTO workSpaceCreateReqDTO) {
+    public ResponseEntity<?> createWorkspace(@RequestBody WorkSpaceCreateReqDTO
+            workSpaceCreateReqDTO, Authentication authentication) {
         String workSpaceUUID = String.valueOf(UUID.randomUUID());
-        String testUUID = "f72a8efc-99dc-4afd-a658-6f42073fb7a3";
+        String userUUID = authentication.getName();
         String title = workSpaceCreateReqDTO.getTitle();
-        workspaceService.createWorkspace(workSpaceUUID, testUUID, title);
+        workspaceService.createWorkspace(workSpaceUUID, userUUID, title);
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body( WorkSpaceResDTO.builder().workspaceUUID(workSpaceUUID).build());
@@ -39,8 +41,9 @@ public class WorkspaceController {
     }
 
     @PatchMapping
-    public void modifiedWorkspaceName(@RequestBody WorkSpaceModifiedReqDTO workSpaceModifiedReqDTO) {
-        String testUUID = "f72a8efc-99dc-4afd-a658-6f42073fb7a3";
+    public void modifiedWorkspaceName(@RequestBody WorkSpaceModifiedReqDTO workSpaceModifiedReqDTO,
+            Authentication authentication) {
+        String userUUID = authentication.getName();
         String workSpaceUUID = workSpaceModifiedReqDTO.getWorkspaceUUID();
         String title = workSpaceModifiedReqDTO.getTitle();
 
@@ -60,8 +63,10 @@ public class WorkspaceController {
     }
 
     @PatchMapping("/tree")
-    public ResponseEntity<Void> changeTree(@RequestBody WorkSpaceTreeChangeReqDTO dto){
-        workspaceService.changeTree(dto, "f72a8efc-99dc-4afd-a658-6f42073fb7a3");
+    public ResponseEntity<Void> changeTree(@RequestBody WorkSpaceTreeChangeReqDTO dto,
+            Authentication authentication){
+        String userUUID = authentication.getName();
+        workspaceService.changeTree(dto, userUUID);
         return ResponseEntity.ok().build();
     }
 }
