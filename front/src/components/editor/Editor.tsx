@@ -29,6 +29,7 @@ export default function Editor() {
   const queryClient = useQueryClient();
 
   const [html, setHtml] = useState<string>('<div><br/></div>');
+  const [length, setLength] = useState<number>();
 
   const [editable, setEditable] = useState<boolean>(true);
   const [fontIndex, setFontIndex] = useState<number>(2);
@@ -99,6 +100,7 @@ export default function Editor() {
 
   const handleChange = (e: ContentEditableEvent) => {
     setHtml(e.target.value);
+    setLength(document?.getElementById('edit')?.innerText.length ?? 0);
   };
 
   const sanitizeConf: IOptions = {
@@ -177,6 +179,7 @@ export default function Editor() {
     a.click();
   };
 
+
   return (
     <>
       <div
@@ -216,6 +219,8 @@ export default function Editor() {
         </div>
 
         <div className="flex flex-col w-[200px] justify-start items-center gap-6">
+          {/* <div>{document && document?.getElementById('edit')?.innerText.length && 0}</div> */}
+          <div className='text-2xl'>{length}</div>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={() => {

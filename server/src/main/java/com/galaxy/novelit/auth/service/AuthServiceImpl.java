@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -43,17 +44,12 @@ public class AuthServiceImpl implements AuthService{
 	@Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
 	private String KAKAO_INFO_URL;
 
-
-	@Value("${jwt.secret}")
-	private String secretKey;
-
 	private final RestTemplate restTemplate = new RestTemplateBuilder()
 		.uriTemplateHandler(new DefaultUriBuilderFactory())
 		.build();
 
 	private final UserRepository userRepository;
 	private final JwtUtils jwtUtils;
-
 	@Override
 	public LoginResDTO kakaoLogin(String code) {
 		KaKaoAccessTokenDTO kakaoAccessToken = getAccessToken(code);
@@ -77,6 +73,7 @@ public class AuthServiceImpl implements AuthService{
 		}
 
 		Authentication authenticate = new UsernamePasswordAuthenticationToken(userUUID, "", List.of(() -> "USER"));
+		SecurityContextHolder.getContext().setAuthentication(authenticate);
 		String accessToken = jwtUtils.generateAccessToken(authenticate);
 		String refreshToken = jwtUtils.generateRefreshToken(authenticate);
 

@@ -41,7 +41,7 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(comment);
         }
 
-        log.info(comment.get_id());
+        //log.info(comment.get_id());
     }
 
     @Override

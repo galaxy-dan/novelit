@@ -29,10 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
 			Authentication authentication = jwtUtils.getAuthentication(accessToken);
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
-		} else {
-			// System.out.println("xhxh");
-			// throw new InvalidTokenException("토큰 확인");
 		}
+
 		filterChain.doFilter(request, response);
 	}
 

@@ -1,6 +1,7 @@
 package com.galaxy.novelit.notification.controller;
 
 import com.galaxy.novelit.notification.service.NotificationService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -21,8 +22,11 @@ public class NotificationController {
 
     // 처음 구독
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> subscribe(@RequestParam("subscriberUUID") String subscriberUUID)
+    public ResponseEntity<SseEmitter> subscribe(@RequestParam("subscriberUUID") String subscriberUUID,
+        HttpServletResponse response)
     {
+        //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
+        response.setHeader("X-Accel-Buffering", "no");
         return ResponseEntity.ok(notificationService.subscribe(subscriberUUID));
     }
 
