@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.IllegalUUIDException;
+import com.galaxy.novelit.common.exception.InvalidTokenException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
@@ -53,5 +54,10 @@ public class ExceptionAdvice {
 	@ExceptionHandler(NonUniqueException.class)
 	public ResponseEntity<ExceptionResDTO> NonUniqueException(NonUniqueException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<ExceptionResDTO> InvalidTokenException(InvalidTokenException e) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionResDTO(e.getMessage()));
 	}
 }
