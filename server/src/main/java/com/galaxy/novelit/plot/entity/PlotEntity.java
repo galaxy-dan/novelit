@@ -2,17 +2,11 @@ package com.galaxy.novelit.plot.entity;
 
 import com.galaxy.novelit.plot.dto.request.PlotCreateRequestDto;
 import com.galaxy.novelit.plot.dto.request.PlotSaveRequestDto;
-import com.galaxy.novelit.plot.dto.response.PlotDetailsResponseDto;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import java.io.Serializable;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,25 +33,25 @@ public class PlotEntity{
     @Column(name = "plot_uuid", nullable = false)
     private String plotUuid;
 
-    @Column(name = "plot_title")
+    @Column(name = "plot_title", length = 500)
     @ColumnDefault("'제목 없음'")
     private String plotTitle;
-    @Column(name = "story")
+    @Column(name = "story",  length = 2000)
     @ColumnDefault("''")
     private String story;
-    @Column(name = "beginning")
+    @Column(name = "beginning", length = 2000)
     @ColumnDefault("''")
     private String beginning;
-    @Column(name = "rising")
+    @Column(name = "rising", length = 2000)
     @ColumnDefault("''")
     private String rising;
-    @Column(name = "crisis")
+    @Column(name = "crisis", length = 2000)
     @ColumnDefault("''")
     private String crisis;
-    @Column(name = "climax")
+    @Column(name = "climax", length = 2000)
     @ColumnDefault("''")
     private String climax;
-    @Column(name = "ending")
+    @Column(name = "ending", length = 2000)
     @ColumnDefault("''")
     private String ending;
 
