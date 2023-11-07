@@ -25,7 +25,7 @@ public class ShareController {
     //     return ResponseEntity.ok(shareService.getContent(directoryUUID));
     // }
 
-    @GetMapping("")
+    @GetMapping("/token")
     public ResponseEntity<ShareTokenResDTO> generateToken(@RequestParam("directoryUUID") String directoryUUID) {
         return ResponseEntity.ok(shareService.generateToken(directoryUUID));
     }

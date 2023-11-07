@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ShareServiceImpl implements ShareService{
 
     private final DirectoryRepository directoryRepository;
-    @Value("{jwt.share-token-expire}")
+    @Value("${jwt.share-token-expire}")
     private long shareTokenExpiration;
     private final JwtUtils jwtUtils;
 
