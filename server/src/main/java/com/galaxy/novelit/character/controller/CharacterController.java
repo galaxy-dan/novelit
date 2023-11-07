@@ -29,7 +29,8 @@ public class CharacterController {
     @GetMapping
     public ResponseEntity<Object> getCharacterInfo(@RequestParam String characterUUID) {
         try {
-            CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID);
+            String userUUID = "temp";
+            CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, userUUID);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -37,9 +38,9 @@ public class CharacterController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto) {
+    public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto, @RequestParam String userUUID) {
         try {
-            characterService.createCharacter(dto);
+            characterService.createCharacter(dto, userUUID);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -47,10 +48,10 @@ public class CharacterController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateCharacter(@RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto) {
+    public ResponseEntity<Object> updateCharacter(@RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto, @RequestParam String userUUID) {
         try {
 //            CharacterDtoRes characterDtoRes = characterService.getCharacter(dto.getCharacterUUID());
-            characterService.updateCharacter(characterUUID, dto);
+            characterService.updateCharacter(characterUUID, dto, userUUID);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -58,24 +59,24 @@ public class CharacterController {
     }
 
     @DeleteMapping
-    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUUID) {
+    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUUID, @RequestParam String userUUID) {
         try {
-            characterService.deleteCharacter(characterUUID);
+            characterService.deleteCharacter(characterUUID, userUUID);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @GetMapping("/diagram")
-    public ResponseEntity<Object> getRelationships() {
-        try {
-            List<RelationDtoRes> dto = characterService.getRelationships();
-
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+//    @GetMapping("/diagram")
+//    public ResponseEntity<Object> getRelationships() {
+//        try {
+////            List<RelationDtoRes> dto = characterService.getRelationships();
+//
+//            return ResponseEntity.ok().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
 
 }

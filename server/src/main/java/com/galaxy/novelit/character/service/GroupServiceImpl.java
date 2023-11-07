@@ -36,14 +36,11 @@ public class GroupServiceImpl implements GroupService {
         GroupDtoRes dto = new GroupDtoRes();
         dto.setGroupUUID(group.getGroupUUID());
         dto.setGroupName(group.getGroupName());
-        dto.setChildUUID(group.getChildUUID());
-        dto.setParentUUID(group.getParentUUID());
+        dto.setChildGroups(group.getChildGroups());
+        dto.setParentGroupUUID(group.getParentGroupUUID());
         dto.setWorkspaceUUID(group.getWorkspaceUUID());
-        dto.setCharactersInfo(group.getCharactersInfo());
+        dto.setChildCharacters(group.getChildCharacters());
         dto.setDeleted(group.isDeleted());
-
-        System.out.println(group.getGroupId());
-        System.out.println(group.getGroupName());
 
         return dto;
     }
@@ -51,7 +48,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(readOnly = true)
     @Override
     public List<GroupSimpleDtoRes> getTopGroup() {
-        List<GroupEntity> groups = groupRepository.findAllByParentUUID(null);
+        List<GroupEntity> groups = groupRepository.findAllByParentGroupUUID(null);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -76,7 +73,7 @@ public class GroupServiceImpl implements GroupService {
         // 최상단 계층일 경우 (부모UUID가 없을 때)
         if (parentUUID == null) {
             newGroup = GroupEntity.builder()
-                .parentUUID(null)
+                .parentGroupUUID(null)
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
                 .workspaceUUID(dto.getWorkspaceUUID())
@@ -89,7 +86,7 @@ public class GroupServiceImpl implements GroupService {
                 .groupName(dto.getGroupName())
                 .workspaceUUID(dto.getWorkspaceUUID())
                 .userUUID(dto.getUserUUID())
-                .parentUUID(parentUUID)
+                .parentGroupUUID(parentUUID)
                 .build();
         }
 

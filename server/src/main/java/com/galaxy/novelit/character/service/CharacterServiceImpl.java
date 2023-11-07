@@ -25,7 +25,7 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional(readOnly = true)
     @Override
-    public CharacterDtoRes getCharacterInfo(String characterUUID) {
+    public CharacterDtoRes getCharacterInfo(String characterUUID, String userUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
 
 //        characterUUID가 db에 없을 때
@@ -40,31 +40,29 @@ public class CharacterServiceImpl implements CharacterService {
         dto.setInformation(character.getInformation());
         dto.setDescription(character.getDescription());
         dto.setRelationship(character.getRelationship());
-        dto.setCharacterImage(character.getCharacterImage());
         dto.setDeleted(character.isDeleted());
-
-        System.out.println(character.getCharacterId());
-
-        return dto;
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID) {
-        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID);
-        List<CharacterSimpleDtoRes> dto = new ArrayList<>();
-
-        for (CharacterEntity character : characters) {
-            CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
-                .characterUUID(character.getCharacterUUID())
-                .characterName(character.getCharacterName())
-                .information(character.getInformation())
-                .characterImage(character.getCharacterImage()).build();
-            dto.add(characterSimpleDtoRes);
-        }
+        dto.setCharacterImage(character.getCharacterImage());
 
         return dto;
     }
+
+//    @Transactional(readOnly = true)
+//    @Override
+//    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID) {
+//        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID);
+//        List<CharacterSimpleDtoRes> dto = new ArrayList<>();
+//
+//        for (CharacterEntity character : characters) {
+//            CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
+//                .characterUUID(character.getCharacterUUID())
+//                .characterName(character.getCharacterName())
+//                .information(character.getInformation())
+//                .characterImage(character.getCharacterImage()).build();
+//            dto.add(characterSimpleDtoRes);
+//        }
+//
+//        return dto;
+//    }
 
     @Transactional(readOnly = true)
     @Override
@@ -87,24 +85,29 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public void createCharacter(CharacterCreateDtoReq dto) {
+    public void createCharacter(CharacterCreateDtoReq dto, String userUUID) {
         String characterUUID = UUID.randomUUID().toString();
 
         CharacterEntity newCharacter = CharacterEntity.builder()
-            .characterUUID(characterUUID)
+            .userUUID(userUUID)
+            .workspaceUUID(dto.getWorkspaceUUID())
             .groupUUID(dto.getGroupUUID())
+            .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
-            .relationship(dto.getRelationship()).build();
+            .relationship(dto.getRelationship())
+            .characterImage(dto.getCharacterImage())
+            .build();
 
         characterRepository.save(newCharacter);
     }
 
     @Transactional
     @Override
-    public void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto) {
+    public void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+
         CharacterEntity newCharacter = CharacterEntity.builder()
             .userUUID(character.getUserUUID())
             .characterId(character.getCharacterId())
@@ -119,21 +122,20 @@ public class CharacterServiceImpl implements CharacterService {
             .build();
 
         characterRepository.save(newCharacter);
-
     }
 
     @Transactional
     @Override
-    public void deleteCharacter(String characterUUID) {
+    public void deleteCharacter(String characterUUID, String userUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         character.deleteCharacter();
         characterRepository.save(character);
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public List<RelationDtoRes> getRelationships() {
-
-        return null;
-    }
+//    @Transactional(readOnly = true)
+//    @Override
+//    public List<RelationDtoRes> getRelationships() {
+//
+//        return null;
+//    }
 }
