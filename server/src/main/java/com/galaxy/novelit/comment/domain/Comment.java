@@ -1,6 +1,5 @@
 package com.galaxy.novelit.comment.domain;
 
-import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +21,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Comment {
     @Id
     private String _id;
-    private String userUUID;
     private String spaceUUID;
     private String directoryUUID;
     private List<CommentInfo> commentInfoList;
 
-    public static Comment create(CommentAddRequestDto commentAddRequestDto) {
+    public static Comment create(CommentAddRequestDto commentAddRequestDto, String userUUID) {
         List<CommentInfo> commentInfoList = new ArrayList<>();
 
         UUID uuid = UUID.randomUUID();
@@ -38,22 +36,21 @@ public class Comment {
             .commentUUID(commentUUID)
             .commentContent(commentAddRequestDto.getCommentContent())
             .commentNickname(commentAddRequestDto.getCommentNickname())
-            .commentPassword(commentAddRequestDto.getCommentPassword())
+            .userUUID(userUUID)
             .build());
 
         log.info("commentInfoList : {}", commentInfoList.get(0).getCommentUUID());
 
         return Comment.builder()
-            .userUUID("f72a8efc-99dc-4afd-a658-6f42073fb7a3")
             .spaceUUID(commentAddRequestDto.getSpaceUUID())
             .directoryUUID(commentAddRequestDto.getDirectoryUUID())
             .commentInfoList(commentInfoList)
             .build();
     }
-    public static Comment create(Comment comment, List<CommentInfo> commentInfoList) {
+    /*public static Comment create(Comment comment, List<CommentInfo> commentInfoList, String userUUID) {
 
         return Comment.builder()
-            .userUUID("f72a8efc-99dc-4afd-a658-6f42073fb7a3")
+            .userUUID(userUUID)
             .spaceUUID(comment.getSpaceUUID())
             .directoryUUID(comment.getDirectoryUUID())
             .commentInfoList(commentInfoList)
@@ -66,7 +63,7 @@ public class Comment {
             list.add(CommentInfo.dtoToInfo(dto));
         }
         return list;
-    }
+    }*/
 
     public void updateCommentInfoList(List<CommentInfo> list){
         this.commentInfoList = list;
