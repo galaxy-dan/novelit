@@ -4,5 +4,5 @@ import com.galaxy.novelit.share.dto.response.ShareTokenResDTO;
 
 public interface ShareService {
 
-    ShareTokenResDTO generateToken(String directoryUUID);
+    ShareTokenResDTO generateToken(String directoryUUID, String userUUID);
 }

@@ -1,6 +1,7 @@
 package com.galaxy.novelit.share.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,8 +22,8 @@ public class ShareController {
     private final ShareService shareService;
 
     @GetMapping("/token")
-    public ResponseEntity<ShareTokenResDTO> generateToken(@RequestParam("directoryUUID") String directoryUUID) {
-        return ResponseEntity.ok(shareService.generateToken(directoryUUID));
+    public ResponseEntity<ShareTokenResDTO> generateToken(@RequestParam("directoryUUID") String directoryUUID, Authentication authentication) {
+        return ResponseEntity.ok(shareService.generateToken(directoryUUID, authentication.getName()));
     }
 
 }

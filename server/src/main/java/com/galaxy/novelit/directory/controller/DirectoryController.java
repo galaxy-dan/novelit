@@ -1,6 +1,7 @@
 package com.galaxy.novelit.directory.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,25 +25,25 @@ public class DirectoryController {
 	private final DirectoryService directoryService;
 
 	@PostMapping
-	public ResponseEntity<Void> createDirectory(@RequestBody DirectoryCreateReqDTO dto){
-		directoryService.createDirectory(dto, "f72a8efc-99dc-4afd-a658-6f42073fb7a3");
+	public ResponseEntity<Void> createDirectory(@RequestBody DirectoryCreateReqDTO dto, Authentication authentication){
+		directoryService.createDirectory(dto, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
 
 	@PatchMapping
-	public ResponseEntity<Void> editDirectoryName(@RequestBody DirectoryNameEditReqDTO dto){
-		directoryService.editDirectoryName(dto, "f72a8efc-99dc-4afd-a658-6f42073fb7a3");
+	public ResponseEntity<Void> editDirectoryName(@RequestBody DirectoryNameEditReqDTO dto, Authentication authentication){
+		directoryService.editDirectoryName(dto, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping
-	public ResponseEntity<DirectoryResDTO> getDirectory(@RequestParam String uuid){
-		return ResponseEntity.ok(directoryService.getDirectory(uuid, "f72a8efc-99dc-4afd-a658-6f42073fb7a3"));
+	public ResponseEntity<DirectoryResDTO> getDirectory(@RequestParam String uuid, Authentication authentication){
+		return ResponseEntity.ok(directoryService.getDirectory(uuid, authentication.getName()));
 	}
 
 	@DeleteMapping
-	public ResponseEntity<Void> deleteDirectory(String uuid){
-		directoryService.deleteDirectory(uuid, "f72a8efc-99dc-4afd-a658-6f42073fb7a3");
+	public ResponseEntity<Void> deleteDirectory(String uuid, Authentication authentication){
+		directoryService.deleteDirectory(uuid, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
 }
