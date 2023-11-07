@@ -27,8 +27,8 @@ public class FileController {
 	}
 
 	@PatchMapping
-	public ResponseEntity<Void> workFile(@RequestBody FileWorkReqDTO dto){
-		directoryService.workFile(dto,"f72a8efc-99dc-4afd-a658-6f42073fb7a3");
+	public ResponseEntity<Void> workFile(@RequestBody FileWorkReqDTO dto, Authentication authentication){
+		directoryService.workFile(dto,authentication.getName());
 		return ResponseEntity.ok().build();
 	}
 }
