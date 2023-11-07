@@ -16,7 +16,7 @@ export type Reply = {
 export type Comment = {
   spaceUUID: string;
   commentUUID?: string;
-  directoryUUID?: string;
+  directoryUUID?: string | string[];
   commentContent?: string;
   commentNickname: string;
   commentPassword: string;

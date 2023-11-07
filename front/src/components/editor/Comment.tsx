@@ -31,7 +31,7 @@ type Inputs = {
 
 type Props = {
   spaceUUID: string;
-  directoryUUID: string;
+  directoryUUID: string | string[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -109,7 +109,7 @@ export default function Comment({
 
       <div className="flex">
         {commentList?.map((el, index) => (
-          <div className='flex justify-between'>
+          <div className="flex justify-between" key={el.commentUUID}>
             <div className="flex gap-2">
               <div>{el.commentNickname}</div>
               <div>{el.commentContent}</div>
