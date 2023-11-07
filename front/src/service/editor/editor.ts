@@ -1,2 +1,2 @@
-export const fontSize = ['sm', 'base', 'lg', 'xl', '2xl'];
-export const fontFamily = ['nanumPen', 'nanum', 'noto', 'melody'];
+export const fontSize = ['base', 'lg', 'xl', '2xl', '3xl'];
+export const fontFamily = ['melody', 'nanum', 'noto', 'nanumPen'];
