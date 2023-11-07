@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,12 +30,12 @@ public class CommentController {
     private final NotificationService notificationService;
 
     @PostMapping
-    public ResponseEntity<Void> addComment(@RequestBody CommentAddRequestDto commentAddRequestDto){
-        commentService.addComment(commentAddRequestDto);
+    public ResponseEntity<Void> addComment(@RequestBody CommentAddRequestDto commentAddRequestDto,
+        Authentication authentication){
+        commentService.addComment(commentAddRequestDto, authentication.getName());
 
         notificationService.alertComment(commentAddRequestDto.getCommentNickname()
             , commentAddRequestDto.getDirectoryUUID());
-
 
         return ResponseEntity.ok().build();
     }
@@ -45,14 +46,16 @@ public class CommentController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateComment(@RequestBody CommentUpdateRequestDto commentUpdateRequestDto) {
-        commentService.updateComment(commentUpdateRequestDto);
+    public ResponseEntity<Void> updateComment(@RequestBody CommentUpdateRequestDto commentUpdateRequestDto
+    , Authentication authentication) {
+        commentService.updateComment(commentUpdateRequestDto, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteComment(@RequestBody CommentDeleteRequestDto commentDeleteRequestDto) {
-        commentService.deleteComment(commentDeleteRequestDto);
+    public ResponseEntity<Void> deleteComment(@RequestBody CommentDeleteRequestDto commentDeleteRequestDto
+    , Authentication authentication) {
+        commentService.deleteComment(commentDeleteRequestDto, authentication.getName());
         return ResponseEntity.ok().build();
     }
 }
