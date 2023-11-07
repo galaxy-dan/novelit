@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 
 import com.galaxy.novelit.auth.util.JwtUtils;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
+import com.galaxy.novelit.share.dto.request.ShareFileReqDTO;
 import com.galaxy.novelit.share.dto.response.ShareTokenResDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -30,5 +32,17 @@ public class ShareServiceImpl implements ShareService{
         String token = jwtUtils.generateShareToken(directoryUUID, shareTokenExpiration);
 
         return new ShareTokenResDTO(token);
+    }
+
+    @Override
+    public void checkToken(ShareFileReqDTO dto) {
+        String token = dto.getToken();
+        if(jwtUtils.validateToken(token)){
+            String directoryUUID = jwtUtils.getSharedDirectoryUUID(token);
+            if(!directoryRepository.existsByUuidAndDeleted(directoryUUID, false)){
+                throw new NoSuchElementFoundException("존재하지 않는 파일입니다. 다시 확인해주세요.");
+            }
+        }
+
     }
 }
