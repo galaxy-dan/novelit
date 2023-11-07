@@ -1,6 +1,7 @@
 package com.galaxy.novelit.directory.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +22,8 @@ public class FileController {
 	private final DirectoryService directoryService;
 
 	@GetMapping
-	public ResponseEntity<FileResDTO> getFile(@RequestParam String uuid){
-		return ResponseEntity.ok(directoryService.getFile(uuid, "f72a8efc-99dc-4afd-a658-6f42073fb7a3"));
+	public ResponseEntity<FileResDTO> getFile(@RequestParam String uuid, Authentication authentication){
+		return ResponseEntity.ok(directoryService.getFile(uuid, authentication.getName()));
 	}
 
 	@PatchMapping
