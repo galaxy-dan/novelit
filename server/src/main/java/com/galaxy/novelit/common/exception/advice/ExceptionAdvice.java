@@ -1,16 +1,18 @@
 package com.galaxy.novelit.common.exception.advice;
 
-import com.galaxy.novelit.common.exception.IllegalUUIDException;
-import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
-import com.galaxy.novelit.common.exception.NonUniqueException;
+import com.galaxy.novelit.common.exception.LengthOutOfLimit;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.IllegalUUIDException;
+import com.galaxy.novelit.common.exception.InvalidTokenException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
+import com.galaxy.novelit.common.exception.NonUniqueException;
 import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.common.exception.dto.ExceptionResDTO;
 
@@ -53,5 +55,10 @@ public class ExceptionAdvice {
 	@ExceptionHandler(NonUniqueException.class)
 	public ResponseEntity<ExceptionResDTO> NonUniqueException(NonUniqueException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<ExceptionResDTO> InvalidTokenException(InvalidTokenException e) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionResDTO(e.getMessage()));
 	}
 }

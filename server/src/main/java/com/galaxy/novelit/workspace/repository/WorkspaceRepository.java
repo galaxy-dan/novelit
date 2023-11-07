@@ -12,4 +12,5 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
     Optional<Workspace> findByWorkspaceUUID(String workSpaceUUID);
 
     List<Workspace> findAllByUserUUID(String userUUID);
+
 }

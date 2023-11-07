@@ -112,6 +112,9 @@ public class DirectoryServiceImpl implements DirectoryService{
 	public FileResDTO getFile(String directoryUUID, String userUUID) {
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
 		//예외 처리
+		if(directoryUUID.equals(userUUID)){
+			userUUID = directory.getUserUUID();
+		}
 		checkDirectoryException(directory, userUUID);
 		if(directory.isDirectory()){
 			throw new WrongDirectoryTypeException();

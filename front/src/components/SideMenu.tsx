@@ -113,7 +113,7 @@ export default function SideMenu() {
       </button>
 
       {isOpen && (
-        <div className="min-h-screen z-50 fixe left-0 top-0 bg-violet-50 min-w-[220px] font-melody">
+        <div className="min-h-screen z-50 fixe left-0 top-0 bg-violet-50 w-[260px] font-melody">
           <div>
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
