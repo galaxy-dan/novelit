@@ -51,6 +51,7 @@ jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expire: ${ACCESS_TOKEN_EXPIRE}
   refresh-token-expire: ${REFRESH_TOKEN_EXPIRE}
+  share-token-expire: ${SHARE_TOKEN_EXPIRE}
 ---
 
 spring:

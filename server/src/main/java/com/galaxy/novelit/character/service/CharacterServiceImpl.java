@@ -43,6 +43,8 @@ public class CharacterServiceImpl implements CharacterService {
         dto.setCharacterImage(character.getCharacterImage());
         dto.setDeleted(character.isDeleted());
 
+        System.out.println(character.getCharacterId());
+
         return dto;
     }
 
@@ -124,18 +126,7 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public void deleteCharacter(String characterUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
-        CharacterEntity newCharacter = CharacterEntity.builder()
-            .characterId(character.getCharacterId())
-            .userUUID(character.getUserUUID())
-            .groupUUID(character.getGroupUUID())
-            .characterUUID(character.getCharacterUUID())
-            .characterName(character.getCharacterName())
-            .description(character.getDescription())
-            .information(character.getInformation())
-            .relationship(character.getRelationship())
-            .characterImage(character.getCharacterImage())
-            .isDeleted(true).build();
-
-        characterRepository.save(newCharacter);
+        character.deleteCharacter();
+        characterRepository.save(character);
     }
 }
