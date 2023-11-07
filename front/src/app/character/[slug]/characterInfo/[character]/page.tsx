@@ -12,7 +12,11 @@ import {
 } from '@/model/charactor';
 import UploadState from '@/components/state/UploadState';
 import styles from '@/service/cssStyle/scrollbar.module.css';
-import { deleteCharacter, getCharacter, putCharacter } from '@/service/api/character';
+import {
+  deleteCharacter,
+  getCharacter,
+  putCharacter,
+} from '@/service/api/character';
 import {
   UseMutationResult,
   UseQueryResult,
@@ -24,6 +28,7 @@ import { useRouter } from 'next/navigation';
 type Props = {
   params: {
     character: string;
+    slug: string
   };
 };
 export default function page({ params }: Props) {
@@ -35,6 +40,7 @@ export default function page({ params }: Props) {
     queryKey: ['character', params.character],
     queryFn: () => getCharacter(params.character),
     onSuccess: (data) => {
+      setImageInput(data?.characterImage || '');
       setImageUrl(data?.characterImage || '');
       setNameInput(data?.characterName || '');
       setInformationInput(data?.information || []);
@@ -43,7 +49,7 @@ export default function page({ params }: Props) {
       setGroupUUID(data?.groupUUID || null);
     },
     onError: () => {
-      router.push('/character');
+      router.push(`/character/${params.slug}`);
     },
     enabled: !isFetched,
   });
@@ -65,9 +71,9 @@ export default function page({ params }: Props) {
     mutationFn: () => deleteCharacter(params.character),
     onSuccess: () => {
       if (groupUUID) {
-        router.push(`/character/${groupUUID}`);
-      } else { 
-        router.push('/character');
+        router.push(`/character/${params.slug}/${groupUUID}`);
+      } else {
+        router.push(`/character/${params.slug}`);
       }
     },
     onError: () => {
@@ -105,8 +111,8 @@ export default function page({ params }: Props) {
   const [relationshipInput, setRelationInput] = useState<
     relationshipType[] | null
   >([]);
-  
-  const [groupUUID, setGroupUUID] = useState<string|null>('');
+
+  const [groupUUID, setGroupUUID] = useState<string | null>('');
 
   const [searchInput, setSearchInput] = useState<number>(-1);
   const [state, setState] = useState<number>(0);
@@ -143,6 +149,7 @@ export default function page({ params }: Props) {
       JSON.stringify(ref.current) !== JSON.stringify(character)
     ) {
       if (isFetched) {
+        console.log(character);
         putCharacterMutation.mutate();
       } else {
         setIsFetched(true);
@@ -180,7 +187,11 @@ export default function page({ params }: Props) {
   }
 
   return (
-    <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem] select-none" onClick={() => setSearchInput(-1)}>
+    <div
+      className="select-none w-full"
+      onClick={() => setSearchInput(-1)}
+    >
+      <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 my-20 ">
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
       <div className="flex items-end justify-between">
         <div className="flex items-center">
@@ -399,11 +410,12 @@ export default function page({ params }: Props) {
                   <input
                     type="text"
                     className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                    value={relationshipInput[i].uuid}
+                    value={relationshipInput[i].name}
                     onChange={(e) => {
                       setState(1);
                       var newItem = [...relationshipInput];
-                      newItem[i].uuid = e.target.value;
+                      newItem[i].name = e.target.value;
+                      newItem[i].uuid = null;
                       setRelationInput(newItem);
                       setSearchInput(i);
                       //UUID null로 초기화
@@ -419,70 +431,8 @@ export default function page({ params }: Props) {
                       onClick={() => {
                         setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].uuid = '이름이름이름이름';
-                        setRelationInput(newItem);
-                        setSearchInput(-1);
-                        //UUID
-                      }}
-                    >
-                      <Image
-                        src="/characterImages/default_character.png"
-                        alt="관계 캐릭터 이미지"
-                        priority={true}
-                        className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                        height={1000}
-                        width={1000}
-                      />
-                      <p className="truncate">이름이름이름이름이름이름</p>
-                    </div>
-                    <div
-                      className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => {
-                        setState(1);
-                        var newItem = [...relationshipInput];
-                        newItem[i].uuid = '이름이름이름이름';
-                        setRelationInput(newItem);
-                        setSearchInput(-1);
-                        //UUID
-                      }}
-                    >
-                      <Image
-                        src="/characterImages/default_character.png"
-                        alt="관계 캐릭터 이미지"
-                        priority={true}
-                        className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                        height={1000}
-                        width={1000}
-                      />
-                      <p className="truncate">이름이름이름이름이름이름</p>
-                    </div>
-                    <div
-                      className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => {
-                        setState(1);
-                        var newItem = [...relationshipInput];
-                        newItem[i].uuid = '이름이름이름이름';
-                        setRelationInput(newItem);
-                        setSearchInput(-1);
-                        //UUID
-                      }}
-                    >
-                      <Image
-                        src="/characterImages/default_character.png"
-                        alt="관계 캐릭터 이미지"
-                        priority={true}
-                        className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                        height={1000}
-                        width={1000}
-                      />
-                      <p className="truncate">이름이름이름이름이름이름</p>
-                    </div>
-                    <div
-                      className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => {
-                        setState(1);
-                        var newItem = [...relationshipInput];
-                        newItem[i].uuid = '이름이름이름이름';
+                        newItem[i].uuid = 'uuid';
+                        newItem[i].name = '이름이름이름이름';
                         setRelationInput(newItem);
                         setSearchInput(-1);
                         //UUID
@@ -537,7 +487,7 @@ export default function page({ params }: Props) {
           onClick={() => {
             let newRelation: relationshipType[] = [
               ...(relationshipInput || []),
-              { uuid: '', description: '' },
+              { uuid: '', name: '', description: '' },
             ];
             setRelationInput(newRelation);
             setState(1);
@@ -545,6 +495,7 @@ export default function page({ params }: Props) {
         >
           <HiPlus className="text-white mx-auto font-bold" />
         </button>
+      </div>
       </div>
     </div>
   );

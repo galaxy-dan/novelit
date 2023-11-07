@@ -7,6 +7,7 @@ import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
 
 type Props = {
   params: {
+    slug: string;
     group: string;
   };
 };
@@ -165,12 +166,12 @@ export default function page({ params }: Props) {
 
         <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
           {subGroups?.map((subGroup, i) => (
-            <SubGroupCard subGroup={subGroup} />
+            <SubGroupCard subGroup={subGroup} slug={params.slug} />
           ))}
         </div>
         <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
           {characters?.map((character, i) => (
-            <CharacterCard character={character} />
+            <CharacterCard character={character} slug={params.slug}/>
           ))}
         </div>
       </div>
