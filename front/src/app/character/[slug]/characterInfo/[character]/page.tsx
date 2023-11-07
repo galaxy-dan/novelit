@@ -23,7 +23,7 @@ import { useRouter } from 'next/navigation';
 
 type Props = {
   params: {
-    slug: string;
+    character: string;
   };
 };
 export default function page({ params }: Props) {
@@ -32,8 +32,8 @@ export default function page({ params }: Props) {
   const [isFetched, setIsFetched] = useState<boolean>(false);
 
   const { data: characterData }: UseQueryResult<characterType> = useQuery({
-    queryKey: ['character', params.slug],
-    queryFn: () => getCharacter(params.slug),
+    queryKey: ['character', params.character],
+    queryFn: () => getCharacter(params.character),
     onSuccess: (data) => {
       setImageUrl(data?.characterImage || '');
       setNameInput(data?.characterName || '');
@@ -49,7 +49,7 @@ export default function page({ params }: Props) {
   });
 
   const putCharacterMutation = useMutation({
-    mutationFn: () => putCharacter(params.slug, character),
+    mutationFn: () => putCharacter(params.character, character),
     onSuccess: () => {
       setState(3);
     },
@@ -62,7 +62,7 @@ export default function page({ params }: Props) {
   });
 
   const deleteCharacterMutation = useMutation({
-    mutationFn: () => deleteCharacter(params.slug),
+    mutationFn: () => deleteCharacter(params.character),
     onSuccess: () => {
       if (groupUUID) {
         router.push(`/character/${groupUUID}`);
@@ -180,7 +180,7 @@ export default function page({ params }: Props) {
   }
 
   return (
-    <div className="px-80 py-20 select-none" onClick={() => setSearchInput(-1)}>
+    <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem] select-none" onClick={() => setSearchInput(-1)}>
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
       <div className="flex items-end justify-between">
         <div className="flex items-center">
