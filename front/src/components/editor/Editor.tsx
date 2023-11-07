@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent } from 'react';
+import { MouseEvent, RefObject } from 'react';
 
 import { Editor, Reply } from '@/model/editor';
 import { fontFamily, fontSize } from '@/service/editor/editor';
@@ -23,6 +23,7 @@ import {
 import { getComment, getEditor, patchEditor } from '@/service/api/editor';
 import { toast } from 'react-toastify';
 import Comment from './Comment';
+import { get } from '@/service/api/http';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -39,16 +40,25 @@ export default function Editor() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const comment = useRef<Reply[]>([]);
 
+  const edit = useRef<HTMLDivElement>(null);
+
   const { data: editor }: UseQueryResult<Editor> = useQuery({
     queryKey: ['editor', searchParams.slug?.[1]],
     queryFn: () => getEditor({ uuid: searchParams.slug?.[1] }),
     enabled: !!searchParams.slug?.[1],
   });
 
+  // 자동 저장
   useEffect(() => {
-    const edit = document.getElementById('edit');
-    if (edit) {
-      edit.onclick = (e: any) => {
+    const time = setTimeout(() => {}, 2000);
+
+    return () => clearTimeout(time);
+  }, []);
+
+  useEffect(() => {
+    const editRef = edit?.current;
+    if (editRef) {
+      editRef.onclick = (e: any) => {
         const id = e.target.id;
         if (!id || id === 'edit') {
           setSpaceUUID('');
@@ -62,7 +72,7 @@ export default function Editor() {
         }
       };
 
-      edit.onpaste = (e) => {
+      editRef.onpaste = (e) => {
         const paste = e.clipboardData?.getData('text');
 
         if (!paste) return;
@@ -77,7 +87,7 @@ export default function Editor() {
       };
     }
 
-    // document.getElementById('edit')?.addEventListener('click', () => {
+    // edit?.current?.addEventListener('click', () => {
     //   toast('버블');
     // });
   }, []);
@@ -100,7 +110,8 @@ export default function Editor() {
 
   const handleChange = (e: ContentEditableEvent) => {
     setHtml(e.target.value);
-    setLength(document?.getElementById('edit')?.innerText.length ?? 0);
+    setLength(edit?.current?.innerText.length ?? 0);
+    console.log(edit?.current?.innerText);
   };
 
   const sanitizeConf: IOptions = {
@@ -142,7 +153,7 @@ export default function Editor() {
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
 
-    setHtml(document.getElementById('edit')?.innerHTML ?? html);
+    setHtml(edit?.current?.innerHTML ?? html);
     setSpaceUUID(wrapper.id);
     setIsOpen(true);
   };
@@ -167,7 +178,7 @@ export default function Editor() {
   };
 
   const shareDoc = () => {
-    const divContent = document.getElementById('edit')?.innerText;
+    const divContent = edit?.current?.innerText;
     if (!divContent) return;
 
     var blob = new Blob([divContent], { type: 'text/plain;charset=utf-8' });
@@ -179,6 +190,14 @@ export default function Editor() {
     a.click();
   };
 
+  const getShareToken = () => {
+    get('/share/token', { directoryUUID: searchParams.slug?.[1] }).then(
+      (data: any) => {
+        console.log(data);
+        localStorage.setItem('accessToken', data.token);
+      },
+    );
+  };
 
   return (
     <>
@@ -190,9 +209,7 @@ export default function Editor() {
           onClick={() => {
             patchMutate.mutate({
               uuid: searchParams.slug?.[1],
-              content:
-                document.getElementById('edit')?.innerHTML ??
-                '<div><br/></div>',
+              content: edit?.current?.innerHTML ?? '<div><br/></div>',
             });
           }}
         >
@@ -200,10 +217,11 @@ export default function Editor() {
         </button>
       </div>
       <div className="flex gap-6 justify-center items-center">
-        <div className="flex flex-col justify-center items-center">
+        <div className=" flex flex-col justify-center items-center">
           <ContentEditable
+            innerRef={edit}
             id="edit"
-            className={`ml-2 w-[700px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
+            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]} border-2`}
             html={html}
             disabled={!editable}
             onChange={handleChange}
@@ -218,15 +236,15 @@ export default function Editor() {
           />
         </div>
 
-        <div className="flex flex-col w-[200px] justify-start items-center gap-6">
+        <div className="flex flex-col w-[200px] justify-start items-center gap-6 border-2">
           {/* <div>{document && document?.getElementById('edit')?.innerText.length && 0}</div> */}
-          <div className='text-2xl'>{length}</div>
+          <div className="text-2xl">{length}</div>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={() => {
               setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
             }}
-          >
+          > 
             <BiSolidPencil size={20} />
           </button>
           <button
@@ -260,6 +278,12 @@ export default function Editor() {
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={shareDoc}
+          >
+            <FaShareSquare size={20} />
+          </button>
+          <button
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
+            onClick={getShareToken}
           >
             <FaShareSquare size={20} />
           </button>
