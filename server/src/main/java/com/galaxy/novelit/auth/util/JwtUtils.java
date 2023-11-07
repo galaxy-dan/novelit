@@ -64,6 +64,19 @@ public class JwtUtils {
 			.signWith(key, SignatureAlgorithm.HS256)
 			.compact();
 	}
+
+	public String generateShareToken(String directoryUUID, long duration) {
+		Date issuedTime = new Date();
+		Date expiredTime = new Date(issuedTime.getTime() + duration);
+
+		return Jwts.builder()
+			.claim("id", directoryUUID)
+			.setIssuedAt(issuedTime)
+			.setExpiration(expiredTime)
+			.signWith(key, SignatureAlgorithm.HS256)
+			.compact();
+	}
+
 	private String getMemberRoles(Authentication authentication) {
 		List<String> authorities = authentication.getAuthorities()
 			.stream()
