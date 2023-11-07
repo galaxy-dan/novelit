@@ -27,8 +27,7 @@ public class AlarmRedisResponseDto{
     public static AlarmRedisResponseDto create(AlarmRedisRequestDto alarmRedisRequestDto){
         return AlarmRedisResponseDto.builder()
             .pubUUID(alarmRedisRequestDto.getPubUUID())
-            .notiDto(NotiDto.create(alarmRedisRequestDto.getSubUUID(),
-                alarmRedisRequestDto.getNotiUUID()))
+            .notiDto(NotiDto.create(alarmRedisRequestDto.getSubUUID(), alarmRedisRequestDto.getNotiUUID()))
             .build();
     }
 }
