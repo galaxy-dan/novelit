@@ -2,6 +2,7 @@ package com.galaxy.novelit.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -47,8 +48,16 @@ public class SecurityConfig {
 
 			// 사용자 로그인이 필요한 API는 필터가 적용되도록 별도 설정해준다.
 			.authorizeHttpRequests(r -> r
-				.requestMatchers(new AntPathRequestMatcher("/login/**"), new AntPathRequestMatcher("/util/**"), new AntPathRequestMatcher("/actuator/**")).permitAll()
-				//.anyRequest().authenticated()
+				.requestMatchers(
+					new AntPathRequestMatcher("/login/**"),
+					new AntPathRequestMatcher("/util/**"),
+					new AntPathRequestMatcher("/actuator/**")
+				).permitAll()
+				.requestMatchers(
+					new AntPathRequestMatcher("/file", HttpMethod.GET.name()),
+					new AntPathRequestMatcher("/comment")
+				).hasAnyAuthority("USER","EDITOR")
+				//.anyRequest().hasAuthority("USER")
 				.anyRequest().permitAll()
 			)
 
