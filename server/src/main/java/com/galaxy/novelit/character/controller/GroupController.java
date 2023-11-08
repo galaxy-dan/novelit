@@ -49,6 +49,13 @@ public class GroupController {
 //        }
 //    }
 
+    @GetMapping("/characters")
+    public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String groupUUID,
+            @RequestParam String keyword) {
+        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID);
+        return ResponseEntity.ok().body(dto);
+    }
+
     @GetMapping("/top")
     public ResponseEntity<Object> topGroupInfo() {
         try {
