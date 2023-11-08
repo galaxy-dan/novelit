@@ -29,12 +29,6 @@ public class CommentInfoDto {
             .build();
     }
 
-   /* public static CommentInfoDto addDtoToDto(CommentAddRequestDto commentAddRequestDto) {
-        return CommentInfoDto.builder()
-            .commentContent(commentAddRequestDto.getCommentContent())
-            .commentNickname(commentAddRequestDto.getCommentNickname())
-            .build();
-    }*/
 
     public static List<CommentInfoDto> infoListToDtoList(List<CommentInfo> commentInfoList) {
         List<CommentInfoDto> dtoList = new ArrayList<>();
