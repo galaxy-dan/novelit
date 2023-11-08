@@ -1,7 +1,10 @@
 package com.galaxy.novelit.notification.controller;
 
+import com.galaxy.novelit.notification.redis.dto.response.AlarmRedisResponseDto;
+import com.galaxy.novelit.notification.redis.service.AlarmRedisService;
 import com.galaxy.novelit.notification.service.NotificationService;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -19,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final AlarmRedisService alarmRedisService;
 
     // 처음 구독
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -28,6 +32,11 @@ public class NotificationController {
         //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
         response.setHeader("X-Accel-Buffering", "no");
         return ResponseEntity.ok(notificationService.subscribe(subscriberUUID));
+    }
+
+    @GetMapping("/alarmlist")
+    public ResponseEntity<List<AlarmRedisResponseDto>> getAllAlarmlist(@RequestParam("subUUID") String subUUID) {
+        return ResponseEntity.ok(alarmRedisService.getAllList(subUUID));
     }
 
     // 코멘트 알람 테스트
