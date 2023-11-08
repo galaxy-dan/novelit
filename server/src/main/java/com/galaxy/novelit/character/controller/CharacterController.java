@@ -5,6 +5,7 @@ import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
+import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.words.service.WordsService;
 import java.util.List;
@@ -78,8 +79,8 @@ public class CharacterController {
     @GetMapping("/diagram")
     public ResponseEntity<Object> getRelationships(Authentication authentication) {
         try {
-            List<RelationDtoRes> dto = characterService.getRelationships();
-            return ResponseEntity.ok(dto);
+
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
