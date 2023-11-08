@@ -1,14 +1,12 @@
 package com.galaxy.novelit.share.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.galaxy.novelit.share.dto.request.ShareFileReqDTO;
 import com.galaxy.novelit.share.dto.response.ShareTokenResDTO;
 import com.galaxy.novelit.share.service.ShareService;
 
@@ -24,14 +22,8 @@ public class ShareController {
     private final ShareService shareService;
 
     @GetMapping("/token")
-    public ResponseEntity<ShareTokenResDTO> generateToken(@RequestParam("directoryUUID") String directoryUUID) {
-        return ResponseEntity.ok(shareService.generateToken(directoryUUID));
-    }
-
-    @PostMapping("/token")
-    public ResponseEntity<Void> checkToken(@RequestBody ShareFileReqDTO dto) {
-        shareService.checkToken(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ShareTokenResDTO> generateToken(@RequestParam("directoryUUID") String directoryUUID, Authentication authentication) {
+        return ResponseEntity.ok(shareService.generateToken(directoryUUID, authentication.getName()));
     }
 
 }

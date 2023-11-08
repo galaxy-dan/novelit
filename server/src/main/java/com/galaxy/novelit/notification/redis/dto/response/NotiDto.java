@@ -12,8 +12,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class NotiDto {
-    //@Indexed
     String subUUID;
-    //@Indexed
     String notiUUID;
+
+    public static NotiDto create(String subUUID, String notiUUID){
+        return NotiDto.builder()
+            .subUUID(subUUID)
+            .notiUUID(notiUUID)
+            .build();
+    }
 }

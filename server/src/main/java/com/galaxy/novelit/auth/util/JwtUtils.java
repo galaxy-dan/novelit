@@ -72,6 +72,7 @@ public class JwtUtils {
 
 		return Jwts.builder()
 			.claim("id", directoryUUID)
+			.claim("role", "EDITOR")
 			.setIssuedAt(issuedTime)
 			.setExpiration(expiredTime)
 			.signWith(key, SignatureAlgorithm.HS256)
@@ -100,28 +101,6 @@ public class JwtUtils {
 				.map(SimpleGrantedAuthority::new)
 				.toList();
 		return new UsernamePasswordAuthenticationToken(userUUId, "", authorities);
-	}
-
-	public String getSharedDirectoryUUID(String token){
-		try {
-			Claims claims = Jwts
-				.parserBuilder()
-				.setSigningKey(key)
-				.build()
-				.parseClaimsJws(token)
-				.getBody();
-
-			return  (String) claims.get("id");
-		} catch (SecurityException | MalformedJwtException e) {
-			throw new InvalidTokenException("잘못된 JWT 시그니처");
-		} catch (UnsupportedJwtException e) {
-			throw new InvalidTokenException("유효하지 않은 JWT 토큰");
-		} catch (ExpiredJwtException e) {
-			throw new InvalidTokenException("토큰 기한 만료");
-		} catch (IllegalArgumentException e) {
-			throw new InvalidTokenException("JWT token compact of handler are invalid.");
-		}
-
 	}
 
 	public boolean validateToken(String token) {
