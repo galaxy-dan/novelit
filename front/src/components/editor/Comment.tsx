@@ -65,7 +65,7 @@ export default function Comment({
       directoryUUID,
       commentContent: data.commentContent,
       commentNickname: 'john',
-      commentPassword: 'bye',
+      // commentPassword: 'bye',
     });
   };
 
@@ -99,7 +99,7 @@ export default function Comment({
     },
   });
   return (
-    <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-black rounded-md shadow-md p-2">
+    <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-black rounded-md shadow-md p-2 bg-white">
       <div className="flex justify-between">
         <div>Comment</div>
         <button onClick={() => setIsOpen((prev) => !prev)}>
@@ -107,7 +107,7 @@ export default function Comment({
         </button>
       </div>
 
-      <div className="flex">
+      <div className="flex flex-col">
         {commentList?.map((el, index) => (
           <div className="flex justify-between" key={el.commentUUID}>
             <div className="flex gap-2">
@@ -120,7 +120,7 @@ export default function Comment({
                   spaceUUID,
                   commentUUID: el.commentUUID,
                   commentNickname: el.commentNickname,
-                  commentPassword: el.commentPassword,
+                  // commentPassword: el.commentPassword,
                 });
               }}
             >
