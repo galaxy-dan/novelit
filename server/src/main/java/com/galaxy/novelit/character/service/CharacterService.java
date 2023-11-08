@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CharacterService {
     CharacterDtoRes getCharacterInfo(String characterUUID, String userUUID);
-//    List<CharacterSimpleDtoRes> getCharacters(String groupUUID);
+    List<CharacterSimpleDtoRes> getCharacters(String groupUUID);
     List<CharacterSimpleDtoRes> getTopCharacter();
     void createCharacter(CharacterCreateDtoReq dto, String userUUID);
     void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID);
