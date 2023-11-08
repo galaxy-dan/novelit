@@ -8,6 +8,7 @@ import com.galaxy.novelit.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,10 +27,9 @@ public class CharacterController {
     private final WordsService wordsService;
 
     @GetMapping
-    public ResponseEntity<Object> getCharacterInfo(@RequestParam String characterUUID) {
+    public ResponseEntity<Object> getCharacterInfo(@RequestParam String characterUUID, Authentication authentication) {
         try {
-            String userUUID = "temp";
-            CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, userUUID);
+            CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, authentication.getName());
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -37,9 +37,9 @@ public class CharacterController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto, @RequestParam String userUUID) {
+    public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto, Authentication authentication) {
         try {
-            characterService.createCharacter(dto, userUUID);
+            characterService.createCharacter(dto, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -47,10 +47,9 @@ public class CharacterController {
     }
 
     @PatchMapping
-    public ResponseEntity<Object> updateCharacter(@RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto, @RequestParam String userUUID) {
+    public ResponseEntity<Object> updateCharacter(@RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto, Authentication authentication) {
         try {
-//            CharacterDtoRes characterDtoRes = characterService.getCharacter(dto.getCharacterUUID());
-            characterService.updateCharacter(characterUUID, dto, userUUID);
+            characterService.updateCharacter(characterUUID, dto, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -58,24 +57,23 @@ public class CharacterController {
     }
 
     @DeleteMapping
-    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUUID, @RequestParam String userUUID) {
+    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUUID, Authentication authentication) {
         try {
-            characterService.deleteCharacter(characterUUID, userUUID);
+            characterService.deleteCharacter(characterUUID, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-//    @GetMapping("/diagram")
-//    public ResponseEntity<Object> getRelationships() {
-//        try {
-////            List<RelationDtoRes> dto = characterService.getRelationships();
-//
-//            return ResponseEntity.ok().build();
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
+    @GetMapping("/diagram")
+    public ResponseEntity<Object> getRelationships(Authentication authentication) {
+        try {
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 }

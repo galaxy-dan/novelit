@@ -37,15 +37,12 @@ public class CharacterEntity {
     private String description;
     @Field(name = "information")
     private List<Map<String, String>> information;
-    // @Field(name = "relationship")
-    // private List<Map<Map<String, String>,String>> relationship;     // Map<Map<타겟캐릭터UUID, 타겟캐릭터이름>, 내용>
     @DBRef
     private RelationEntity relationship;
     @Field(name = "is_deleted")
     private boolean isDeleted;
     @Field(name = "character_image")
     private String characterImage;
-//    List<ArrayList<Map<String, String>>>
 
     public void deleteCharacter() {
         this.isDeleted = true;
