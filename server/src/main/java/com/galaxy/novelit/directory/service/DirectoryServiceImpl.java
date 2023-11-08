@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.EditRefusedException;
 import com.galaxy.novelit.common.exception.IllegalUUIDException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
 import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
@@ -175,6 +176,10 @@ public class DirectoryServiceImpl implements DirectoryService{
 		checkDirectoryException(directory, userUUID);
 		if(directory.isDirectory()){
 			throw new WrongDirectoryTypeException();
+		}
+
+		if(!directory.isEditable()){
+			throw new EditRefusedException();
 		}
 
 		directory.updateContent(dto.getContent());
