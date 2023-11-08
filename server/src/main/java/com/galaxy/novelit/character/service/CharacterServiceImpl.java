@@ -123,9 +123,28 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+        RelationEntity relation = relationRepository.findByCharacterUUID(characterUUID);
+        RelationEntity newRelation;
+        CharacterEntity newCharacter;
 
-        CharacterEntity newCharacter = CharacterEntity.builder()
-            .userUUID(character.getUserUUID())
+        // 캐릭터 이름에 수정사항이 있을 시
+        if (!character.getCharacterName().equals(dto.getCharacterName())) {
+            newRelation = RelationEntity.builder()
+                .id(relation.getId())
+                .characterName(dto.getCharacterName())
+                .relations(dto.getRelationship().getRelations())
+                .build();
+        }
+        else {
+            newRelation = RelationEntity.builder()
+                .id(relation.getId())
+                .relations(dto.getRelationship().getRelations())
+                .build();
+        }
+        relationRepository.save(newRelation);
+
+        newCharacter = CharacterEntity.builder()
+            .userUUID(userUUID)
             .characterId(character.getCharacterId())
             .characterUUID(characterUUID)
             .groupUUID(dto.getGroupUUID())
