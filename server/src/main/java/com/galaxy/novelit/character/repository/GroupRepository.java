@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupRepository extends MongoRepository<GroupEntity, String> {
     GroupEntity findByGroupUUID(String groupUUID);
-    List<GroupEntity> findAllByParentUUID(String parentUUID);
+    List<GroupEntity> findAllByParentGroupUUID(String parentUUID);
 
 }
