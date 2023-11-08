@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.galaxy.novelit.auth.util.JwtUtils;
 import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.share.dto.request.EditableReqDTO;
@@ -55,6 +56,10 @@ public class ShareServiceImpl implements ShareService{
         //권한 예외 처리
         if(!directory.getUserUUID().equals(userUUID)){
             throw new AccessRefusedException();
+        }
+
+        if(directory.isDirectory()){
+            throw new WrongDirectoryTypeException();
         }
 
         directory.updateEditable(dto.isEditable());
