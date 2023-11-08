@@ -8,9 +8,11 @@ import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.RelationEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
-import com.galaxy.novelit.character.repository.RelationRepository;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -47,28 +49,32 @@ public class CharacterServiceImpl implements CharacterService {
         return dto;
     }
 
-//    @Transactional(readOnly = true)
-//    @Override
-//    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID) {
-//        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID);
-//        List<CharacterSimpleDtoRes> dto = new ArrayList<>();
-//
-//        for (CharacterEntity character : characters) {
-//            CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
-//                .characterUUID(character.getCharacterUUID())
-//                .characterName(character.getCharacterName())
-//                .information(character.getInformation())
-//                .characterImage(character.getCharacterImage()).build();
-//            dto.add(characterSimpleDtoRes);
-//        }
-//
-//        return dto;
-//    }
+    @Transactional(readOnly = true)
+    @Override
+    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID) {
+        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID)
+            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
+
+        List<CharacterSimpleDtoRes> characterSimpleInfoList = new ArrayList<>();
+
+        for (CharacterEntity character : characters) {
+            CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterImage(character.getCharacterImage())
+                .characterName(character.getCharacterName())
+                .information(new ArrayList<>(character.getInformation().subList(0, 2)))
+                .build();
+            characterSimpleInfoList.add(characterSimpleDtoRes);
+        }
+
+        return characterSimpleInfoList;
+    }
 
     @Transactional(readOnly = true)
     @Override
     public List<CharacterSimpleDtoRes> getTopCharacter() {
-        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(null);
+        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(null)
+            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
         List<CharacterSimpleDtoRes> dto = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
