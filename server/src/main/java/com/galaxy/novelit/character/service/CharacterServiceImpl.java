@@ -3,13 +3,16 @@ package com.galaxy.novelit.character.service;
 import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
+import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.RelationEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
+import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +23,17 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+
+
 @Service
 @RequiredArgsConstructor
 public class CharacterServiceImpl implements CharacterService {
 
     private final CharacterRepository characterRepository;
+    private final GroupRepository groupRepository;
     private final RelationRepository relationRepository;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -123,9 +131,28 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+        RelationEntity relation = relationRepository.findByCharacterUUID(characterUUID);
+        RelationEntity newRelation;
+        CharacterEntity newCharacter;
 
-        CharacterEntity newCharacter = CharacterEntity.builder()
-            .userUUID(character.getUserUUID())
+        // 캐릭터 이름에 수정사항이 있을 시
+        if (!character.getCharacterName().equals(dto.getCharacterName())) {
+            newRelation = RelationEntity.builder()
+                .id(relation.getId())
+                .characterName(dto.getCharacterName())
+                .relations(dto.getRelationship().getRelations())
+                .build();
+        }
+        else {
+            newRelation = RelationEntity.builder()
+                .id(relation.getId())
+                .relations(dto.getRelationship().getRelations())
+                .build();
+        }
+        relationRepository.save(newRelation);
+
+        newCharacter = CharacterEntity.builder()
+            .userUUID(userUUID)
             .characterId(character.getCharacterId())
             .characterUUID(characterUUID)
             .groupUUID(dto.getGroupUUID())
@@ -146,6 +173,26 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         character.deleteCharacter();
         characterRepository.save(character);
+    }
+
+    @Transactional
+    @Override
+    public List<CharacterSearchInfoResDTO> searchCharacter(String characterName) {
+        List<CharacterEntity> characters = characterRepository.findAllByCharacterName(characterName);
+        List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
+
+        for (CharacterEntity character : characters) {
+            CharacterSearchInfoResDTO characterSearchInfoResDTO = CharacterSearchInfoResDTO.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterImage(character.getCharacterImage())
+                .groupUUID(character.getGroupUUID())
+                .groupName(groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName())
+                .characterName(character.getCharacterName())
+                .information(new ArrayList<>(character.getInformation().subList(0, 2)))
+                .build();
+            characterInfoList.add(characterSearchInfoResDTO);
+        }
+        return characterInfoList;
     }
 
 //    @Transactional(readOnly = true)
