@@ -10,7 +10,14 @@ import { v4 as uuidv4 } from 'uuid';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import sanitizeHtml, { IOptions } from 'sanitize-html';
 
-import { BiSolidPencil, BiBold, BiSolidTrashAlt } from 'react-icons/bi';
+import {
+  BiSolidPencil,
+  BiBold,
+  BiSolidTrashAlt,
+  BiCommentDetail,
+  BiFontSize,
+  BiFontFamily,
+} from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
 import { useParams } from 'next/navigation';
@@ -20,10 +27,16 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { getComment, getEditor, patchEditor } from '@/service/api/editor';
+import {
+  getComment,
+  getEditor,
+  patchEditable,
+  patchEditor,
+} from '@/service/api/editor';
 import { toast } from 'react-toastify';
 import Comment from './Comment';
 import { get } from '@/service/api/http';
+import UploadState from '../state/UploadState';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -40,6 +53,8 @@ export default function Editor() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const comment = useRef<Reply[]>([]);
 
+  const [uploadIndex, setUploadIndex] = useState<number>(0);
+
   const edit = useRef<HTMLDivElement>(null);
 
   const { data: editor }: UseQueryResult<Editor> = useQuery({
@@ -50,10 +65,16 @@ export default function Editor() {
 
   // 자동 저장
   useEffect(() => {
-    const time = setTimeout(() => {}, 2000);
+    if (editor?.content === html) return;
+    const time = setTimeout(() => {
+      patchMutate.mutate({
+        uuid: searchParams.slug?.[1],
+        content: html ?? '<div><br/></div>',
+      });
+    }, 2000);
 
     return () => clearTimeout(time);
-  }, []);
+  }, [html]);
 
   useEffect(() => {
     const editRef = edit?.current;
@@ -102,16 +123,20 @@ export default function Editor() {
 
   const patchMutate = useMutation({
     mutationFn: patchEditor,
+    onMutate: () => {
+      setUploadIndex(2);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['editor']);
+      setUploadIndex(3);
       toast('저장 성공');
     },
   });
 
   const handleChange = (e: ContentEditableEvent) => {
+    setUploadIndex(1);
     setHtml(e.target.value);
     setLength(edit?.current?.innerText.length ?? 0);
-    console.log(edit?.current?.innerText);
   };
 
   const sanitizeConf: IOptions = {
@@ -122,10 +147,6 @@ export default function Editor() {
 
   const sanitize = () => {
     setHtml((prev) => sanitizeHtml(prev, sanitizeConf));
-  };
-
-  const toggleEditable = () => {
-    setEditable((prev) => !prev);
   };
 
   const addReply = () => {
@@ -193,10 +214,26 @@ export default function Editor() {
   const getShareToken = () => {
     get('/share/token', { directoryUUID: searchParams.slug?.[1] }).then(
       (data: any) => {
-        console.log(data);
-        localStorage.setItem('accessToken', data.token);
+        // console.log(data);
+        toast(data.token);
+        // localStorage.setItem('accessToken', data.token);
       },
     );
+  };
+
+  const editableMutate = useMutation({
+    mutationFn: patchEditable,
+    onSuccess: () => {
+      toast('토글 성공');
+      queryClient.invalidateQueries(['editor', searchParams.slug?.[1]]);
+    },
+  });
+
+  const toggleEditable = () => {
+    editableMutate.mutate({
+      directoryUUID: searchParams.slug?.[1],
+      editable: !editor?.editable,
+    });
   };
 
   return (
@@ -204,8 +241,11 @@ export default function Editor() {
       <div
         className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
       >
-        <div className="w-[924px]">{editor?.title}</div>
-        <button
+        <div className="flex justify-between w-[1160px]">
+          <div>{editor?.title}</div>
+          <UploadState state={uploadIndex} />
+        </div>
+        {/* <button
           onClick={() => {
             patchMutate.mutate({
               uuid: searchParams.slug?.[1],
@@ -214,16 +254,16 @@ export default function Editor() {
           }}
         >
           임시저장
-        </button>
+        </button> */}
       </div>
-      <div className="flex gap-6 justify-center items-center">
+      <div className="flex gap-6 justify-center items-start">
         <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
             id="edit"
-            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]} border-2`}
+            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
             html={html}
-            disabled={!editable}
+            disabled={!editor?.editable ?? false}
             onChange={handleChange}
             // onBlur={sanitize}
           />
@@ -236,16 +276,22 @@ export default function Editor() {
           />
         </div>
 
-        <div className="flex flex-col w-[200px] justify-start items-center gap-6 border-2">
+        <div className="flex flex-col w-[200px] justify-start items-center gap-6">
           {/* <div>{document && document?.getElementById('edit')?.innerText.length && 0}</div> */}
-          <div className="text-2xl">{length}</div>
+          <div className="text-2xl">{length && `${length}자`}</div>
+          <button
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
+            onClick={toggleEditable}
+          >
+            <BiSolidPencil size={20} />
+          </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={() => {
               setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
             }}
-          > 
-            <BiSolidPencil size={20} />
+          >
+            <BiFontFamily size={20} />
           </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
@@ -253,7 +299,7 @@ export default function Editor() {
               setFontIndex((prev) => (prev + 1) % fontSize.length);
             }}
           >
-            <PiTextTLight size={20} />
+            <BiFontSize size={20} />
           </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
@@ -267,7 +313,7 @@ export default function Editor() {
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={addReply}
           >
-            <FaCheck size={20} />
+            <BiCommentDetail size={20} />
           </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
@@ -287,7 +333,7 @@ export default function Editor() {
           >
             <FaShareSquare size={20} />
           </button>
-          {isOpen && (
+          {isOpen && !editor?.editable && (
             <Comment
               spaceUUID={spaceUUID}
               directoryUUID={searchParams.slug?.[1]}
