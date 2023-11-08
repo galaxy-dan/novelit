@@ -19,19 +19,6 @@ public class CommentInfo {
     private String commentNickname;
     private String userUUID;
 
-    /*public static CommentInfo dtoToInfo(CommentInfoDto commentInfoDto) {
-        UUID commentUUID = UUID.randomUUID();
-
-        String strUUID = commentUUID.toString();
-
-        return CommentInfo.builder()
-            .commentUUID(strUUID)
-            .commentContent(commentInfoDto.getCommentContent())
-            .commentNickname(commentInfoDto.getCommentNickname())
-            .commentPassword(commentInfoDto.getCommentPassword())
-            .build();
-    }*/
-
     public static CommentInfo create(CommentAddRequestDto commentAddRequestDto, String userUUID) {
         UUID uuid = UUID.randomUUID();
 

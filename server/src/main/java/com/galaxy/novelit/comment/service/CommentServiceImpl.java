@@ -22,7 +22,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void addComment(CommentAddRequestDto commentAddRequestDto, String userUUID) {
-        // spaceUUID get
         Comment comment = commentRepository.findCommentBySpaceUUID(
             commentAddRequestDto.getSpaceUUID());
 
@@ -41,7 +40,6 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(comment);
         }
 
-        //log.info(comment.get_id());
     }
 
     @Override
