@@ -53,8 +53,10 @@ public class SecurityConfig {
 				).permitAll()
 				.requestMatchers(
 					new AntPathRequestMatcher("/file", HttpMethod.GET.name()),
+					new AntPathRequestMatcher("/file", HttpMethod.PATCH.name()),
 					new AntPathRequestMatcher("/comment")
-				).permitAll()
+				)//.hasAnyAuthority("USER","EDITOR")
+				.permitAll()
 				//.anyRequest().hasAuthority("USER")
 				.anyRequest().permitAll()
 			)
