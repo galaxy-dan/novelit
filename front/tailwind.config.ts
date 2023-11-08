@@ -56,6 +56,7 @@ const config: Config = {
         'text-xl',
         'text-2xl',
         'text-3xl',
+        'text-4xl',
         'font-nanum',
         'font-noto',
         'font-nanumPen',
