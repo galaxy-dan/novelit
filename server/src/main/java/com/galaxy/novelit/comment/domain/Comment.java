@@ -39,7 +39,6 @@ public class Comment {
             .userUUID(userUUID)
             .build());
 
-        log.info("commentInfoList : {}", commentInfoList.get(0).getCommentUUID());
 
         return Comment.builder()
             .spaceUUID(commentAddRequestDto.getSpaceUUID())
@@ -47,23 +46,6 @@ public class Comment {
             .commentInfoList(commentInfoList)
             .build();
     }
-    /*public static Comment create(Comment comment, List<CommentInfo> commentInfoList, String userUUID) {
-
-        return Comment.builder()
-            .userUUID(userUUID)
-            .spaceUUID(comment.getSpaceUUID())
-            .directoryUUID(comment.getDirectoryUUID())
-            .commentInfoList(commentInfoList)
-            .build();
-    }
-
-    public static List<CommentInfo> dtoListToInfoList(List<CommentInfoDto> commentInfoDtoList) {
-        List<CommentInfo> list = new ArrayList<>();
-        for (CommentInfoDto dto :commentInfoDtoList) {
-            list.add(CommentInfo.dtoToInfo(dto));
-        }
-        return list;
-    }*/
 
     public void updateCommentInfoList(List<CommentInfo> list){
         this.commentInfoList = list;
