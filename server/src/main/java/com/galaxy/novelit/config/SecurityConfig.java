@@ -13,8 +13,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.galaxy.novelit.config.security.filter.JwtExceptionFilter;
 import com.galaxy.novelit.config.security.filter.JwtFilter;
-import com.galaxy.novelit.config.security.handler.CustomAccessDeniedHandler;
-import com.galaxy.novelit.config.security.handler.CustomAuthenticationEntryPoint;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,7 +54,7 @@ public class SecurityConfig {
 				.requestMatchers(
 					new AntPathRequestMatcher("/file", HttpMethod.GET.name()),
 					new AntPathRequestMatcher("/comment")
-				).hasAnyAuthority("USER","EDITOR")
+				).permitAll()
 				//.anyRequest().hasAuthority("USER")
 				.anyRequest().permitAll()
 			)
@@ -66,9 +64,9 @@ public class SecurityConfig {
 
 			// 인증이 필요한 서비스의 경우 Authorization Header에 Bearer토큰 여부와, 토큰 유효 여부를 판단해야하므로 커스텀 필터를 추가한다.
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(jwtExceptionFilter, JwtFilter.class)
+			.addFilterBefore(jwtExceptionFilter, JwtFilter.class);
 			// Filter에서 발생한 예외는 Controller Advice를 통해 제어할 수 없으므로 인증/인가 실패 관련 오류 제어를 위한 객체를 추가한다.
-			.exceptionHandling(c -> c.authenticationEntryPoint(new CustomAuthenticationEntryPoint()).accessDeniedHandler(new CustomAccessDeniedHandler()));
+			//.exceptionHandling(c -> c.authenticationEntryPoint(new CustomAuthenticationEntryPoint()).accessDeniedHandler(new CustomAccessDeniedHandler()));
 
 		return http.build();
 	}
