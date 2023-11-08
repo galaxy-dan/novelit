@@ -65,26 +65,26 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void createGroup(GroupCreateDtoReq dto) {
         String groupUUID = UUID.randomUUID().toString();
-        String parentUUID = dto.getParentUUID();
-        GroupEntity newGroup = new GroupEntity();
+        String parentGroupUUID = dto.getParentGroupUUID();
+        GroupEntity newGroup;
 
         // 최상단 계층일 경우 (부모UUID가 없을 때)
-        if (parentUUID == null) {
+        if (parentGroupUUID == null) {
             newGroup = GroupEntity.builder()
-                .parentGroupUUID(null)
+                .userUUID(dto.getUserUUID())
+                .workspaceUUID(dto.getWorkspaceUUID())
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
-                .workspaceUUID(dto.getWorkspaceUUID())
-                .userUUID(dto.getUserUUID())
+                .parentGroupUUID(null)
                 .build();
         }
         else {
             newGroup = GroupEntity.builder()
+                .userUUID(dto.getUserUUID())
+                .workspaceUUID(dto.getWorkspaceUUID())
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
-                .workspaceUUID(dto.getWorkspaceUUID())
-                .userUUID(dto.getUserUUID())
-                .parentGroupUUID(parentUUID)
+                .parentGroupUUID(parentGroupUUID)
                 .build();
         }
 
