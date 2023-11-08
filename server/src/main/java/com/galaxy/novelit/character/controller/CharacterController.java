@@ -75,17 +75,6 @@ public class CharacterController {
         }
     }
 
-
-    @GetMapping("/diagram")
-    public ResponseEntity<Object> getRelationships(Authentication authentication) {
-        try {
-
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
     @GetMapping("/search")
     public ResponseEntity<Object> searchCharacter(@RequestParam String characterName) {
         List<CharacterSearchInfoResDTO> charactersList = characterService.searchCharacter(characterName);
@@ -93,15 +82,15 @@ public class CharacterController {
         return ResponseEntity.ok().body("");
     }
 
-//    @GetMapping("/diagram")
-//    public ResponseEntity<Object> getRelationships() {
-//        try {
-////            List<RelationDtoRes> dto = characterService.getRelationships();
-//
-//            return ResponseEntity.ok().build();
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
+    @GetMapping("/diagram")
+    public ResponseEntity<Object> getRelationships() {
+        try {
+            List<RelationDtoRes> dto = characterService.getRelationships();
+
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
 }

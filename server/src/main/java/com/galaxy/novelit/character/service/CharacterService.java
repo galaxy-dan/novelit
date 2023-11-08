@@ -17,5 +17,5 @@ public interface CharacterService {
     void deleteCharacter(String characterUUID, String userUUID);
 
     List<CharacterSearchInfoResDTO> searchCharacter(String characterName);
-//    List<RelationDtoRes> getRelationships();
+    List<RelationDtoRes> getRelationships();
 }

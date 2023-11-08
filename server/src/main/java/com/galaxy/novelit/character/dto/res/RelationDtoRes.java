@@ -1,8 +1,10 @@
 package com.galaxy.novelit.character.dto.res;
 
+import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,8 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
 public class RelationDtoRes {
-    private String start;
-    private List<List<String>> end;     //List<[이름,내용,이미지]>
-    private String content;
+    private String characterUUID;
+    private String characterName;
+    private List<Relation> relations;
 }
