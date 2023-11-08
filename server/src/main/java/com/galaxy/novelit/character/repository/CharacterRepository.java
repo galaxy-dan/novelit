@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CharacterRepository extends MongoRepository<CharacterEntity, String> {
     CharacterEntity findByCharacterUUID(String characterUUID);
-    Optional<List<CharacterEntity>> findAllByGroupUUID(String groupUUID);
+    List<CharacterEntity> findAllByGroupUUID(String groupUUID);
 }
