@@ -9,10 +9,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.galaxy.novelit.config.security.filter.JwtExceptionFilter;
 import com.galaxy.novelit.config.security.filter.JwtFilter;
+import com.galaxy.novelit.config.security.handler.CustomAccessDeniedHandler;
+import com.galaxy.novelit.config.security.handler.CustomAuthenticationEntryPoint;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,16 +48,14 @@ public class SecurityConfig {
 			// 사용자 로그인이 필요한 API는 필터가 적용되도록 별도 설정해준다.
 			.authorizeHttpRequests(r -> r
 				.requestMatchers(
-					new AntPathRequestMatcher("/login/**"),
-					new AntPathRequestMatcher("/util/**"),
-					new AntPathRequestMatcher("/actuator/**")
+					"/login/**",
+					"/util/**",
+					"/actuator/**"
 				).permitAll()
-				.requestMatchers(
-					new AntPathRequestMatcher("/file", HttpMethod.GET.name()),
-					new AntPathRequestMatcher("/file", HttpMethod.PATCH.name()),
-					new AntPathRequestMatcher("/comment")
-				)//.hasAnyAuthority("USER","EDITOR")
-				.permitAll()
+				.requestMatchers(HttpMethod.GET,"/file").permitAll()//.hasAnyAuthority("USER","EDITOR")
+				.requestMatchers(HttpMethod.PATCH,"/file").permitAll()//.hasAnyAuthority("USER","EDITOR")
+				.requestMatchers("/comment").permitAll()//.hasAnyAuthority("USER","EDITOR")
+				//.permitAll()
 				//.anyRequest().hasAuthority("USER")
 				.anyRequest().permitAll()
 			)
@@ -66,9 +65,9 @@ public class SecurityConfig {
 
 			// 인증이 필요한 서비스의 경우 Authorization Header에 Bearer토큰 여부와, 토큰 유효 여부를 판단해야하므로 커스텀 필터를 추가한다.
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(jwtExceptionFilter, JwtFilter.class);
+			.addFilterBefore(jwtExceptionFilter, JwtFilter.class)
 			// Filter에서 발생한 예외는 Controller Advice를 통해 제어할 수 없으므로 인증/인가 실패 관련 오류 제어를 위한 객체를 추가한다.
-			//.exceptionHandling(c -> c.authenticationEntryPoint(new CustomAuthenticationEntryPoint()).accessDeniedHandler(new CustomAccessDeniedHandler()));
+			.exceptionHandling(c -> c.authenticationEntryPoint(new CustomAuthenticationEntryPoint()).accessDeniedHandler(new CustomAccessDeniedHandler()));
 
 		return http.build();
 	}
