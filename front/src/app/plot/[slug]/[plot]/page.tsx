@@ -20,6 +20,7 @@ export default function page({ params }: Props) {
   const router = useRouter();
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
+
   const { data: plotData }: UseQueryResult<plotType> = useQuery({
     queryKey: ['plot', params.plot],
     queryFn: () => getPlot(params.plot),
@@ -36,6 +37,8 @@ export default function page({ params }: Props) {
       router.push(`/plot/${params.slug}`);
     },
     enabled: !isFetched,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const putCharacterMutation = useMutation({
@@ -108,9 +111,12 @@ export default function page({ params }: Props) {
   };
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
-      return hello();
-    }, 1300);
+    const debounce = setTimeout(
+      () => {
+        return hello();
+      },
+      isFetched ? 1300 : 0,
+    );
     return () => {
       clearTimeout(debounce);
     };
@@ -132,7 +138,6 @@ export default function page({ params }: Props) {
         setIsFetched(true);
       }
     } else {
-      console.log("이전이랑 같음");
       setState(0);
     }
     ref.current = JSON.parse(JSON.stringify(plot));
@@ -162,9 +167,9 @@ export default function page({ params }: Props) {
 
   useEffect(() => {
     if (beginningRef.current) {
-      console.log(beginningRef.current.value.length + " / "+ beginningRef.current.style.height);
       beginningRef.current.style.height = 'auto';
-      beginningRef.current.style.height = beginningRef.current.scrollHeight + 'px';
+      beginningRef.current.style.height =
+        beginningRef.current.scrollHeight + 'px';
     }
   }, [beginningInput, windowSize]);
 
@@ -196,19 +201,8 @@ export default function page({ params }: Props) {
     }
   }, [endingInput, windowSize]);
 
-  if (typeof window !== 'undefined') {
-    window.onbeforeunload = function (e) {
-      // 입력 중이거나 저장 중일때는 나갈지 묻는다.
-      if (state !== 1 && state !== 2) {
-        return;
-      }
-      //메시지는 사용할 수 없다. 커스텀 메세지를 막아놓음..
-      var dialogText =
-        '아직 저장이 완료되지 않았습니다. 페이지를 정말로 이동하시겠습니까?';
-      e.returnValue = dialogText;
-      return dialogText;
-    };
-  }
+  
+  
 
   return (
     <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem]">

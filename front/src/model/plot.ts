@@ -11,5 +11,11 @@ export type plotType = {
 };
 
 export type plotListType = {
-  plotInfoDtoList?: plotType[]
-}
+  plotInfoDtoList?: plotType[];
+};
+
+export type plotDirectory = {
+  id?: string | null;
+  name: string;
+  children?: plotDirectory[] | null;
+};
