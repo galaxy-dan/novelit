@@ -13,6 +13,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,37 +32,26 @@ public class GroupController {
     private final CharacterService characterService;
 
     @GetMapping
-    public ResponseEntity<Object> getGroupInfo(@RequestParam String groupUUID) {
+    public ResponseEntity<Object> getGroupInfo(@RequestParam String groupUUID, Authentication authentication) {
         try {
-            GroupDtoRes dto = groupService.getGroupInfo(groupUUID);
+            GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName());
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-//    @GetMapping("/character")
-//    public ResponseEntity<Object> getCharacters(@RequestParam String groupUUID) {
-//        try {
-//            List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID);
-//            return ResponseEntity.ok(dto);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
-
     @GetMapping("/characters")
-    public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String groupUUID,
-            @RequestParam String keyword) {
-        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID);
+    public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String groupUUID, Authentication authentication) {
+        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName());
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/top")
-    public ResponseEntity<Object> topGroupInfo() {
+    public ResponseEntity<Object> topGroupInfo(Authentication authentication) {
         try {
-            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup();
-            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter();
+            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(authentication.getName());
+            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
 
             Map<String, Object> response = new HashMap<>();
             response.put("groups", groupDto);
@@ -75,9 +65,9 @@ public class GroupController {
 
 
     @PostMapping
-    public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto) {
+    public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto, Authentication authentication) {
         try {
-            groupService.createGroup(dto);
+            groupService.createGroup(dto, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -85,9 +75,9 @@ public class GroupController {
     }
 
     @PatchMapping
-    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUUID, @RequestParam String newName) {
+    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUUID, @RequestParam String newName, Authentication authentication) {
         try {
-            groupService.updateGroupName(groupUUID, newName);
+            groupService.updateGroupName(groupUUID, newName, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -95,9 +85,9 @@ public class GroupController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Object> deleteGroup(@RequestParam String groupUUID) {
+    public ResponseEntity<Object> deleteGroup(@RequestParam String groupUUID, Authentication authentication) {
         try {
-            groupService.deleteGroup(groupUUID);
+            groupService.deleteGroup(groupUUID, authentication.getName());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

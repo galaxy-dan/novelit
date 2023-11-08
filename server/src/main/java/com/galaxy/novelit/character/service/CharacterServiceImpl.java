@@ -52,7 +52,7 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID) {
+    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID, String userUUID) {
         List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID);
 //            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
 
@@ -73,7 +73,7 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterSimpleDtoRes> getTopCharacter() {
+    public List<CharacterSimpleDtoRes> getTopCharacter(String userUUID) {
         List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(null);
 //            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
         List<CharacterSimpleDtoRes> dto = new ArrayList<>();

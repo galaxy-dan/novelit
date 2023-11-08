@@ -27,7 +27,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public GroupDtoRes getGroupInfo(String groupUUID) {
+    public GroupDtoRes getGroupInfo(String groupUUID, String userUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
         List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUID(groupUUID);
         List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUID(groupUUID);
@@ -45,7 +45,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<GroupSimpleDtoRes> getTopGroup() {
+    public List<GroupSimpleDtoRes> getTopGroup(String userUUID) {
         List<GroupEntity> groups = groupRepository.findAllByParentGroupUUID(null);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void createGroup(GroupCreateDtoReq dto) {
+    public void createGroup(GroupCreateDtoReq dto, String userUUID) {
         String groupUUID = UUID.randomUUID().toString();
         String parentGroupUUID = dto.getParentGroupUUID();
         GroupEntity newGroup;
@@ -71,7 +71,7 @@ public class GroupServiceImpl implements GroupService {
         // 최상단 계층일 경우 (부모UUID가 없을 때)
         if (parentGroupUUID == null) {
             newGroup = GroupEntity.builder()
-                .userUUID(dto.getUserUUID())
+                .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
@@ -80,7 +80,7 @@ public class GroupServiceImpl implements GroupService {
         }
         else {
             newGroup = GroupEntity.builder()
-                .userUUID(dto.getUserUUID())
+                .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
@@ -93,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void deleteGroup(String groupUUID) {
+    public void deleteGroup(String groupUUID, String userUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
         group.deleteGroup();
         groupRepository.save(group);
@@ -101,7 +101,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void updateGroupName(String groupUUID, String newName) {
+    public void updateGroupName(String groupUUID, String newName, String userUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
         group.updateGroupName(newName);
         groupRepository.save(group);
