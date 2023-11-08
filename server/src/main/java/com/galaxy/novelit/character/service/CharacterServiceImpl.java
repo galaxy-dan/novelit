@@ -8,6 +8,7 @@ import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.RelationEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
+import com.galaxy.novelit.character.repository.RelationRepository;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import java.util.ArrayList;
 import java.util.List;
