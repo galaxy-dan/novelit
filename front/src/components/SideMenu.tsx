@@ -117,7 +117,7 @@ export default function SideMenu() {
           <div>
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
-                <button onClick={() => router.push('/')}>
+                <button onClick={() => router.push('/main')}>
                   <BiSolidHome size={30} />
                 </button>
                 <div className="font-bold text-xl">{workspace?.title}</div>
