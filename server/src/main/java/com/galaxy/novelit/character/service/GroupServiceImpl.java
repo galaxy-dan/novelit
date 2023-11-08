@@ -3,7 +3,9 @@ package com.galaxy.novelit.character.service;
 import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
+import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
+import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,25 +23,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
+    private final CharacterRepository characterRepository;
 
     @Transactional(readOnly = true)
     @Override
     public GroupDtoRes getGroupInfo(String groupUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
-
-//        삭제된 그룹 처리
-//        if (group.isDeleted()) {
-//            return ;
-//        }
+        List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUID(groupUUID);
+        List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUID(groupUUID);
 
         GroupDtoRes dto = new GroupDtoRes();
+        dto.setWorkspaceUUID(group.getWorkspaceUUID());
         dto.setGroupUUID(group.getGroupUUID());
         dto.setGroupName(group.getGroupName());
-        dto.setChildGroups(group.getChildGroups());
         dto.setParentGroupUUID(group.getParentGroupUUID());
-        dto.setWorkspaceUUID(group.getWorkspaceUUID());
-        dto.setChildCharacters(group.getChildCharacters());
-        dto.setDeleted(group.isDeleted());
+        dto.setChildGroups(childGroups);
+        dto.setChildCharacters(childCharacters);
 
         return dto;
     }

@@ -19,12 +19,12 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class GroupEntity {
     @Id
     private String groupId;
-    @Field(name = "group_uuid")
-    private String groupUUID;
     @Field(name = "user_uuid")
     private String userUUID;
     @Field(name = "workspace_uuid")
     private String workspaceUUID;
+    @Field(name = "group_uuid")
+    private String groupUUID;
     @Field(name = "group_name")
     private String groupName;
     @Field(name = "parent_uuid")
