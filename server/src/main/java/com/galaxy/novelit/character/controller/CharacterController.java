@@ -3,8 +3,10 @@ package com.galaxy.novelit.character.controller;
 import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
+import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.words.service.WordsService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,8 +76,8 @@ public class CharacterController {
     @GetMapping("/diagram")
     public ResponseEntity<Object> getRelationships(Authentication authentication) {
         try {
-
-            return ResponseEntity.ok().build();
+            List<RelationDtoRes> dto = characterService.getRelationships();
+            return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

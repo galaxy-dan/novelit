@@ -167,10 +167,21 @@ public class CharacterServiceImpl implements CharacterService {
         characterRepository.save(character);
     }
 
-//    @Transactional(readOnly = true)
-//    @Override
-//    public List<RelationDtoRes> getRelationships() {
-//
-//        return null;
-//    }
+    @Transactional(readOnly = true)
+    @Override
+    public List<RelationDtoRes> getRelationships() {
+        List<RelationEntity> allRelation = relationRepository.findAll();
+        List<RelationDtoRes> allDto = new ArrayList<>();
+
+        for (RelationEntity relation : allRelation) {
+            RelationDtoRes dto = RelationDtoRes.builder()
+                .characterUUID(relation.getCharacterUUID())
+                .characterName(relation.getCharacterName())
+                .relations(relation.getRelations())
+                .build();
+            allDto.add(dto);
+        }
+
+        return allDto;
+    }
 }

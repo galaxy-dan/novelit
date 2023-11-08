@@ -14,5 +14,5 @@ public interface CharacterService {
     void createCharacter(CharacterCreateDtoReq dto, String userUUID);
     void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID);
     void deleteCharacter(String characterUUID, String userUUID);
-//    List<RelationDtoRes> getRelationships();
+    List<RelationDtoRes> getRelationships();
 }
