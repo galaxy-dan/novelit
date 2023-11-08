@@ -175,30 +175,21 @@ public class CharacterServiceImpl implements CharacterService {
         characterRepository.save(character);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public List<CharacterSearchInfoResDTO> searchCharacter(String characterName) {
-        List<CharacterEntity> characters = characterRepository.findAllByCharacterName(characterName);
-        List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
+    public List<RelationDtoRes> getRelationships() {
+        List<RelationEntity> allRelation = relationRepository.findAll();
+        List<RelationDtoRes> allDto = new ArrayList<>();
 
-        for (CharacterEntity character : characters) {
-            CharacterSearchInfoResDTO characterSearchInfoResDTO = CharacterSearchInfoResDTO.builder()
-                .characterUUID(character.getCharacterUUID())
-                .characterImage(character.getCharacterImage())
-                .groupUUID(character.getGroupUUID())
-                .groupName(groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName())
-                .characterName(character.getCharacterName())
-                .information(new ArrayList<>(character.getInformation().subList(0, 2)))
+        for (RelationEntity relation : allRelation) {
+            RelationDtoRes dto = RelationDtoRes.builder()
+                .characterUUID(relation.getCharacterUUID())
+                .characterName(relation.getCharacterName())
+                .relations(relation.getRelations())
                 .build();
-            characterInfoList.add(characterSearchInfoResDTO);
+            allDto.add(dto);
         }
-        return characterInfoList;
-    }
 
-//    @Transactional(readOnly = true)
-//    @Override
-//    public List<RelationDtoRes> getRelationships() {
-//
-//        return null;
-//    }
+        return allDto;
+    }
 }
