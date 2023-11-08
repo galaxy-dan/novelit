@@ -3,6 +3,7 @@ package com.galaxy.novelit.character.controller;
 import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
+import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.words.service.WordsService;
