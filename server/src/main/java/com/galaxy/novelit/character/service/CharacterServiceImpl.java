@@ -6,6 +6,7 @@ import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
+import com.galaxy.novelit.character.entity.RelationEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
 import java.util.ArrayList;
@@ -87,6 +88,14 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public void createCharacter(CharacterCreateDtoReq dto, String userUUID) {
         String characterUUID = UUID.randomUUID().toString();
+
+        RelationEntity newRelation = RelationEntity.builder()
+            .characterUUID(characterUUID)
+            .characterName(dto.getCharacterName())
+            .relations(dto.getRelationship().getRelations())
+            .build();
+
+        relationRepository.save(newRelation);
 
         CharacterEntity newCharacter = CharacterEntity.builder()
             .userUUID(userUUID)

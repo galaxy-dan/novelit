@@ -24,7 +24,7 @@ public class RelationEntity {
     private String characterName;
     private List<Relation> relations;
 
-    public static class Relation {
+    private static class Relation {
         private String targetUUID;
         private String targetName;
         private String content;

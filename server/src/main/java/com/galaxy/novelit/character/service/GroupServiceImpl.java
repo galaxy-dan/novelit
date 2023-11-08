@@ -21,13 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
-    private final MongoTemplate mongoTemplate;
 
     @Transactional(readOnly = true)
     @Override
     public GroupDtoRes getGroupInfo(String groupUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
-        log.info("groupId:{}", group.getGroupId());
+
 //        삭제된 그룹 처리
 //        if (group.isDeleted()) {
 //            return ;

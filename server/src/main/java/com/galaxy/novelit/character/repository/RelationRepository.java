@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RelationRepository extends MongoRepository<RelationEntity, String> {
-//    List<RelationEntity> find();
+    RelationEntity findByCharacterUUID(String characterUUID);
 }
