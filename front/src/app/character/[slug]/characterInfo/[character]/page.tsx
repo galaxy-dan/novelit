@@ -22,6 +22,7 @@ import {
   UseQueryResult,
   useMutation,
   useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -32,23 +33,25 @@ type Props = {
   };
 };
 
-const listener = (e : any) => {
+const listener = (e: any) => {
   e.preventDefault();
   e.returnValue = '';
-}
+};
 
 const enablePrevent = () => {
   window.addEventListener('beforeunload', listener);
-}
+};
 
 const disablePrevent = () => {
   window.removeEventListener('beforeunload', listener);
-}
+};
 
 export default function page({ params }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
+  const [isNameChanged, setIsNameChanged] = useState<boolean>(false);
 
   const { data: characterData }: UseQueryResult<characterType> = useQuery({
     queryKey: ['character', params.character],
@@ -163,11 +166,16 @@ export default function page({ params }: Props) {
       JSON.stringify(ref.current) !== JSON.stringify(character)
     ) {
       if (isFetched) {
-        console.log(character);
         putCharacterMutation.mutate();
+        if (isNameChanged) {
+          queryClient.invalidateQueries(['characterDirectory']);
+          setIsNameChanged(false);
+        }
       } else {
         setIsFetched(true);
       }
+    } else {
+      setState(0);
     }
     ref.current = JSON.parse(JSON.stringify(character));
   }, [character]);
@@ -179,6 +187,7 @@ export default function page({ params }: Props) {
       } else {
         setWidth(100);
       }
+      setIsNameChanged(true);
     }
   }, [nameInput]);
 

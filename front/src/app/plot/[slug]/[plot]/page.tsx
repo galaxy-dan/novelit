@@ -4,7 +4,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import UploadState from '@/components/state/UploadState';
 import styles from '@/service/cssStyle/scrollbar.module.css';
-import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
+import {
+  QueryClient,
+  UseQueryResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { plotType } from '@/model/plot';
 import { deletePlot, getPlot, putPlot } from '@/service/api/plot';
@@ -16,25 +22,26 @@ type Props = {
   };
 };
 
-const listener = (e : any) => {
+const listener = (e: any) => {
   e.preventDefault();
   e.returnValue = '';
-}
+};
 
 const enablePrevent = () => {
   window.addEventListener('beforeunload', listener);
-}
+};
 
 const disablePrevent = () => {
   window.removeEventListener('beforeunload', listener);
-}
+};
 
 export default function page({ params }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
-
-
+  const [istitleChanged, setIstitleChanged] = useState<boolean>(false);
+  
   const { data: plotData }: UseQueryResult<plotType> = useQuery({
     queryKey: ['plot', params.plot],
     queryFn: () => getPlot(params.plot),
@@ -59,6 +66,11 @@ export default function page({ params }: Props) {
     mutationFn: () => putPlot(params.plot, plot),
     onSuccess: () => {
       setState(3);
+      if (istitleChanged) {
+        queryClient.refetchQueries(['plotDirectory']);
+        queryClient.refetchQueries(['plotList']);
+        setIstitleChanged(false);
+      }
     },
     onError: () => {
       setState(4);
@@ -71,6 +83,8 @@ export default function page({ params }: Props) {
   const deleteCharacterMutation = useMutation({
     mutationFn: () => deletePlot(params.plot),
     onSuccess: () => {
+      queryClient.refetchQueries(['plotDirectory']);
+      queryClient.refetchQueries(['plotList']);
       router.push(`/plot/${params.slug}`);
     },
     onError: () => {
@@ -129,7 +143,7 @@ export default function page({ params }: Props) {
       () => {
         return hello();
       },
-      isFetched ? 1300 : 0,
+      isFetched ? 500 : 0,
     );
     return () => {
       clearTimeout(debounce);
@@ -164,6 +178,7 @@ export default function page({ params }: Props) {
       } else {
         setWidth(100);
       }
+      setIstitleChanged(true);
     }
   }, [plotTitleInput]);
 
@@ -216,13 +231,12 @@ export default function page({ params }: Props) {
   }, [endingInput, windowSize]);
 
   useEffect(() => {
-    if(state === 1 || state === 2){
+    if (state === 1 || state === 2) {
       enablePrevent();
-    }else{
+    } else {
       disablePrevent();
     }
   }, [state]);
-
 
   return (
     <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem]">
@@ -252,6 +266,7 @@ export default function page({ params }: Props) {
             className="text-2xl mb-1 cursor-pointer"
             onClick={() => {
               deleteCharacterMutation.mutate();
+              router.push(`/plot/${params.slug}`);
             }}
           />
         </div>

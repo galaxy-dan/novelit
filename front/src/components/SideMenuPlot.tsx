@@ -59,7 +59,8 @@ export default function SideMenuPlot() {
   const createMutate = useMutation({
     mutationFn: () => postPlot({ workspaceUuid: slug, plotTitle: '새 플롯' }),
     onSuccess: () => {
-      queryClient.invalidateQueries(['plotDirectory']);
+      queryClient.refetchQueries(['plotDirectory']);
+      queryClient.refetchQueries(['plotList']);
     },
   });
 
@@ -120,7 +121,7 @@ export default function SideMenuPlot() {
                 {plotDirectories?.children && (
                   <Tree
                     ref={treeRef}
-                    initialData={plotDirectories.children}
+                    data={plotDirectories.children}
                     openByDefault={false}
                     width={200}
                     indent={24}
@@ -158,7 +159,7 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
   const deleteMutate = useMutation({
     mutationFn: deleteDirectory,
     onSuccess: () => {
-      queryClient.invalidateQueries(['plotDirectory']);
+      queryClient.removeQueries(['plotDirectory']);
     },
   });
 
@@ -173,13 +174,15 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
         }}
         onDoubleClick={() => {
           if (node.isLeaf) {
-            queryClient.invalidateQueries(['plot', node.id]);
+            queryClient.removeQueries(['plot', node.id]);
+            queryClient.refetchQueries(['plotList']);
+            queryClient.refetchQueries(['plotDirectory']);
             router.push(`/plot/${slug}/${node.id}`);
           }
         }}
       >
         <div className="text-black">
-          <div style={style} className="text-sm font-bold">
+          <div style={style} className="text-sm font-bold cursor-default">
             {node.isLeaf ? '📖' : node.isOpen ? '📂' : '📁'}
             {node.data.name}
           </div>
