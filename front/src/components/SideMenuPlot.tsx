@@ -16,14 +16,10 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {
-  deleteDirectory,
-  patchDirectory,
-  postDirectory,
-} from '@/service/api/novel';
+
 import { useParams, useRouter } from 'next/navigation';
 import { AiOutlineMenu } from 'react-icons/ai';
-import { getPlotDirectory, postPlot } from '@/service/api/plot';
+import { deletePlot, getPlotDirectory, postPlot } from '@/service/api/plot';
 import { plotDirectory, plotType } from '@/model/plot';
 
 export default function SideMenuPlot() {
@@ -63,7 +59,6 @@ export default function SideMenuPlot() {
       queryClient.refetchQueries(['plotList']);
     },
   });
-
   return (
     <>
       <button
@@ -157,9 +152,14 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
     : searchParams.slug;
 
   const deleteMutate = useMutation({
-    mutationFn: deleteDirectory,
+    mutationFn: deletePlot,
     onSuccess: () => {
-      queryClient.removeQueries(['plotDirectory']);
+      console.log('삭제.. 성공~~');
+      queryClient.refetchQueries(['plotDirectory']);
+      queryClient.refetchQueries(['plotList']);
+      if (searchParams.plot === node.id) {
+        router.push(`/plot/${searchParams.slug}`);
+      }
     },
   });
 
@@ -192,8 +192,7 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
           <div className="folderFileActions flex items-center">
             <button
               onClick={() => {
-                deleteMutate.mutate({ uuid: node.id });
-                tree.delete(node.id);
+                deleteMutate.mutate(node.id);
               }}
               title="Delete"
             >
