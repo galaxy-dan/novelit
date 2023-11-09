@@ -52,9 +52,9 @@ public class SecurityConfig {
 					"/util/**",
 					"/actuator/**"
 				).permitAll()
-				.requestMatchers(HttpMethod.GET,"/file").permitAll()//.hasAnyAuthority("USER","EDITOR")
-				.requestMatchers(HttpMethod.PATCH,"/file").permitAll()//.hasAnyAuthority("USER","EDITOR")
-				.requestMatchers("/comment").permitAll()//.hasAnyAuthority("USER","EDITOR")
+				.requestMatchers(HttpMethod.GET,"/file").hasAnyAuthority("USER","EDITOR")
+				.requestMatchers(HttpMethod.PATCH,"/file").hasAnyAuthority("USER","EDITOR")
+				.requestMatchers("/comment").hasAnyAuthority("USER","EDITOR")
 				//.permitAll()
 				//.anyRequest().hasAuthority("USER")
 				.anyRequest().permitAll()
