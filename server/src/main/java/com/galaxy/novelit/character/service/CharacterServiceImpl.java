@@ -108,7 +108,7 @@ public class CharacterServiceImpl implements CharacterService {
 
         RelationEntity newRelation = RelationEntity.builder()
             .characterUUID(characterUUID)
-            .relations(dto.getRelationship().getRelations())
+            .relations(dto.getRelations())
             .build();
 
         relationRepository.save(newRelation);
@@ -121,7 +121,7 @@ public class CharacterServiceImpl implements CharacterService {
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
-            .relationship(dto.getRelationship())
+            .relationship(newRelation)
             .characterImage(dto.getCharacterImage())
             .build();
 
