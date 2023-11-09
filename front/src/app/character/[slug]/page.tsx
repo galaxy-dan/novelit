@@ -5,8 +5,12 @@ import { characterType, groupType, subGroupType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
-
-export default function page() {
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+export default function page({ params }: Props) {
   const [subGroups, setSubgroups] = useState<subGroupType[]>([
     { id: 'subgroup1', name: '서브그룹 1' },
     { id: 'subgroup2', name: '서브그룹 2' },
@@ -101,7 +105,7 @@ export default function page() {
       relationship: [],
     },
   ]);
-  
+
   return (
     <div className="ml-10 my-20 select-none">
       {/* 제목 */}
@@ -124,19 +128,17 @@ export default function page() {
       <div className="mt-6">
         {/* 캐릭터 카드 그룹 */}
         <div>
-          <p
-            className="text-4xl font-extrabold max-w-[30rem] truncate"
-          >전체</p>
+          <p className="text-4xl font-extrabold max-w-[30rem] truncate">전체</p>
         </div>
 
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {subGroups?.map((subGroup, i) => (
-            <SubGroupCard subGroup={subGroup} />
+            <SubGroupCard subGroup={subGroup} slug={params.slug} />
           ))}
         </div>
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {characters?.map((character, i) => (
-            <CharacterCard character={character} />
+            <CharacterCard character={character} slug={params.slug} />
           ))}
         </div>
       </div>
