@@ -1,6 +1,6 @@
 package com.galaxy.novelit.notification.controller;
 
-import com.galaxy.novelit.notification.redis.dto.response.AlarmRedisResponseDto;
+import com.galaxy.novelit.notification.redis.dto.response.AlarmGetResponseDto;
 import com.galaxy.novelit.notification.redis.service.AlarmRedisService;
 import com.galaxy.novelit.notification.service.NotificationService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,15 +35,29 @@ public class NotificationController {
     }
 
     @GetMapping("/alarmlist")
-    public ResponseEntity<List<AlarmRedisResponseDto>> getAllAlarmlist(Authentication authentication) {
+    public ResponseEntity<List<AlarmGetResponseDto>> getAllAlarmlist(Authentication authentication) {
         String subUUID = authentication.getName();
         return ResponseEntity.ok(alarmRedisService.getAllList(subUUID));
     }
 
+    /*@GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> subscribe(@RequestParam("subscriberUUID") String subUUID, HttpServletResponse response)
+    {
+        //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
+        response.setHeader("X-Accel-Buffering", "no");
+        String subscriberUUID = subUUID;
+        return ResponseEntity.ok(notificationService.subscribe(subscriberUUID));
+    }
+
+    @GetMapping("/alarmlist")
+    public ResponseEntity<List<AlarmGetResponseDto>> getAllAlarmlist(@RequestParam("subscriberUUID") String subUUID) {
+        return ResponseEntity.ok(alarmRedisService.getAllList(subUUID));
+    }*/
+
     // 코멘트 알람 테스트
     /*@PostMapping("/send")
-    public ResponseEntity<Void> alertComment(@RequestBody NotificationRequestDto notificationRequestDto) {
-        notificationService.alertComment(notificationRequestDto);
+    public ResponseEntity<Void> alertComment(Authentication authentication) {
+        notificationService.alertComment(authentication.getName());
         return ResponseEntity.ok().build();
     }*/
 }
