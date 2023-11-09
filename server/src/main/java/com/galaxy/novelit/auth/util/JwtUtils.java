@@ -18,6 +18,7 @@ import com.galaxy.novelit.common.exception.InvalidTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -115,6 +116,16 @@ public class JwtUtils {
 			throw new InvalidTokenException("토큰 기한 만료");
 		} catch (IllegalArgumentException e) {
 			throw new InvalidTokenException("JWT token compact of handler are invalid.");
+		}
+
+	}
+
+	public boolean validateShareToken(String token) {
+		try {
+			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+			return true;
+		} catch (JwtException e) {
+			return false;
 		}
 
 	}
