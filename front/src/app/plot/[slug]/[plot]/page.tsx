@@ -16,28 +16,24 @@ type Props = {
   };
 };
 
-function usePreventLeave() {
-  function listener(e : any) {
-    e.preventDefault();
-    e.returnValue = '';
-  }
+const listener = (e : any) => {
+  e.preventDefault();
+  e.returnValue = '';
+}
 
-  function enablePrevent() {
-    window.addEventListener('beforeunload', listener)
-  }
+const enablePrevent = () => {
+  window.addEventListener('beforeunload', listener);
+}
 
-  function disablePrevent() {
-    window.removeEventListener('beforeunload', listener)
-  }
-
-  return {enablePrevent, disablePrevent}
+const disablePrevent = () => {
+  window.removeEventListener('beforeunload', listener);
 }
 
 export default function page({ params }: Props) {
   const router = useRouter();
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
-  const {enablePrevent, disablePrevent} = usePreventLeave();
+
 
   const { data: plotData }: UseQueryResult<plotType> = useQuery({
     queryKey: ['plot', params.plot],

@@ -8,8 +8,7 @@ import People from '../../public/images/people.svg';
 import Image from 'next/image';
 import { BiSolidHome } from 'react-icons/bi';
 import { FiChevronsLeft } from 'react-icons/fi';
-import { AiFillFolderAdd, AiFillFileAdd } from 'react-icons/ai';
-import { MdEdit } from 'react-icons/md';
+import { AiFillFileAdd } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
 import {
   UseQueryResult,
@@ -17,16 +16,12 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { PostDirectory } from '@/model/novel';
 import {
   deleteDirectory,
   patchDirectory,
   postDirectory,
 } from '@/service/api/novel';
-import { getWorkspace } from '@/service/api/workspace';
-import { Directory, Novel } from '@/model/workspace';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { v4 as uuidv4 } from 'uuid';
+import { useParams, useRouter } from 'next/navigation';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { getPlotDirectory, postPlot } from '@/service/api/plot';
 import { plotDirectory, plotType } from '@/model/plot';
@@ -64,7 +59,7 @@ export default function SideMenuPlot() {
   const createMutate = useMutation({
     mutationFn: () => postPlot({ workspaceUuid: slug, plotTitle: '새 플롯' }),
     onSuccess: () => {
-      queryClient.removeQueries(['plotDirectory']);
+      queryClient.invalidateQueries(['plotDirectory']);
     },
   });
 
@@ -178,7 +173,7 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
         }}
         onDoubleClick={() => {
           if (node.isLeaf) {
-            queryClient.removeQueries(['plot', node.id]);
+            queryClient.invalidateQueries(['plot', node.id]);
             router.push(`/plot/${slug}/${node.id}`);
           }
         }}
