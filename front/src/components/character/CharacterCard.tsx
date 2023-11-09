@@ -25,6 +25,7 @@ export default function CharacterCard({ character, slug }: Props) {
         height={100}
         alt="캐릭터이미지"
         className="w-24 h-32 object-cover"
+        priority
       />:
       <Image
       src='/images/default_character.png'
@@ -32,6 +33,7 @@ export default function CharacterCard({ character, slug }: Props) {
       height={100}
       alt="캐릭터이미지"
       className="w-24 h-32 object-cover"
+      priority
     />
       }
       
