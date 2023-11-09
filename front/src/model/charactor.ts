@@ -29,3 +29,9 @@ export type relationshipType = {
   name: string;
   description: string;
 };
+
+export type groupItemType = {
+  name: string;
+  childGroup : subGroupType[];
+  childCharacter: characterType[];
+}
