@@ -17,17 +17,6 @@ public class NotificationResponseDto {
     private String notificationUUID;
     private String notificationContent;
 
-    /*public static NotificationResponseDto createAlarmComment(NotificationRequestDto notificationRequestDto){
-        UUID uuid = UUID.randomUUID();
-
-        String notiUUID = uuid.toString();
-
-        return NotificationResponseDto.builder()
-            .subscriberUUID(notificationRequestDto.getSubscriberUUID())
-            .notificationUUID(notiUUID)
-            .notificationContent(notificationRequestDto.getSubscriberUUID() + " 님이 댓글을 남겼습니다.")
-            .build();
-    }*/
 
     public static NotificationResponseDto createAlarmComment(String commentNickname, String subscriberUUID){
         UUID uuid = UUID.randomUUID();

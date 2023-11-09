@@ -1,9 +1,10 @@
 package com.galaxy.novelit.character.dto.res;
 
-import com.galaxy.novelit.character.entity.RelationEntity;
+import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,13 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class CharacterDtoRes {
-    private String groupUUID;
+@Builder
+public class RelationDtoRes {
     private String characterUUID;
     private String characterName;
-    private String description;
-    private List<Map<String, String>> information;
-    private RelationEntity relationship;
-    private boolean isDeleted;
-    private String characterImage;
+    private List<Relation> relations;
 }
