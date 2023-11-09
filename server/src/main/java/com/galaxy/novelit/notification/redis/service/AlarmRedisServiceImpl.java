@@ -1,8 +1,8 @@
 package com.galaxy.novelit.notification.redis.service;
 
+import com.galaxy.novelit.notification.redis.domain.AlarmRedis;
 import com.galaxy.novelit.notification.redis.dto.request.AlarmRedisRequestDto;
 import com.galaxy.novelit.notification.redis.dto.response.AlarmGetResponseDto;
-import com.galaxy.novelit.notification.redis.domain.AlarmRedis;
 import com.galaxy.novelit.notification.redis.repository.AlarmRedisRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class AlarmRedisServiceImpl implements AlarmRedisService{
 
     private final AlarmRedisRepository alarmRedisRepository;
+/*
+    private final RedisTemplate<String, AlarmRedis> redisTemplate;
 
+
+    // redistemplate
+    public void saveWithTTL(AlarmRedis alarmRedis) {
+        redisTemplate.opsForValue().set(alarmRedis.getPubUUID(), alarmRedis, alarmRedis.getExpiration(), TimeUnit.DAYS);
+    }
+
+    public AlarmRedis get(String pubName){
+        return redisTemplate.opsForValue().get(pubName);
+    }
+*/
+
+
+    // crudRepository
     @Transactional
     public void save(AlarmRedisRequestDto alarmRedisRequestDto) {
         AlarmRedis responseDto = AlarmRedis.create(alarmRedisRequestDto);
@@ -28,6 +43,8 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
         List<AlarmGetResponseDto> list = new ArrayList<>();
 
         List<AlarmRedis> all = (List<AlarmRedis>) alarmRedisRepository.findAll();
+
+        log.info("d : {}" , all.get(0).getNoti().getSubUUID());
 
         for (AlarmRedis alarmRedis : all) {
             if (alarmRedis.getNoti().getSubUUID().equals(subUUID)) {
