@@ -31,10 +31,29 @@ type Props = {
     slug: string;
   };
 };
+
+function usePreventLeave() {
+  function listener(e: any) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+
+  function enablePrevent() {
+    window.addEventListener('beforeunload', listener);
+  }
+
+  function disablePrevent() {
+    window.removeEventListener('beforeunload', listener);
+  }
+
+  return { enablePrevent, disablePrevent };
+}
+
 export default function page({ params }: Props) {
   const router = useRouter();
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
+  const {enablePrevent, disablePrevent} = usePreventLeave();
 
   const { data: characterData }: UseQueryResult<characterType> = useQuery({
     queryKey: ['character', params.character],
@@ -172,19 +191,13 @@ export default function page({ params }: Props) {
     return src;
   };
 
-  if (typeof window !== 'undefined') {
-    window.onbeforeunload = function (e) {
-      // 입력 중이거나 저장 중일때는 나갈지 묻는다.
-      if (state !== 1 && state !== 2) {
-        return;
-      }
-      //메시지는 사용할 수 없다. 커스텀 메세지를 막아놓음..
-      var dialogText =
-        '아직 저장이 완료되지 않았습니다. 페이지를 정말로 이동하시겠습니까?';
-      e.returnValue = dialogText;
-      return dialogText;
-    };
-  }
+  useEffect(() => {
+    if (state === 1 || state === 2) {
+      enablePrevent();
+    } else {
+      disablePrevent();
+    }
+  }, [state]);
 
   return (
     <div className="select-none w-full" onClick={() => setSearchInput(-1)}>

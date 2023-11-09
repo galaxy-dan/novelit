@@ -16,10 +16,28 @@ type Props = {
   };
 };
 
+function usePreventLeave() {
+  function listener(e : any) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+
+  function enablePrevent() {
+    window.addEventListener('beforeunload', listener)
+  }
+
+  function disablePrevent() {
+    window.removeEventListener('beforeunload', listener)
+  }
+
+  return {enablePrevent, disablePrevent}
+}
+
 export default function page({ params }: Props) {
   const router = useRouter();
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
+  const {enablePrevent, disablePrevent} = usePreventLeave();
 
   const { data: plotData }: UseQueryResult<plotType> = useQuery({
     queryKey: ['plot', params.plot],
@@ -201,8 +219,14 @@ export default function page({ params }: Props) {
     }
   }, [endingInput, windowSize]);
 
-  
-  
+  useEffect(() => {
+    if(state === 1 || state === 2){
+      enablePrevent();
+    }else{
+      disablePrevent();
+    }
+  }, [state]);
+
 
   return (
     <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem]">
