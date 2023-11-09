@@ -1,7 +1,6 @@
 package com.galaxy.novelit.character.entity;
 
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
