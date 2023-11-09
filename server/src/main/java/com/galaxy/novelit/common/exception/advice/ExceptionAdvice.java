@@ -1,12 +1,12 @@
 package com.galaxy.novelit.common.exception.advice;
 
-import com.galaxy.novelit.common.exception.LengthOutOfLimit;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.EditRefusedException;
 import com.galaxy.novelit.common.exception.IllegalUUIDException;
 import com.galaxy.novelit.common.exception.InvalidTokenException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
@@ -60,5 +60,10 @@ public class ExceptionAdvice {
 	@ExceptionHandler(InvalidTokenException.class)
 	public ResponseEntity<ExceptionResDTO> InvalidTokenException(InvalidTokenException e) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(EditRefusedException.class)
+	public ResponseEntity<ExceptionResDTO> EditRefusedException(EditRefusedException e) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
 	}
 }

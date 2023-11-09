@@ -35,6 +35,8 @@ public class Directory {
 	private String userUUID;
 	@Field(name = "deleted")
 	private boolean deleted;
+	@Field(name = "editable")
+	private boolean editable;
 
 	public void editName(String name){
 		this.name = name;
@@ -47,6 +49,9 @@ public class Directory {
 	}
 	public void updateParentUUID(String parentUUID){
 		this.parentUUID = parentUUID;
+	}
+	public void updateEditable(boolean editable){
+		this.editable = editable;
 	}
 
 	@Override

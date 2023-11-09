@@ -58,7 +58,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 		if(isDirectory){
 			builder.children(new ArrayList<>());
 		}else{
-			builder.content("");
+			builder.content("").editable(true);
 		}
 		Directory directory = builder.build();
 
@@ -120,7 +120,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 			throw new WrongDirectoryTypeException();
 		}
 
-		return new FileResDTO(directory.getName(), directory.getContent());
+		return new FileResDTO(directory.getName(), directory.getContent(), directory.isEditable());
 	}
 
 	@Transactional
@@ -176,6 +176,10 @@ public class DirectoryServiceImpl implements DirectoryService{
 		if(directory.isDirectory()){
 			throw new WrongDirectoryTypeException();
 		}
+
+		// if(!directory.isEditable()){
+		// 	throw new EditRefusedException();
+		// }
 
 		directory.updateContent(dto.getContent());
 		directoryRepository.save(directory);

@@ -1,14 +1,17 @@
 package com.galaxy.novelit.character.entity;
 
-import jakarta.persistence.Id;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "relation")
+@Document(collection = "relationship")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +19,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class RelationEntity {
     @Id
     private String id;
-    private Map<String, String> name;
-    private Map<String, String> UUID;
-    private Map<String, String> relation;
+    @Field(name = "character_uuid")
+    private String characterUUID;
+    @Field(name = "character_name")
+    private String characterName;
+    private List<Relation> relations;
+
+    @Getter
+    @Setter
+    public static class Relation {
+        private String targetUUID;
+        private String targetName;
+        private String content;
+    }
 }

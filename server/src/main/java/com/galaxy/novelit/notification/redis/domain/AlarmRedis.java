@@ -1,4 +1,4 @@
-package com.galaxy.novelit.notification.redis.dto.response;
+package com.galaxy.novelit.notification.redis.domain;
 
 import com.galaxy.novelit.notification.redis.dto.request.AlarmRedisRequestDto;
 import lombok.AllArgsConstructor;
@@ -15,19 +15,19 @@ import org.springframework.data.redis.core.RedisHash;
 @NoArgsConstructor
 @AllArgsConstructor
 @RedisHash("AlarmRedis")
-public class AlarmRedisResponseDto{
+public class AlarmRedis {
     @Id
-    private String pubUUID;
+    private String pubName; // 보내는 사람
 
-    private NotiDto notiDto;
+    private Noti noti;
 
     //@TimeToLive(unit = TimeUnit.DAYS)
     //private Long days;
 
-    public static AlarmRedisResponseDto create(AlarmRedisRequestDto alarmRedisRequestDto){
-        return AlarmRedisResponseDto.builder()
-            .pubUUID(alarmRedisRequestDto.getPubUUID())
-            .notiDto(NotiDto.create(alarmRedisRequestDto.getSubUUID(), alarmRedisRequestDto.getNotiUUID()))
+    public static AlarmRedis create(AlarmRedisRequestDto alarmRedisRequestDto){
+        return AlarmRedis.builder()
+            .pubName(alarmRedisRequestDto.getPubName())
+            .noti(Noti.create(alarmRedisRequestDto.getSubUUID(), alarmRedisRequestDto.getDirectoryName()))
             .build();
     }
 }
