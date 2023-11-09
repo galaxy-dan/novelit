@@ -53,7 +53,7 @@ public class CharacterServiceImpl implements CharacterService {
         dto.setCharacterUUID(character.getCharacterUUID());
         dto.setInformation(character.getInformation());
         dto.setDescription(character.getDescription());
-        dto.setRelationship(character.getRelationship());
+        dto.setRelations(character.getRelationship().getRelations());
         dto.setDeleted(character.isDeleted());
         dto.setCharacterImage(character.getCharacterImage());
 
