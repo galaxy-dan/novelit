@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class AlarmRedisRequestDto {
+    private String pubUUID;
     private String pubName;
     private String subUUID;
     private String directoryName;

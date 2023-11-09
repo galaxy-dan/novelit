@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 
 @Builder
 @Getter
@@ -17,17 +18,19 @@ import org.springframework.data.redis.core.RedisHash;
 @RedisHash("AlarmRedis")
 public class AlarmRedis {
     @Id
-    private String pubName; // 보내는 사람
-
+    private String pubUUID;
     private Noti noti;
 
-    //@TimeToLive(unit = TimeUnit.DAYS)
-    //private Long days;
+    @TimeToLive // 초단위
+    private Long expiration;
 
     public static AlarmRedis create(AlarmRedisRequestDto alarmRedisRequestDto){
         return AlarmRedis.builder()
-            .pubName(alarmRedisRequestDto.getPubName())
-            .noti(Noti.create(alarmRedisRequestDto.getSubUUID(), alarmRedisRequestDto.getDirectoryName()))
+            .pubUUID(alarmRedisRequestDto.getPubUUID())
+            .noti(Noti.create(alarmRedisRequestDto.getPubName()
+                , alarmRedisRequestDto.getSubUUID()
+                , alarmRedisRequestDto.getDirectoryName()))
+            .expiration(1L * 10)
             .build();
     }
 }
