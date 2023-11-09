@@ -133,12 +133,12 @@ export default function page({ params }: Props) {
 
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {subGroups?.map((subGroup, i) => (
-            <SubGroupCard subGroup={subGroup} slug={params.slug} />
+            <SubGroupCard subGroup={subGroup} slug={params.slug} key={subGroup.id}/>
           ))}
         </div>
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {characters?.map((character, i) => (
-            <CharacterCard character={character} slug={params.slug} />
+            <CharacterCard character={character} slug={params.slug}key={character.characterUUID} />
           ))}
         </div>
       </div>
