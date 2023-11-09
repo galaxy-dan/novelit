@@ -24,3 +24,8 @@ export const deletePlot = async (uuid : string) => {
     const data = await del(`/plot?plotUuid=${uuid}`);
     return data;
 };
+
+export const getPlotDirectory = async(workspaceUuid : string) => {
+    const data = await get(`/plot?workspaceUuid=${workspaceUuid}&keyword=`);
+    return data;
+};
