@@ -175,6 +175,26 @@ public class CharacterServiceImpl implements CharacterService {
         characterRepository.save(character);
     }
 
+    @Transactional
+    @Override
+    public List<CharacterSearchInfoResDTO> searchCharacter(String characterName) {
+        List<CharacterEntity> characters = characterRepository.findAllByCharacterName(characterName);
+        List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
+
+        for (CharacterEntity character : characters) {
+            CharacterSearchInfoResDTO characterSearchInfoResDTO = CharacterSearchInfoResDTO.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterImage(character.getCharacterImage())
+                .groupUUID(character.getGroupUUID())
+                .groupName(groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName())
+                .characterName(character.getCharacterName())
+                .information(new ArrayList<>(character.getInformation().subList(0, 2)))
+                .build();
+            characterInfoList.add(characterSearchInfoResDTO);
+        }
+        return characterInfoList;
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<RelationDtoRes> getRelationships() {
@@ -189,7 +209,6 @@ public class CharacterServiceImpl implements CharacterService {
                 .build();
             allDto.add(dto);
         }
-
         return allDto;
     }
 }

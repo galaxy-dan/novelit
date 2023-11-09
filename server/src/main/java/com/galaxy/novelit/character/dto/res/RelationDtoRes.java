@@ -11,10 +11,11 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
 @Getter
 @Builder
 public class RelationDtoRes {
-    private String characterUUID;          // 캐릭터 UUID
+    private String characterUUID;
     private String characterName;
     private List<Relation> relations;
 }
