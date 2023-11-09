@@ -1,4 +1,4 @@
-package com.galaxy.novelit.notification.redis.dto.response;
+package com.galaxy.novelit.notification.redis.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,15 +12,15 @@ import org.springframework.data.redis.core.index.Indexed;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NotiDto {
+public class Noti {
     String subUUID;
     @Indexed
-    String notiUUID;
+    String directoryName;
 
-    public static NotiDto create(String subUUID, String notiUUID){
-        return NotiDto.builder()
+    public static Noti create(String subUUID, String directoryName){
+        return Noti.builder()
             .subUUID(subUUID)
-            .notiUUID(notiUUID)
+            .directoryName(directoryName)
             .build();
     }
 }
