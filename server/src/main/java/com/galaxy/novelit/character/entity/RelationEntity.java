@@ -33,20 +33,3 @@ public class RelationEntity {
         private String content;
     }
 }
-
-//{
-//    "character_uuid": "",
-//    "character_name": "",
-//    "relations": [
-//      {
-//       "targetUUID": "",
-//      "targetName": "",
-//      "content": ""
-//      },
-//      {
-//       "targetUUID": "",
-//      "targetName": "",
-//      "content": ""
-//      }
-//    ]
-//}
