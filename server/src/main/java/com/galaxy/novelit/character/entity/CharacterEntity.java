@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -24,6 +25,8 @@ public class CharacterEntity {
     private String characterId;
     @Field(name = "user_uuid")
     private String userUUID;
+    @Field(name = "workspace_uuid")
+    private String workspaceUUID;
     @Field(name = "group_uuid")
     private String groupUUID;
     @Field(name = "character_uuid")
@@ -34,11 +37,15 @@ public class CharacterEntity {
     private String description;
     @Field(name = "information")
     private List<Map<String, String>> information;
-    @Field(name = "relationship")
-    private List<Map<String, String>> relationship;
+    @DBRef
+    private RelationEntity relationship;
     @Field(name = "is_deleted")
     private boolean isDeleted;
     @Field(name = "character_image")
     private String characterImage;
-//    List<ArrayList<Map<String, String>>>
+
+    public void deleteCharacter() {
+        this.isDeleted = true;
+    }
+
 }
