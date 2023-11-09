@@ -7,5 +7,5 @@ public interface NotificationService {
 
     //void alertComment(NotificationRequestDto notificationRequestDto);
 
-    void alertComment(String commentNickname, String directoryUUID);
+    void alertComment(String commentNickname, String directoryUUID, String publisherUUID);
 }
