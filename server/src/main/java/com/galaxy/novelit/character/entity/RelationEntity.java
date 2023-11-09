@@ -20,15 +20,16 @@ public class RelationEntity {
     private String id;
     @Field(name = "character_uuid")
     private String characterUUID;
-//    @Field(name = "character_name")
-//    private String characterName;
+    @Field(name = "character_name")
+    private String characterName;
     private List<Relation> relations;
 
     @Getter
     @Setter
     public static class Relation {
         private String targetUUID;
-//        private String targetName;
+        private String targetName;
         private String content;
     }
+
 }
