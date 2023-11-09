@@ -108,6 +108,7 @@ public class CharacterServiceImpl implements CharacterService {
 
         RelationEntity newRelation = RelationEntity.builder()
             .characterUUID(characterUUID)
+            .characterName(dto.getCharacterName())
             .relations(dto.getRelations())
             .build();
 
@@ -136,19 +137,13 @@ public class CharacterServiceImpl implements CharacterService {
         RelationEntity newRelation;
         CharacterEntity newCharacter;
 
-        // 캐릭터 이름에 수정사항이 있을 시
-        if (!character.getCharacterName().equals(dto.getCharacterName())) {
-            newRelation = RelationEntity.builder()
-                .id(relation.getId())
-                .relations(dto.getRelationship().getRelations())
-                .build();
-        }
-        else {
-            newRelation = RelationEntity.builder()
-                .id(relation.getId())
-                .relations(dto.getRelationship().getRelations())
-                .build();
-        }
+        newRelation = RelationEntity.builder()
+            .id(relation.getId())
+            .characterUUID(characterUUID)
+            .characterName(dto.getCharacterName())
+            .relations(dto.getRelations())
+            .build();
+
         relationRepository.save(newRelation);
 
         newCharacter = CharacterEntity.builder()
@@ -159,7 +154,7 @@ public class CharacterServiceImpl implements CharacterService {
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
-            .relationship(dto.getRelationship())
+            .relationship(newRelation)
             .characterImage(dto.getCharacterImage())
             .isDeleted(character.isDeleted())
             .build();
@@ -173,6 +168,7 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         character.deleteCharacter();
         characterRepository.save(character);
+        relationRepository.deleteByCharacterUUID(characterUUID);
     }
 
     @Transactional
@@ -207,9 +203,8 @@ public class CharacterServiceImpl implements CharacterService {
 
             // 캐릭터(주체,기준) 정보 조회
             String characterUUID = relation.getCharacterUUID();
-            CharacterEntity characterEntity = characterRepository.findByCharacterUUID(characterUUID);
-            String characterName = characterEntity.getCharacterName();
-            String groupUUID = characterEntity.getGroupUUID();
+            String characterName = relation.getCharacterName();
+            String groupUUID = characterRepository.findByCharacterUUID(characterUUID).getGroupUUID();
             String groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
 
 
@@ -218,9 +213,8 @@ public class CharacterServiceImpl implements CharacterService {
 
             for (Relation target : relation.getRelations()) {
                 String targetUUID = target.getTargetUUID();
-                CharacterEntity targetEntity = characterRepository.findByCharacterUUID(targetUUID);
-                String targetName = targetEntity.getCharacterName();
-                String targetGroupUUID = targetEntity.getGroupUUID();
+                String targetName = target.getTargetName();
+                String targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
                 String targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
                 String content = target.getContent();
 
