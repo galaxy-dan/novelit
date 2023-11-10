@@ -29,7 +29,7 @@ export default function page({ params }: Props) {
     queryFn: () => getSubGroupAndCharacter(params.group),
     onSuccess: (data) => setGroupNameInput(data.name),
     onError: () => {
-      router.push(`/plot/${params.slug}`);
+      router.push(`/character/${params.slug}`);
     },
   });
 
