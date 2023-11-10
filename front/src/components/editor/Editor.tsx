@@ -20,6 +20,8 @@ import {
 } from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
+import { MdEdit, MdEditOff } from 'react-icons/md';
+import { GiToken } from 'react-icons/gi';
 import { useParams } from 'next/navigation';
 import {
   UseQueryResult,
@@ -37,6 +39,7 @@ import { toast } from 'react-toastify';
 import Comment from './Comment';
 import { get } from '@/service/api/http';
 import UploadState from '../state/UploadState';
+import { getShareToken } from '@/service/api/share';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -80,6 +83,7 @@ export default function Editor() {
     const editRef = edit?.current;
     if (editRef) {
       editRef.onclick = (e: any) => {
+        // 댓글
         const id = e.target.id;
         if (!id || id === 'edit') {
           setSpaceUUID('');
@@ -150,6 +154,10 @@ export default function Editor() {
   };
 
   const addReply = () => {
+    if (editor?.editable) {
+      toast('글 작성중이어서 댓글을 작성할 수 없습니다.');
+      return;
+    }
     const selection = window.getSelection();
     console.log(selection?.rangeCount);
     console.log(selection?.isCollapsed);
@@ -206,25 +214,48 @@ export default function Editor() {
 
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'output.doc';
+    a.download = `${editor?.title}.txt`;
 
     a.click();
   };
 
-  const getShareToken = () => {
-    get('/share/token', { directoryUUID: searchParams.slug?.[1] }).then(
-      (data: any) => {
-        // console.log(data);
-        toast(data.token);
-        // localStorage.setItem('accessToken', data.token);
-      },
-    );
+  const getMutation = useMutation({
+    mutationFn: getShareToken,
+    onSuccess: (data: any) => {
+      navigator.clipboard
+        .writeText(data.token)
+        .then(() => toast('토큰이 복사되었습니다.'));
+
+      editableMutate.mutate({
+        directoryUUID: searchParams.slug?.[1],
+        editable: false,
+      });
+      // toast(data.token, {
+      //   autoClose: false,
+      //   onClose: () =>
+
+      // });
+
+      // localStorage.setItem('accessToken', data.token);
+    },
+  });
+
+  const getToken = () => {
+    // get('/share/token', { directoryUUID: searchParams.slug?.[1] }).then(
+    //   (data: any) => {
+    //     // console.log(data);
+    //     toast(data.token);
+    //     localStorage.setItem('accessToken', data.token);
+    //   },
+    // );
+    getMutation.mutate({ directoryUUID: searchParams.slug?.[1] });
   };
 
   const editableMutate = useMutation({
     mutationFn: patchEditable,
     onSuccess: () => {
       toast('토글 성공');
+      setIsOpen(false);
       queryClient.invalidateQueries(['editor', searchParams.slug?.[1]]);
     },
   });
@@ -283,7 +314,7 @@ export default function Editor() {
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={toggleEditable}
           >
-            <BiSolidPencil size={20} />
+            {editor?.editable ? <MdEdit size={20} /> : <MdEditOff size={20} />}
           </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
@@ -315,12 +346,12 @@ export default function Editor() {
           >
             <BiCommentDetail size={20} />
           </button>
-          <button
+          {/* <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={addReply2}
           >
             <BiSolidTrashAlt size={20} />
-          </button>
+          </button> */}
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={shareDoc}
@@ -329,9 +360,9 @@ export default function Editor() {
           </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={getShareToken}
+            onClick={getToken}
           >
-            <FaShareSquare size={20} />
+            <GiToken size={20} />
           </button>
           {isOpen && !editor?.editable && (
             <Comment
