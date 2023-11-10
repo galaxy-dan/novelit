@@ -1,7 +1,12 @@
+'use client';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useMutation } from '@tanstack/react-query';
+import { getShareTokenValidation } from '@/service/api/share';
+import { useRouter } from 'next/navigation';
+import { getJwtPayload } from '@/service/editor/editor';
+import { toast } from 'react-toastify';
 
 const schema = yup
   .object({
@@ -22,6 +27,8 @@ type Inputs = {
 // };
 
 export default function ShareInput() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -34,20 +41,30 @@ export default function ShareInput() {
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
+    localStorage.clear();
+    localStorage.setItem('name', data.name);
+    getMutation.mutate({ token: data.token });
   };
 
-
   const getMutation = useMutation({
-    mutationFn: 
-  })
+    mutationFn: getShareTokenValidation,
+    onSuccess: (data: any, req) => {
+      if (data.valid) {
+        const payload = getJwtPayload(req.token);
+        localStorage.setItem('accessToken', req.token);
+        router.replace(`/share/${payload.id}`);
+      } else {
+        toast.error('토큰이 잘못되었습니다');
+      }
+    },
+  });
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm flex flex-col w-64 items-center"
     >
-        <h1>편집자 로그인</h1>
+      <h1>편집자 로그인</h1>
       <input
         type="text"
         {...register('name')}
