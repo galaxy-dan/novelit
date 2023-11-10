@@ -51,13 +51,13 @@ public class GroupController {
     }
 
     @GetMapping("/top")
-    public ResponseEntity<Object> topGroupInfo(Authentication authentication) {
+    public ResponseEntity<Object> getTopGroupAndCharacter(@RequestParam String workspaceUUID, Authentication authentication) {
         try {
 //            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(authentication.getName());
 //            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
 
-            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(tempUser);
-            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(tempUser);
+            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(workspaceUUID, tempUser);
+            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(workspaceUUID, tempUser);
 
             Map<String, Object> response = new HashMap<>();
             response.put("groups", groupDto);

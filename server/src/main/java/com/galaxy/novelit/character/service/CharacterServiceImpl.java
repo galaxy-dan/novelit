@@ -83,8 +83,10 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterSimpleDtoRes> getTopCharacter(String userUUID) {
-        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(null);
+    public List<CharacterSimpleDtoRes> getTopCharacter(String workspaceUUID, String userUUID) {
+        List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
+
+//        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(null);
 //            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
         List<CharacterSimpleDtoRes> dto = new ArrayList<>();
 
@@ -106,6 +108,12 @@ public class CharacterServiceImpl implements CharacterService {
     public void createCharacter(CharacterCreateDtoReq dto, String userUUID) {
         String characterUUID = UUID.randomUUID().toString();
 
+        String groupUUID = dto.getGroupUUID();
+        if (groupRepository.findByGroupUUID(groupUUID) == null) {
+            groupUUID = null;
+        }
+
+
         RelationEntity newRelation = RelationEntity.builder()
             .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
@@ -117,7 +125,7 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity newCharacter = CharacterEntity.builder()
             .userUUID(userUUID)
             .workspaceUUID(dto.getWorkspaceUUID())
-            .groupUUID(dto.getGroupUUID())
+            .groupUUID(groupUUID)
             .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
