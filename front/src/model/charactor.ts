@@ -12,26 +12,27 @@ export type subGroupType = {
 };
 
 export type characterType = {
-  characterUUID?: string|null;
-  groupUUID?: string|null;
-  characterName?: string|null;
-  description?: string|null;
-  characterImage?: string|null;
-  information?: informationType[]|null;
-  relationship?: relationshipType[]|null;
-  deleted?: boolean|null;
+  characterUUID?: string | null;
+  groupUUID?: string | null;
+  characterName?: string | null;
+  description?: string | null;
+  characterImage?: string | null;
+  information?: informationType[] | null;
+  relations: relationshipType[];
+  deleted?: boolean | null;
 };
+
 export type informationType = {
   [key: string]: string;
 };
 export type relationshipType = {
-  uuid?: string|null;
-  name: string;
-  description: string;
+  targetUUID?: string | null;
+  targetName: string;
+  content: string;
 };
 
 export type groupItemType = {
   name: string;
-  childGroup : subGroupType[];
+  childGroup: subGroupType[];
   childCharacter: characterType[];
-}
+};

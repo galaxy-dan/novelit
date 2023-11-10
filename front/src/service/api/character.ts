@@ -1,18 +1,24 @@
 import { characterType } from "@/model/charactor";
-import { del, get, post, put } from "./http";
+import { del, get, patch, post, put } from "./http";
+
+
 
 export const getCharacter = async (uuid : string) => {
     const data = await get(`/character?characterUUID=${uuid}`);
     return data;
 };
   
-export const postCharacter = async (body : characterType) => {
-    const data = await post(`/character`, body);
+export const postCharacter = async (workspace : string, group : string) => {
+    const data = await post(`/character`, {
+        workspaceUUID : workspace,
+        groupUUID : group,
+        characterName : "새 캐릭터",
+    });
     return data;
 };
   
-export const putCharacter = async (params:string, body: characterType) => {
-    const data = await put(`/character?characterUUID=${params}`, body);
+export const patchCharacter = async (params:string, body: characterType) => {
+    const data = await patch(`/character?characterUUID=${params}`, body);
     return data;
 };
 
