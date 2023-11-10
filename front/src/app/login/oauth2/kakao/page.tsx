@@ -9,6 +9,7 @@ export default function KaKaoPage() {
 
   useEffect(() => {
     const code = searchParams.get('code');
+    localStorage.clear();
     get('/login/oauth2/kakao', { code }).then((data: any) => {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);

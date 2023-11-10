@@ -9,6 +9,8 @@ import { Hi_Melody } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Favicon from '../../public/vercel.svg';
+import SSE from '@/components/SSE';
+import NotificationButton from '@/components/NotificationButton';
 import Side from '@/components/Side';
 
 // const nanumFont = Nanum_Myeongjo({
@@ -35,10 +37,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={nanumFont.className}>
-      <body className="w-full flex">
+      <body className="w-full flex flex-col">
         <QueryProvider>
           <RecoilProvider>
+            <SSE />
             <ToastContainer pauseOnFocusLoss={false} />
+            <NotificationButton />
             <Side />
             <main className="flex-grow">{children}</main>
           </RecoilProvider>

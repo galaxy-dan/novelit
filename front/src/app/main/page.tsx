@@ -18,7 +18,7 @@ import {
   getUser,
   postWorkspace,
 } from '@/service/api/workspace';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NewWorkspaceModal from '@/components/workspace/NewWorkspaceModal';
 import { MdEdit } from 'react-icons/md';
 import { RxCross2 } from 'react-icons/rx';
@@ -50,6 +50,12 @@ export default function MainPage() {
     queryFn: getUser,
     // enabled: !!user?.userId,
   });
+
+  useEffect(() => {
+    if (user?.nickname) {
+      localStorage.setItem('name', user.nickname);
+    }
+  }, [user?.nickname]);
 
   const delMutate = useMutation({
     mutationFn: deleteWorkspace,
@@ -88,53 +94,53 @@ export default function MainPage() {
           </div>
         </div>
         {/* <div className="flex justify-center flex-grow"> */}
-          <div className="flex flex-grow flex-col text-2xl font-extrabold gap-14 mt-10">
-            <div className="flex justify-between items-center pr-2">
-              <div className="flex flex-col gap-2">
-                <div className="font-normal">{`${user?.nickname}님 안녕하세요.`}</div>
-                <div>노벨릿에 오신 것을 환영합니다.</div>
-              </div>
-              <CreateButton onClick={buttonClick} content="새 작품" />
+        <div className="flex flex-grow flex-col text-2xl font-extrabold gap-14 mt-10">
+          <div className="flex justify-between items-center pr-2">
+            <div className="flex flex-col gap-2">
+              <div className="font-normal">{`${user?.nickname}님 안녕하세요.`}</div>
+              <div>노벨릿에 오신 것을 환영합니다.</div>
             </div>
-            <div>
-              <div className="text-base mb-2">내 작품</div>
-              <div className="border-2 border-dotted flex flex-wrap gap-10 p-5 justify-center mr-10">
-                {user?.workspaces?.map((el, index) => (
-                  <Link
-                    href={`/novel/${el.workspaceUUID}`}
-                    key={el.workspaceUUID}
-                    className="flex flex-col relative justify-center items-center gap-2 cursor-pointer hover:bg-gray-200 hover:bg-opacity-30 hover:rounded-md text-white hover:text-black"
-                  >
-                    <Image alt="novel" src={Novel} />
-                    <div className="text-base text-black">{el.title}</div>
-                    <div className="absolute top-0 right-0 flex items-center text-base m-1">
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          form.setValue('workspaceUUID', el.workspaceUUID);
-                          form.setValue('title', el.title);
-                          setIsOpen((prev) => !prev);
-                        }}
-                        title="Rename..."
-                      >
-                        <MdEdit />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          delMutate.mutate(el.workspaceUUID);
-                        }}
-                        title="Delete"
-                      >
-                        <RxCross2 />
-                      </button>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+            <CreateButton onClick={buttonClick} content="새 작품" />
+          </div>
+          <div>
+            <div className="text-base mb-2">내 작품</div>
+            <div className="border-2 border-dotted flex flex-wrap gap-10 p-5 justify-center mr-10">
+              {user?.workspaces?.map((el, index) => (
+                <Link
+                  href={`/novel/${el.workspaceUUID}`}
+                  key={el.workspaceUUID}
+                  className="flex flex-col relative justify-center items-center gap-2 cursor-pointer hover:bg-gray-200 hover:bg-opacity-30 hover:rounded-md text-white hover:text-black"
+                >
+                  <Image alt="novel" src={Novel} />
+                  <div className="text-base text-black">{el.title}</div>
+                  <div className="absolute top-0 right-0 flex items-center text-base m-1">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        form.setValue('workspaceUUID', el.workspaceUUID);
+                        form.setValue('title', el.title);
+                        setIsOpen((prev) => !prev);
+                      }}
+                      title="Rename..."
+                    >
+                      <MdEdit />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        delMutate.mutate(el.workspaceUUID);
+                      }}
+                      title="Delete"
+                    >
+                      <RxCross2 />
+                    </button>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
+      </div>
       {/* </div> */}
       {isOpen && <NewWorkspaceModal setIsOpen={setIsOpen} form={form} />}
     </>
