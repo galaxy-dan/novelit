@@ -77,16 +77,16 @@ public class CharacterServiceImpl implements CharacterService {
                 .characterImage(character.getCharacterImage())
                 .characterName(character.getCharacterName());
 
-            if(infos != null) {
-                if(infos.size() == 0) {
-                    characterSimpleDtoRes.information(new ArrayList<>());
-                }
-                else if(infos.size() < 3){
-                    characterSimpleDtoRes.information(infos.subList(0, infos.size() - 1));
-                } else {
-                    characterSimpleDtoRes.information(infos.subList(0, 2));
-                }
+//            if(infos != null) {
+            if(infos.size() == 0) {
+                characterSimpleDtoRes.information(new ArrayList<>());
             }
+            else if(infos.size() < 3){
+                characterSimpleDtoRes.information(infos.subList(0, infos.size() - 1));
+            } else {
+                characterSimpleDtoRes.information(infos.subList(0, 2));
+            }
+//            }
             characterSimpleInfoList.add(characterSimpleDtoRes.build());
         }
 
@@ -197,6 +197,7 @@ public class CharacterServiceImpl implements CharacterService {
     public List<CharacterSearchInfoResDTO> searchCharacter(String workspaceUUID, String characterName) {
         List<CharacterEntity> characters = characterRepository
                 .findAllByWorkspaceUUIDAndCharacterNameLike(workspaceUUID, characterName);
+        System.out.println(characters.size());
         List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
@@ -205,29 +206,28 @@ public class CharacterServiceImpl implements CharacterService {
             CharacterSearchInfoResDTOBuilder characterSearchInfoResDTO = CharacterSearchInfoResDTO.builder()
                 .characterUUID(character.getCharacterUUID())
                 .characterImage(character.getCharacterImage())
-                .groupUUID(character.getGroupUUID())
                 .characterName(character.getCharacterName());
 
 
 
             if(character.getGroupUUID() != null) {
                 String groupName = groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName();
-                characterSearchInfoResDTO.groupName(groupName);
+                characterSearchInfoResDTO.groupName(groupName).groupUUID(character.getGroupUUID());;
             } else {
-                characterSearchInfoResDTO.groupName("");
+                characterSearchInfoResDTO.groupName("").groupUUID("");
             }
 
             List<Map<String, String>> infos = character.getInformation();
-            if(infos != null) {
-                if(infos.size() == 0) {
-                    characterSearchInfoResDTO.information(new ArrayList<>());
-                }
-                else if(infos.size() < 3){
-                    characterSearchInfoResDTO.information(infos.subList(0, infos.size() - 1));
-                } else {
-                    characterSearchInfoResDTO.information(infos.subList(0, 2));
-                }
+//            if(infos != null) {
+            if(infos.size() == 0) {
+                characterSearchInfoResDTO.information(new ArrayList<Map<String, String>>());
             }
+            else if(infos.size() < 3){
+                characterSearchInfoResDTO.information(infos.subList(0, infos.size() - 1));
+            } else {
+                characterSearchInfoResDTO.information(infos.subList(0, 2));
+            }
+//            }
 
             characterInfoList.add(characterSearchInfoResDTO.build());
         }
