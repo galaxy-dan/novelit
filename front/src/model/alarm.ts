@@ -4,13 +4,11 @@ export type Alarm = {
   senderName: string;
   context: string;
   createdAt: Date;
-
   nickname: string;
   produceName: string;
 };
 
 export type Message = {
-  message: string;
-  link: string;
-  time: string;
+  pubName: string;
+  directoryName: string;
 };
