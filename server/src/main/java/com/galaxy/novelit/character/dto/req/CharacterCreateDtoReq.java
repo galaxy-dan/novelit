@@ -17,7 +17,6 @@ public class CharacterCreateDtoReq {
     private String characterName;
     private String description;
     private List<Map<String, String>> information;
-//    private RelationEntity relationship;
     private List<Relation> relations;    // targetUUID,targetName,content
     private String characterImage;
 }
