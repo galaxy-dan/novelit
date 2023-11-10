@@ -37,7 +37,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={nanumFont.className}>
-      <body className="w-full flex flex-col">
+      <body className="w-full flex">
         <QueryProvider>
           <RecoilProvider>
             <SSE />
