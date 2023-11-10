@@ -18,6 +18,8 @@ const config: Config = {
         noto: ['"Noto Sans Korean"'],
         nanumPen: ['"Nanum Pen Script"'],
         melody: ['"Hi Melody"'],
+        jalnan: ['Jalnan'],
+        jalnanGothic: ['JalnanGothic'],
       },
     },
     screens: {
@@ -61,6 +63,8 @@ const config: Config = {
         'font-noto',
         'font-nanumPen',
         'font-melody',
+        'font-jalnan',
+        'font-jalnanGothic',
       ],
     },
   },
