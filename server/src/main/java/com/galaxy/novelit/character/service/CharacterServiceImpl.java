@@ -78,7 +78,10 @@ public class CharacterServiceImpl implements CharacterService {
                 .characterName(character.getCharacterName());
 
             if(infos != null) {
-                if(infos.size() < 3){
+                if(infos.size() == 0) {
+                    characterSimpleDtoRes.information(new ArrayList<>());
+                }
+                else if(infos.size() < 3){
                     characterSimpleDtoRes.information(infos.subList(0, infos.size() - 1));
                 } else {
                     characterSimpleDtoRes.information(infos.subList(0, 2));
@@ -197,7 +200,7 @@ public class CharacterServiceImpl implements CharacterService {
         List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
-            List<Map<String, String>> infos = character.getInformation();
+
 
             CharacterSearchInfoResDTOBuilder characterSearchInfoResDTO = CharacterSearchInfoResDTO.builder()
                 .characterUUID(character.getCharacterUUID())
@@ -205,15 +208,21 @@ public class CharacterServiceImpl implements CharacterService {
                 .groupUUID(character.getGroupUUID())
                 .characterName(character.getCharacterName());
 
-            String groupName = groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName();
-            if(groupRepository.findByGroupUUID(character.getGroupUUID()) != null) {
+
+
+            if(character.getGroupUUID() != null) {
+                String groupName = groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName();
                 characterSearchInfoResDTO.groupName(groupName);
             } else {
                 characterSearchInfoResDTO.groupName("");
             }
 
+            List<Map<String, String>> infos = character.getInformation();
             if(infos != null) {
-                if(infos.size() < 3){
+                if(infos.size() == 0) {
+                    characterSearchInfoResDTO.information(new ArrayList<>());
+                }
+                else if(infos.size() < 3){
                     characterSearchInfoResDTO.information(infos.subList(0, infos.size() - 1));
                 } else {
                     characterSearchInfoResDTO.information(infos.subList(0, 2));
