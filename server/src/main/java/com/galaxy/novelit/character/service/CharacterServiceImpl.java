@@ -10,6 +10,7 @@ import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes.CharacterSimpl
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes.RelationDto;
 import com.galaxy.novelit.character.entity.CharacterEntity;
+import com.galaxy.novelit.character.entity.CharacterEntity.CharacterEntityBuilder;
 import com.galaxy.novelit.character.entity.RelationEntity;
 import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import com.galaxy.novelit.character.repository.CharacterRepository;
@@ -135,19 +136,24 @@ public class CharacterServiceImpl implements CharacterService {
 
         relationRepository.save(newRelation);
 
-        CharacterEntity newCharacter = CharacterEntity.builder()
+        CharacterEntityBuilder newCharacter = CharacterEntity.builder()
             .userUUID(userUUID)
             .workspaceUUID(dto.getWorkspaceUUID())
             .groupUUID(groupUUID)
             .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
-            .information(dto.getInformation())
-            .relationship(newRelation)
-            .characterImage(dto.getCharacterImage())
-            .build();
 
-        characterRepository.save(newCharacter);
+            .relationship(newRelation)
+            .characterImage(dto.getCharacterImage());
+
+        if(dto.getInformation() != null) {
+            newCharacter.information(dto.getInformation());
+        } else {
+            newCharacter.information(new ArrayList<>());
+        }
+
+        characterRepository.save(newCharacter.build());
     }
 
     @Transactional
@@ -156,7 +162,7 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         RelationEntity relation = relationRepository.findByCharacterUUID(characterUUID);
         RelationEntity newRelation;
-        CharacterEntity newCharacter;
+        CharacterEntityBuilder newCharacter;
 
         newRelation = RelationEntity.builder()
             .id(relation.getId())
@@ -177,10 +183,15 @@ public class CharacterServiceImpl implements CharacterService {
             .information(dto.getInformation())
             .relationship(newRelation)
             .characterImage(dto.getCharacterImage())
-            .isDeleted(character.isDeleted())
-            .build();
+            .isDeleted(character.isDeleted());
 
-        characterRepository.save(newCharacter);
+        if(dto.getInformation() != null) {
+            newCharacter.information(dto.getInformation());
+        } else {
+            newCharacter.information(new ArrayList<>());
+        }
+
+        characterRepository.save(newCharacter.build());
     }
 
     @Transactional
