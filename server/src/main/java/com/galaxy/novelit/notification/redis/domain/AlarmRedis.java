@@ -30,7 +30,7 @@ public class AlarmRedis {
             .noti(Noti.create(alarmRedisRequestDto.getPubName()
                 , alarmRedisRequestDto.getSubUUID()
                 , alarmRedisRequestDto.getDirectoryName()))
-            .expiration(1L * 10)
+            .expiration(1L * 60 * 60 * 24) // 유효기간 하루
             .build();
     }
 }
