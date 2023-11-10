@@ -4,7 +4,9 @@ import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
+import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO.CharacterSearchInfoResDTOBuilder;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
+import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes.CharacterSimpleDtoResBuilder;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes.RelationDto;
 import com.galaxy.novelit.character.entity.CharacterEntity;
@@ -69,13 +71,20 @@ public class CharacterServiceImpl implements CharacterService {
         List<CharacterSimpleDtoRes> characterSimpleInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
-            CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
+            List<Map<String, String>> infos = character.getInformation();
+            CharacterSimpleDtoResBuilder characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
                 .characterUUID(character.getCharacterUUID())
                 .characterImage(character.getCharacterImage())
-                .characterName(character.getCharacterName())
-                .information(new ArrayList<>(character.getInformation().subList(0, 2)))
-                .build();
-            characterSimpleInfoList.add(characterSimpleDtoRes);
+                .characterName(character.getCharacterName());
+
+            if(infos != null) {
+                if(infos.size() < 3){
+                    characterSimpleDtoRes.information(infos.subList(0, infos.size() - 1));
+                } else {
+                    characterSimpleDtoRes.information(infos.subList(0, 2));
+                }
+            }
+            characterSimpleInfoList.add(characterSimpleDtoRes.build());
         }
 
         return characterSimpleInfoList;
@@ -187,15 +196,30 @@ public class CharacterServiceImpl implements CharacterService {
         List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
-            CharacterSearchInfoResDTO characterSearchInfoResDTO = CharacterSearchInfoResDTO.builder()
+            List<Map<String, String>> infos = character.getInformation();
+
+            CharacterSearchInfoResDTOBuilder characterSearchInfoResDTO = CharacterSearchInfoResDTO.builder()
                 .characterUUID(character.getCharacterUUID())
                 .characterImage(character.getCharacterImage())
                 .groupUUID(character.getGroupUUID())
-                .groupName(groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName())
-                .characterName(character.getCharacterName())
-                .information(new ArrayList<>(character.getInformation().subList(0, 2)))
-                .build();
-            characterInfoList.add(characterSearchInfoResDTO);
+                .characterName(character.getCharacterName());
+
+            String groupName = groupRepository.findByGroupUUID(character.getGroupUUID()).getGroupName();
+            if(groupRepository.findByGroupUUID(character.getGroupUUID()) != null) {
+                characterSearchInfoResDTO.groupName(groupName);
+            } else {
+                characterSearchInfoResDTO.groupName("");
+            }
+
+            if(infos != null) {
+                if(infos.size() < 3){
+                    characterSearchInfoResDTO.information(infos.subList(0, infos.size() - 1));
+                } else {
+                    characterSearchInfoResDTO.information(infos.subList(0, 2));
+                }
+            }
+
+            characterInfoList.add(characterSearchInfoResDTO.build());
         }
         return characterInfoList;
     }
