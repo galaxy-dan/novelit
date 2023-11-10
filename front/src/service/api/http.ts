@@ -37,7 +37,20 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error?.response?.status === 401) {
+    if (
+      error?.response?.status === 401 &&
+      error?.response?.data?.message === '액세스 토큰 만료'
+    ) {
+      localStorage.setItem(
+        'accessToken',
+        localStorage.getItem('refreshToken') ?? '',
+      );
+      get('/login/reissue')
+        .then((data: any) => {
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
+        })
+        .catch(() => {});
     }
 
     return Promise.reject(error);

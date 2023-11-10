@@ -1,6 +1,7 @@
 export type Editor = {
   title: string;
   content: string;
+  editable: boolean;
 };
 
 export type PatchEditor = {
@@ -16,8 +17,13 @@ export type Reply = {
 export type Comment = {
   spaceUUID: string;
   commentUUID?: string;
-  directoryUUID?: string;
+  directoryUUID?: string | string[];
   commentContent?: string;
   commentNickname: string;
-  commentPassword: string;
+  // commentPassword: string;
+};
+
+export type Editable = {
+  directoryUUID: string;
+  editable: boolean;
 };

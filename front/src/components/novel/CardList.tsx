@@ -33,7 +33,10 @@ export default function CardList() {
 
   return (
     <>
-      <CardListHeader title={workspace?.title ?? ''} parentUUID={directory[directory.length - 1]} />
+      <CardListHeader
+        title={workspace?.title ?? ''}
+        parentUUID={directory[directory.length - 1]}
+      />
       {directory.length > 1 && (
         <button
           className="border-2 px-2 py-1 rounded-lg my-4"
@@ -55,6 +58,7 @@ export default function CardList() {
             <div
               className="cursor-pointer"
               onClick={() => setDirectory((prev) => [...prev, el.uuid])}
+              key={el.uuid}
             >
               <Card subject={`${el.name}`} isDirectory={true} />
             </div>
