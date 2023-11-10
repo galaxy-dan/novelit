@@ -1,4 +1,4 @@
-import { Comment, PatchEditor } from '@/model/editor';
+import { Comment, Editable, PatchEditor } from '@/model/editor';
 import { del, delData, get, patch, post } from './http';
 
 export const getEditor = async (req: { uuid: string | string[] }) => {
@@ -23,5 +23,10 @@ export const getComment = async (req: { spaceUUID: string }) => {
 
 export const deleteComment = async (req: Comment) => {
   const data = await delData('/comment', req);
+  return data;
+};
+
+export const patchEditable = async (req: Editable) => {
+  const data = await patch('/share/toggle', req);
   return data;
 };

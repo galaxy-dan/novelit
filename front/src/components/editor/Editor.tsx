@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent } from 'react';
+import { MouseEvent, RefObject } from 'react';
 
 import { Editor, Reply } from '@/model/editor';
 import { fontFamily, fontSize } from '@/service/editor/editor';
@@ -10,9 +10,18 @@ import { v4 as uuidv4 } from 'uuid';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import sanitizeHtml, { IOptions } from 'sanitize-html';
 
-import { BiSolidPencil, BiBold, BiSolidTrashAlt } from 'react-icons/bi';
+import {
+  BiSolidPencil,
+  BiBold,
+  BiSolidTrashAlt,
+  BiCommentDetail,
+  BiFontSize,
+  BiFontFamily,
+} from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
+import { MdEdit, MdEditOff } from 'react-icons/md';
+import { GiToken } from 'react-icons/gi';
 import { useParams } from 'next/navigation';
 import {
   UseQueryResult,
@@ -20,9 +29,17 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { getComment, getEditor, patchEditor } from '@/service/api/editor';
+import {
+  getComment,
+  getEditor,
+  patchEditable,
+  patchEditor,
+} from '@/service/api/editor';
 import { toast } from 'react-toastify';
 import Comment from './Comment';
+import { get } from '@/service/api/http';
+import UploadState from '../state/UploadState';
+import { getShareToken } from '@/service/api/share';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -39,16 +56,34 @@ export default function Editor() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const comment = useRef<Reply[]>([]);
 
+  const [uploadIndex, setUploadIndex] = useState<number>(0);
+
+  const edit = useRef<HTMLDivElement>(null);
+
   const { data: editor }: UseQueryResult<Editor> = useQuery({
     queryKey: ['editor', searchParams.slug?.[1]],
     queryFn: () => getEditor({ uuid: searchParams.slug?.[1] }),
     enabled: !!searchParams.slug?.[1],
   });
 
+  // 자동 저장
   useEffect(() => {
-    const edit = document.getElementById('edit');
-    if (edit) {
-      edit.onclick = (e: any) => {
+    if (editor?.content === html) return;
+    const time = setTimeout(() => {
+      patchMutate.mutate({
+        uuid: searchParams.slug?.[1],
+        content: html ?? '<div><br/></div>',
+      });
+    }, 2000);
+
+    return () => clearTimeout(time);
+  }, [html]);
+
+  useEffect(() => {
+    const editRef = edit?.current;
+    if (editRef) {
+      editRef.onclick = (e: any) => {
+        // 댓글
         const id = e.target.id;
         if (!id || id === 'edit') {
           setSpaceUUID('');
@@ -62,7 +97,7 @@ export default function Editor() {
         }
       };
 
-      edit.onpaste = (e) => {
+      editRef.onpaste = (e) => {
         const paste = e.clipboardData?.getData('text');
 
         if (!paste) return;
@@ -77,7 +112,7 @@ export default function Editor() {
       };
     }
 
-    // document.getElementById('edit')?.addEventListener('click', () => {
+    // edit?.current?.addEventListener('click', () => {
     //   toast('버블');
     // });
   }, []);
@@ -92,15 +127,20 @@ export default function Editor() {
 
   const patchMutate = useMutation({
     mutationFn: patchEditor,
+    onMutate: () => {
+      setUploadIndex(2);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['editor']);
+      setUploadIndex(3);
       toast('저장 성공');
     },
   });
 
   const handleChange = (e: ContentEditableEvent) => {
+    setUploadIndex(1);
     setHtml(e.target.value);
-    setLength(document?.getElementById('edit')?.innerText.length ?? 0);
+    setLength(edit?.current?.innerText.length ?? 0);
   };
 
   const sanitizeConf: IOptions = {
@@ -113,11 +153,11 @@ export default function Editor() {
     setHtml((prev) => sanitizeHtml(prev, sanitizeConf));
   };
 
-  const toggleEditable = () => {
-    setEditable((prev) => !prev);
-  };
-
   const addReply = () => {
+    if (editor?.editable) {
+      toast('글 작성중이어서 댓글을 작성할 수 없습니다.');
+      return;
+    }
     const selection = window.getSelection();
     console.log(selection?.rangeCount);
     console.log(selection?.isCollapsed);
@@ -142,7 +182,7 @@ export default function Editor() {
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
 
-    setHtml(document.getElementById('edit')?.innerHTML ?? html);
+    setHtml(edit?.current?.innerHTML ?? html);
     setSpaceUUID(wrapper.id);
     setIsOpen(true);
   };
@@ -167,45 +207,94 @@ export default function Editor() {
   };
 
   const shareDoc = () => {
-    const divContent = document.getElementById('edit')?.innerText;
+    const divContent = edit?.current?.innerText;
     if (!divContent) return;
 
     var blob = new Blob([divContent], { type: 'text/plain;charset=utf-8' });
 
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'output.doc';
+    a.download = `${editor?.title}.txt`;
 
     a.click();
   };
 
+  const getMutation = useMutation({
+    mutationFn: getShareToken,
+    onSuccess: (data: any) => {
+      navigator.clipboard
+        .writeText(data.token)
+        .then(() => toast('토큰이 복사되었습니다.'));
+
+      editableMutate.mutate({
+        directoryUUID: searchParams.slug?.[1],
+        editable: false,
+      });
+      // toast(data.token, {
+      //   autoClose: false,
+      //   onClose: () =>
+
+      // });
+
+      // localStorage.setItem('accessToken', data.token);
+    },
+  });
+
+  const getToken = () => {
+    // get('/share/token', { directoryUUID: searchParams.slug?.[1] }).then(
+    //   (data: any) => {
+    //     // console.log(data);
+    //     toast(data.token);
+    //     localStorage.setItem('accessToken', data.token);
+    //   },
+    // );
+    getMutation.mutate({ directoryUUID: searchParams.slug?.[1] });
+  };
+
+  const editableMutate = useMutation({
+    mutationFn: patchEditable,
+    onSuccess: () => {
+      toast('토글 성공');
+      setIsOpen(false);
+      queryClient.invalidateQueries(['editor', searchParams.slug?.[1]]);
+    },
+  });
+
+  const toggleEditable = () => {
+    editableMutate.mutate({
+      directoryUUID: searchParams.slug?.[1],
+      editable: !editor?.editable,
+    });
+  };
 
   return (
     <>
       <div
         className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
       >
-        <div className="w-[924px]">{editor?.title}</div>
-        <button
+        <div className="flex justify-between w-[1160px]">
+          <div>{editor?.title}</div>
+          <UploadState state={uploadIndex} />
+        </div>
+        {/* <button
           onClick={() => {
             patchMutate.mutate({
               uuid: searchParams.slug?.[1],
-              content:
-                document.getElementById('edit')?.innerHTML ??
-                '<div><br/></div>',
+              content: edit?.current?.innerHTML ?? '<div><br/></div>',
             });
           }}
         >
           임시저장
-        </button>
+        </button> */}
       </div>
-      <div className="flex gap-6 justify-center items-center">
-        <div className="flex flex-col justify-center items-center">
+      <div className="flex gap-6 justify-center items-start">
+        <div className=" flex flex-col justify-center items-center">
           <ContentEditable
+            innerRef={edit}
             id="edit"
-            className={`ml-2 w-[700px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
+            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
             html={html}
-            disabled={!editable}
+            disabled={!editor?.editable ?? false}
             onChange={handleChange}
             // onBlur={sanitize}
           />
@@ -220,14 +309,20 @@ export default function Editor() {
 
         <div className="flex flex-col w-[200px] justify-start items-center gap-6">
           {/* <div>{document && document?.getElementById('edit')?.innerText.length && 0}</div> */}
-          <div className='text-2xl'>{length}</div>
+          <div className="text-2xl">{length && `${length}자`}</div>
+          <button
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
+            onClick={toggleEditable}
+          >
+            {editor?.editable ? <MdEdit size={20} /> : <MdEditOff size={20} />}
+          </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={() => {
               setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
             }}
           >
-            <BiSolidPencil size={20} />
+            <BiFontFamily size={20} />
           </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
@@ -235,7 +330,7 @@ export default function Editor() {
               setFontIndex((prev) => (prev + 1) % fontSize.length);
             }}
           >
-            <PiTextTLight size={20} />
+            <BiFontSize size={20} />
           </button>
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
@@ -249,21 +344,27 @@ export default function Editor() {
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={addReply}
           >
-            <FaCheck size={20} />
+            <BiCommentDetail size={20} />
           </button>
-          <button
+          {/* <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={addReply2}
           >
             <BiSolidTrashAlt size={20} />
-          </button>
+          </button> */}
           <button
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={shareDoc}
           >
             <FaShareSquare size={20} />
           </button>
-          {isOpen && (
+          <button
+            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
+            onClick={getToken}
+          >
+            <GiToken size={20} />
+          </button>
+          {isOpen && !editor?.editable && (
             <Comment
               spaceUUID={spaceUUID}
               directoryUUID={searchParams.slug?.[1]}
