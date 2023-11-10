@@ -30,11 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupController {
     private final GroupService groupService;
     private final CharacterService characterService;
+    private final String tempUser = "temp";
 
     @GetMapping
     public ResponseEntity<Object> getGroupInfo(@RequestParam String groupUUID, Authentication authentication) {
         try {
-            GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName());
+//            GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName());
+            GroupDtoRes dto = groupService.getGroupInfo(groupUUID, tempUser);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -43,15 +45,19 @@ public class GroupController {
 
     @GetMapping("/characters")
     public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String groupUUID, Authentication authentication) {
-        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName());
+//        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName());
+        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, tempUser);
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/top")
     public ResponseEntity<Object> topGroupInfo(Authentication authentication) {
         try {
-            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(authentication.getName());
-            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
+//            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(authentication.getName());
+//            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
+
+            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(tempUser);
+            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(tempUser);
 
             Map<String, Object> response = new HashMap<>();
             response.put("groups", groupDto);
@@ -67,7 +73,8 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto, Authentication authentication) {
         try {
-            groupService.createGroup(dto, authentication.getName());
+//            groupService.createGroup(dto, authentication.getName());
+            groupService.createGroup(dto, tempUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -77,7 +84,8 @@ public class GroupController {
     @PatchMapping
     public ResponseEntity<Object> updateGroupName(@RequestParam String groupUUID, @RequestParam String newName, Authentication authentication) {
         try {
-            groupService.updateGroupName(groupUUID, newName, authentication.getName());
+//            groupService.updateGroupName(groupUUID, newName, authentication.getName());
+            groupService.updateGroupName(groupUUID, newName, tempUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -87,7 +95,8 @@ public class GroupController {
     @DeleteMapping
     public ResponseEntity<Object> deleteGroup(@RequestParam String groupUUID, Authentication authentication) {
         try {
-            groupService.deleteGroup(groupUUID, authentication.getName());
+//            groupService.deleteGroup(groupUUID, authentication.getName());
+            groupService.deleteGroup(groupUUID, tempUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
