@@ -64,7 +64,7 @@ export default function Comment({
       spaceUUID,
       directoryUUID,
       commentContent: data.commentContent,
-      commentNickname: 'john',
+      commentNickname: localStorage.getItem('name') ?? '',
       // commentPassword: 'bye',
     });
   };
@@ -73,14 +73,12 @@ export default function Comment({
     mutationFn: patchEditor,
     onSuccess: () => {
       queryClient.invalidateQueries(['editor']);
-      toast('저장 성공');
     },
   });
 
   const postMutate = useMutation({
     mutationFn: postComment,
     onSuccess: () => {
-      toast('댓글 작성 성공');
       queryClient.invalidateQueries(['comment', spaceUUID]);
 
       // 글도 최신화
@@ -114,18 +112,20 @@ export default function Comment({
               <div>{el.commentNickname}</div>
               <div>{el.commentContent}</div>
             </div>
-            <button
-              onClick={() => {
-                deleteMutate.mutate({
-                  spaceUUID,
-                  commentUUID: el.commentUUID,
-                  commentNickname: el.commentNickname,
-                  // commentPassword: el.commentPassword,
-                });
-              }}
-            >
-              <RxCross2 />
-            </button>
+            {el.commentNickname === localStorage.getItem('name') && (
+              <button
+                onClick={() => {
+                  deleteMutate.mutate({
+                    spaceUUID,
+                    commentUUID: el.commentUUID,
+                    commentNickname: el.commentNickname,
+                    // commentPassword: el.commentPassword,
+                  });
+                }}
+              >
+                <RxCross2 />
+              </button>
+            )}
           </div>
         ))}
       </div>
