@@ -15,6 +15,7 @@ import styles from '@/service/cssStyle/scrollbar.module.css';
 import {
   deleteCharacter,
   getCharacter,
+  getCharacterByName,
   patchCharacter,
 } from '@/service/api/character';
 import {
@@ -70,6 +71,15 @@ export default function page({ params }: Props) {
     },
     enabled: !isFetched,
   });
+
+  const [otherCharacterNameInput, setOtherCharacterNameInput] =
+    useState<string>('');
+
+  const { data: otherCharacterData }: UseQueryResult<characterType[]> =
+    useQuery({
+      queryKey: ['otherCharacter', otherCharacterNameInput],
+      queryFn: () => getCharacterByName(params.slug, otherCharacterNameInput),
+    });
 
   const putCharacterMutation = useMutation({
     mutationFn: () => patchCharacter(params.character, character),
@@ -442,6 +452,7 @@ export default function page({ params }: Props) {
                         newItem[i].targetName = e.target.value;
                         newItem[i].targetUUID = null;
                         setRelationInput(newItem);
+                        setOtherCharacterNameInput(e.target.value);
                         setSearchInput(i);
                       }}
                     />
@@ -450,27 +461,46 @@ export default function page({ params }: Props) {
                         searchInput !== i && 'hidden'
                       } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
                     >
-                      <div
-                        className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => {
-                          setState(1);
-                          var newItem = [...relationshipInput];
-                          newItem[i].targetUUID = 'uuid';
-                          newItem[i].targetName = '이름이름이름이름';
-                          setRelationInput(newItem);
-                          setSearchInput(-1);
-                        }}
-                      >
-                        <Image
-                          src="/characterImages/default_character.png"
-                          alt="관계 캐릭터 이미지"
-                          priority={true}
-                          className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                          height={1000}
-                          width={1000}
-                        />
-                        <p className="truncate">이름이름이름이름이름이름</p>
-                      </div>
+                      {otherCharacterData?.map((otherCharacter, j) => (
+                        <div
+                          className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                          onClick={() => {
+                            setState(1);
+                            var newItem = [...relationshipInput];
+                            newItem[i].targetUUID =
+                              otherCharacter.characterUUID;
+                            newItem[i].targetName =
+                              otherCharacter.characterName || '';
+                            setRelationInput(newItem);
+
+                            setSearchInput(-1);
+                          }}
+                          key={otherCharacter.characterUUID}
+                        >
+                          {!otherCharacter.characterImage ? (
+                            <Image
+                              src="/images/default_character.png"
+                              alt="관계 캐릭터 이미지 없음"
+                              priority={true}
+                              className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                              height={1000}
+                              width={1000}
+                            />
+                          ) : (
+                            <Image
+                              src={otherCharacter.characterImage || ''}
+                              alt="관계 캐릭터 이미지"
+                              priority={true}
+                              className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                              height={1000}
+                              width={1000}
+                            />
+                          )}
+                          <p className="truncate">
+                            {otherCharacter.characterName}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </td>
                   <td
@@ -510,7 +540,7 @@ export default function page({ params }: Props) {
             onClick={() => {
               let newRelation: relationshipType[] = [
                 ...(relationshipInput || []),
-                { targetUUID: '', targetName: '', content: '' },
+                { targetUUID: null, targetName: '', content: '' },
               ];
               setRelationInput(newRelation);
               setState(1);
