@@ -9,6 +9,7 @@ import { Hi_Melody } from 'next/font/google';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Favicon from '../../public/vercel.svg';
+import Side from '@/components/Side';
 
 // const nanumFont = Nanum_Myeongjo({
 //   subsets: ['latin'],
@@ -38,7 +39,7 @@ export default function RootLayout({
         <QueryProvider>
           <RecoilProvider>
             <ToastContainer pauseOnFocusLoss={false} />
-            <SideMenu />
+            <Side />
             <main className="flex-grow">{children}</main>
           </RecoilProvider>
         </QueryProvider>

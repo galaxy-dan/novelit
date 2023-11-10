@@ -47,7 +47,7 @@ function test2(){
   const senderUUID = "f72a8efc-99dc-4afd-a658-6f42073fb7a3"
 
   const eventSource = new EventSource(
-      `http://localhost:8003/notifications/send-data?subscriberUUID=${senderUUID}`
+      `http://localhost:8003/notifications/alarmlist?subscriberUUID=${senderUUID}`
   );
 
   eventSource.addEventListener("alertComment", (event) => {

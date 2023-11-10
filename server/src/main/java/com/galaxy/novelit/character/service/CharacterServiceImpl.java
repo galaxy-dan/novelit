@@ -6,8 +6,10 @@ import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
+import com.galaxy.novelit.character.dto.res.RelationDtoRes.RelationDto;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.RelationEntity;
+import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
@@ -107,7 +109,7 @@ public class CharacterServiceImpl implements CharacterService {
         RelationEntity newRelation = RelationEntity.builder()
             .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
-            .relations(dto.getRelationship().getRelations())
+            .relations(dto.getRelations())
             .build();
 
         relationRepository.save(newRelation);
@@ -120,7 +122,7 @@ public class CharacterServiceImpl implements CharacterService {
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
-            .relationship(dto.getRelationship())
+            .relationship(newRelation)
             .characterImage(dto.getCharacterImage())
             .build();
 
@@ -135,20 +137,13 @@ public class CharacterServiceImpl implements CharacterService {
         RelationEntity newRelation;
         CharacterEntity newCharacter;
 
-        // 캐릭터 이름에 수정사항이 있을 시
-        if (!character.getCharacterName().equals(dto.getCharacterName())) {
-            newRelation = RelationEntity.builder()
-                .id(relation.getId())
-                .characterName(dto.getCharacterName())
-                .relations(dto.getRelationship().getRelations())
-                .build();
-        }
-        else {
-            newRelation = RelationEntity.builder()
-                .id(relation.getId())
-                .relations(dto.getRelationship().getRelations())
-                .build();
-        }
+        newRelation = RelationEntity.builder()
+            .id(relation.getId())
+            .characterUUID(characterUUID)
+            .characterName(dto.getCharacterName())
+            .relations(dto.getRelations())
+            .build();
+
         relationRepository.save(newRelation);
 
         newCharacter = CharacterEntity.builder()
@@ -159,7 +154,7 @@ public class CharacterServiceImpl implements CharacterService {
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
-            .relationship(dto.getRelationship())
+            .relationship(newRelation)
             .characterImage(dto.getCharacterImage())
             .isDeleted(character.isDeleted())
             .build();
@@ -173,6 +168,7 @@ public class CharacterServiceImpl implements CharacterService {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
         character.deleteCharacter();
         characterRepository.save(character);
+        relationRepository.deleteByCharacterUUID(characterUUID);
     }
 
     @Transactional
@@ -195,10 +191,56 @@ public class CharacterServiceImpl implements CharacterService {
         return characterInfoList;
     }
 
-//    @Transactional(readOnly = true)
-//    @Override
-//    public List<RelationDtoRes> getRelationships() {
-//
-//        return null;
-//    }
+    @Transactional(readOnly = true)
+    @Override
+    public List<RelationDtoRes> getRelationships() {
+        List<RelationEntity> allRelation = relationRepository.findAll();
+        List<RelationDtoRes> allDto = new ArrayList<>();
+
+
+
+        for (RelationEntity relation : allRelation) {
+
+            // 캐릭터(주체,기준) 정보 조회
+            String characterUUID = relation.getCharacterUUID();
+            String characterName = relation.getCharacterName();
+            String groupUUID = characterRepository.findByCharacterUUID(characterUUID).getGroupUUID();
+            String groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
+
+
+            // 타켓 정보 조회
+            List<RelationDto> targetList = new ArrayList<>();
+
+            for (Relation target : relation.getRelations()) {
+                String targetUUID = target.getTargetUUID();
+                String targetName = target.getTargetName();
+                String targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
+                String targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
+                String content = target.getContent();
+
+                RelationDto targetDto = RelationDto.builder()
+                    .targetUUID(targetUUID)
+                    .targetName(targetName)
+                    .targetGroupUUID(targetGroupUUID)
+                    .targetGroupName(targetGroupName)
+                    .content(content)
+                    .build();
+
+                targetList.add(targetDto);
+            }
+
+            // 조회한 정보 모두 dto에 저장
+            RelationDtoRes dto = RelationDtoRes.builder()
+                .characterUUID(characterUUID)
+                .characterName(characterName)
+                .groupUUID(groupUUID)
+                .groupName(groupName)
+                .relations(targetList)
+                .build();
+
+            allDto.add(dto);
+        }
+
+        return allDto;
+    }
 }

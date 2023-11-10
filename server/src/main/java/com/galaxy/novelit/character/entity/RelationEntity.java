@@ -1,11 +1,11 @@
 package com.galaxy.novelit.character.entity;
 
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -24,26 +24,12 @@ public class RelationEntity {
     private String characterName;
     private List<Relation> relations;
 
-    private static class Relation {
+    @Getter
+    @Setter
+    public static class Relation {
         private String targetUUID;
         private String targetName;
         private String content;
     }
-}
 
-//{
-//    "character_uuid": "",
-//    "character_name": "",
-//    "relations": [
-//      {
-//       "targetUUID": "",
-//      "targetName": "",
-//      "content": ""
-//      },
-//      {
-//       "targetUUID": "",
-//      "targetName": "",
-//      "content": ""
-//      }
-//    ]
-//}
+}

@@ -32,10 +32,11 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<Void> addComment(@RequestBody CommentAddRequestDto commentAddRequestDto,
         Authentication authentication){
-        commentService.addComment(commentAddRequestDto, authentication.getName());
+        String publisherUUID = authentication.getName();
+        commentService.addComment(commentAddRequestDto, publisherUUID);
 
         notificationService.alertComment(commentAddRequestDto.getCommentNickname()
-            , commentAddRequestDto.getDirectoryUUID());
+            , commentAddRequestDto.getDirectoryUUID(), publisherUUID);
 
         return ResponseEntity.ok().build();
     }

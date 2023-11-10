@@ -4,8 +4,9 @@ import { characterType } from '@/model/charactor';
 import { useRouter } from 'next/navigation';
 type Props = {
   character: characterType;
+  slug : string;
 };
-export default function CharacterCard({ character }: Props) {
+export default function CharacterCard({ character, slug }: Props) {
 
   const router = useRouter();
 
@@ -13,7 +14,7 @@ export default function CharacterCard({ character }: Props) {
     <div
       className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8 cursor-pointer"
       onClick={() => {
-        router.push(`/character/characterInfo/${character.characterUUID}`);
+        router.push(`/character/${slug}/characterInfo/${character.characterUUID}`);
       }}
     >
       {

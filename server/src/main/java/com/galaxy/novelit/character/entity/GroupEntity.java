@@ -1,7 +1,6 @@
 package com.galaxy.novelit.character.entity;
 
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,8 +32,6 @@ public class GroupEntity {
     private List<GroupEntity> childGroups;
     @DBRef
     private List<CharacterEntity> childCharacters;
-//    @DBRef
-//    private List<Map<String, String>> charactersInfo;   // Map<characteUUID, characterName>
     @Field(name = "is_deleted")
     private boolean isDeleted;
 

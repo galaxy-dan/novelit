@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RelationRepository extends MongoRepository<RelationEntity, String> {
     RelationEntity findByCharacterUUID(String characterUUID);
+    void deleteByCharacterUUID(String characterUUID);
 }
