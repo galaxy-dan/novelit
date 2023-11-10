@@ -173,8 +173,9 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public List<CharacterSearchInfoResDTO> searchCharacter(String characterName) {
-        List<CharacterEntity> characters = characterRepository.findAllByCharacterName(characterName);
+    public List<CharacterSearchInfoResDTO> searchCharacter(String workspaceUUID, String characterName) {
+        List<CharacterEntity> characters = characterRepository
+                .findAllByWorkspaceUUIDAndCharacterName(workspaceUUID, characterName);
         List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
