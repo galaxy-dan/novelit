@@ -28,6 +28,7 @@ import { Directory, Novel } from '@/model/workspace';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineMenu } from 'react-icons/ai';
+import Link from 'next/link';
 
 const temp = {
   name: 'root',
@@ -105,16 +106,16 @@ export default function SideMenu() {
 
   return (
     <>
-      <button
-        className="fixed top-2 left-2"
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
-        <AiOutlineMenu size={25} />
-      </button>
-
-      {isOpen && (
+      {!isOpen ? (
+        <button
+          className="fixed top-2 left-2"
+          onClick={() => setIsOpen((prev) => !prev)}
+        >
+          <AiOutlineMenu size={25} />
+        </button>
+      ) : (
         <div className="min-h-screen z-50 fixe left-0 top-0 bg-violet-50 w-[260px] font-melody">
-          <div>
+          <div className="h-full">
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
                 <button onClick={() => router.push('/main')}>
@@ -126,11 +127,17 @@ export default function SideMenu() {
                 <FiChevronsLeft size={20} />
               </button>
             </div>
-            <div className="flex">
-              <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2">
-                <MdOutlineStickyNote2 size={20} />
-                <IoExtensionPuzzle size={20} />
-                <Image alt="people" src={People} width={20} />
+            <div className="flex h-full">
+              <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2 h-full">
+                <Link href={`/novel/${slug}`}>
+                  <MdOutlineStickyNote2 size={20} />
+                </Link>
+                <Link href={`/plot/${slug}`}>
+                  <IoExtensionPuzzle size={20} />
+                </Link>
+                <Link href={`/character/${slug}`}>
+                  <Image alt="people" src={People} width={20} />
+                </Link>
               </div>
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
@@ -223,7 +230,6 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     },
   });
 
-  console.log(dragHandle);
 
   return (
     <>
