@@ -12,6 +12,7 @@ import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.share.dto.request.EditableReqDTO;
 import com.galaxy.novelit.share.dto.response.ShareTokenResDTO;
+import com.galaxy.novelit.share.dto.response.ShareTokenValidationResDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,11 @@ public class ShareServiceImpl implements ShareService{
 
         directory.updateEditable(dto.isEditable());
         directoryRepository.save(directory);
+    }
+
+    @Override
+    public ShareTokenValidationResDTO validateToken(String token) {
+        return new ShareTokenValidationResDTO(jwtUtils.validateShareToken(token));
     }
 
 }

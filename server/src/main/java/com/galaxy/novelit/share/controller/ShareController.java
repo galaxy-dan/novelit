@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.galaxy.novelit.share.dto.request.EditableReqDTO;
 import com.galaxy.novelit.share.dto.response.ShareTokenResDTO;
+import com.galaxy.novelit.share.dto.response.ShareTokenValidationResDTO;
 import com.galaxy.novelit.share.service.ShareService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,11 @@ public class ShareController {
     public ResponseEntity<Void> updateEditable(@RequestBody EditableReqDTO dto, Authentication authentication) {
         shareService.updateEditable(dto, authentication.getName());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/token/validation")
+    public ResponseEntity<ShareTokenValidationResDTO> validateToken(@RequestParam("token") String token) {
+        return ResponseEntity.ok(shareService.validateToken(token));
     }
 
 }
