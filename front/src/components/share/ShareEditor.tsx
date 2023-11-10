@@ -10,9 +10,17 @@ import { v4 as uuidv4 } from 'uuid';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import sanitizeHtml, { IOptions } from 'sanitize-html';
 
-import { BiSolidPencil, BiBold, BiSolidTrashAlt } from 'react-icons/bi';
+import {
+  BiSolidPencil,
+  BiBold,
+  BiSolidTrashAlt,
+  BiCommentDetail,
+  BiFontSize,
+  BiFontFamily,
+} from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
+import { MdEdit, MdEditOff } from 'react-icons/md';
 import { useParams } from 'next/navigation';
 import {
   UseQueryResult,
@@ -20,9 +28,16 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { getComment, getEditor, patchEditor } from '@/service/api/editor';
+import {
+  getComment,
+  getEditor,
+  patchEditable,
+  patchEditor,
+} from '@/service/api/editor';
 import { toast } from 'react-toastify';
 import Comment from '../editor/Comment';
+import { get } from '@/service/api/http';
+import UploadState from '../state/UploadState';
 
 export default function ShareEditor() {
   const searchParams = useParams();
@@ -39,6 +54,8 @@ export default function ShareEditor() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const comment = useRef<Reply[]>([]);
 
+  const [uploadIndex, setUploadIndex] = useState<number>(0);
+
   const edit = useRef<HTMLDivElement>(null);
 
   const { data: editor }: UseQueryResult<Editor> = useQuery({
@@ -47,17 +64,13 @@ export default function ShareEditor() {
     enabled: !!searchParams.slug,
   });
 
-  // 자동 저장
-  useEffect(() => {
-    const time = setTimeout(() => {}, 2000);
 
-    return () => clearTimeout(time);
-  }, []);
 
   useEffect(() => {
     const editRef = edit?.current;
     if (editRef) {
       editRef.onclick = (e: any) => {
+        // 댓글
         const id = e.target.id;
         if (!id || id === 'edit') {
           setSpaceUUID('');
@@ -70,25 +83,7 @@ export default function ShareEditor() {
           toast('버블');
         }
       };
-
-      editRef.onpaste = (e) => {
-        const paste = e.clipboardData?.getData('text');
-
-        if (!paste) return;
-        const reversed = Array.from(paste).reverse().join('');
-
-        const selection = window.getSelection();
-        if (!selection?.rangeCount) return false;
-        selection.deleteFromDocument();
-        selection.getRangeAt(0).insertNode(document.createTextNode(paste));
-
-        e.preventDefault();
-      };
     }
-
-    // edit?.current?.addEventListener('click', () => {
-    //   toast('버블');
-    // });
   }, []);
 
   useEffect(() => {
@@ -101,16 +96,15 @@ export default function ShareEditor() {
 
   const patchMutate = useMutation({
     mutationFn: patchEditor,
+    onMutate: () => {
+      setUploadIndex(2);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['editor']);
+      setUploadIndex(3);
       toast('저장 성공');
     },
   });
-
-  const handleChange = (e: ContentEditableEvent) => {
-    setHtml(e.target.value);
-    setLength(edit?.current?.innerText.length ?? 0);
-  };
 
   const sanitizeConf: IOptions = {
     allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'h1', 'div', 'span'],
@@ -122,11 +116,12 @@ export default function ShareEditor() {
     setHtml((prev) => sanitizeHtml(prev, sanitizeConf));
   };
 
-  const toggleEditable = () => {
-    setEditable((prev) => !prev);
-  };
-
   const addReply = () => {
+    if (editor?.editable) {
+      toast("글 작성중이어서 댓글을 작성할 수 없습니다.")
+      return;
+    }
+
     const selection = window.getSelection();
     console.log(selection?.rangeCount);
     console.log(selection?.isCollapsed);
@@ -141,13 +136,6 @@ export default function ShareEditor() {
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
 
-    //임시
-    // setSpaceUUID(wrapper.id);
-    // 버블링 안되게
-    // wrapper.onclick = () => {
-    //   alert('되');
-    //   setSpaceUUID('aa');
-    // };
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
 
@@ -156,72 +144,28 @@ export default function ShareEditor() {
     setIsOpen(true);
   };
 
-  const addReply2 = () => {
-    // const selection = window.getSelection();
-    // console.log(selection?.rangeCount);
-    // console.log(selection?.isCollapsed);
-    // // 선택한 부분이 없으면 return
-    // if (selection?.isCollapsed) return;
-    // if (!selection?.rangeCount) return;
-  };
-
-  const clickExecCommand = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    cmd: string,
-  ) => {
-    e.preventDefault();
-    document.execCommand(cmd, false);
-    // document.execCommand(props.cmd, false, props.arg);
-    0;
-  };
-
-  const shareDoc = () => {
-    const divContent = edit?.current?.innerText;
-    if (!divContent) return;
-
-    var blob = new Blob([divContent], { type: 'text/plain;charset=utf-8' });
-
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'output.doc';
-
-    a.click();
-  };
+  
 
   return (
     <>
+    <div>편집자 페이지</div>
       <div
         className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
       >
-        <div className="w-[924px]">{editor?.title}</div>
-        <button
-          onClick={() => {
-            patchMutate.mutate({
-              uuid: searchParams.slug,
-              content: edit?.current?.innerHTML ?? '<div><br/></div>',
-            });
-          }}
-        >
-          임시저장
-        </button>
+        <div className="flex justify-between w-[1160px]">
+          <div>{editor?.title}</div>
+        </div>
       </div>
-      <div className="flex gap-6 justify-center items-center">
-        <div className="flex flex-col justify-center items-center">
+      <div className="flex gap-6 justify-center items-start">
+        <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
             id="edit"
-            className={`ml-2 w-[700px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
+            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
             html={html}
             disabled={true}
-            onChange={handleChange}
+            onChange={() => {}}
             // onBlur={sanitize}
-          />
-          <h3>source</h3>
-          <textarea
-            className="ml-2 w-3/4 min-h-[100px] border-gray-100 border-2 p-1 resize-none"
-            value={html}
-            onChange={handleChange}
-            onBlur={sanitize}
           />
         </div>
 
@@ -230,16 +174,10 @@ export default function ShareEditor() {
             className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
             onClick={addReply}
           >
-            <FaCheck size={20} />
+            <BiCommentDetail size={20} />
           </button>
-          
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={shareDoc}
-          >
-            <FaShareSquare size={20} />
-          </button>
-          {isOpen && (
+
+          {isOpen && !editor?.editable && (
             <Comment
               spaceUUID={spaceUUID}
               directoryUUID={searchParams.slug}

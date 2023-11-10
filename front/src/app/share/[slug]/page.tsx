@@ -1,5 +1,5 @@
 import ShareEditor from '@/components/share/ShareEditor';
 
-export default function SharePage() {
+export default function ShareDetailPage() {
   return <ShareEditor />;
 }
