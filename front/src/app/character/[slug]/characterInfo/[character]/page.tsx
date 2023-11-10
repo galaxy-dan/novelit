@@ -15,7 +15,7 @@ import styles from '@/service/cssStyle/scrollbar.module.css';
 import {
   deleteCharacter,
   getCharacter,
-  putCharacter,
+  patchCharacter,
 } from '@/service/api/character';
 import {
   UseMutationResult,
@@ -61,7 +61,7 @@ export default function page({ params }: Props) {
       setImageUrl(data?.characterImage || '');
       setNameInput(data?.characterName || '');
       setInformationInput(data?.information || []);
-      setRelationInput(data?.relationship || []);
+      setRelationInput(data?.relations || []);
       setdescriptionInput(data?.description || '');
       setGroupUUID(data?.groupUUID || null);
     },
@@ -72,7 +72,7 @@ export default function page({ params }: Props) {
   });
 
   const putCharacterMutation = useMutation({
-    mutationFn: () => putCharacter(params.character, character),
+    mutationFn: () => patchCharacter(params.character, character),
     onSuccess: () => {
       setState(3);
     },
@@ -104,7 +104,7 @@ export default function page({ params }: Props) {
     characterImage: '',
     description: '',
     information: [],
-    relationship: [],
+    relations: [],
   });
 
   const ref = useRef<characterType | null>(null);
@@ -140,7 +140,7 @@ export default function page({ params }: Props) {
       characterName: nameInput,
       description: descriptionInput,
       characterImage: characterImageInput,
-      relationship: relationshipInput,
+      relations: relationshipInput || [],
       information: informationInput,
     }));
   };
@@ -166,7 +166,6 @@ export default function page({ params }: Props) {
       JSON.stringify(ref.current) !== JSON.stringify(character)
     ) {
       if (isFetched) {
-        console.log(character);
         putCharacterMutation.mutate();
         if (isNameChanged) {
           queryClient.invalidateQueries(['characterDirectory']);
@@ -333,77 +332,84 @@ export default function page({ params }: Props) {
           <p className="text-xl font-extrabold">기본 정보</p>
           <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
             <tbody>
-              {informationInput?.map((info, i) => {
-                let objkey: string = '';
-                let objvalue: string = '';
-
-                Object.entries(info).forEach(([key, value]) => {
-                  objkey = key;
-                  objvalue = value;
-                });
-
-                return (
-                  <tr className="h-16  relative" key={i}>
-                    <td
-                      className={`${i === 0 && 'rounded-tl-xl'} ${
-                        i === informationInput.length - 1 && 'rounded-bl-xl'
-                      } border border-gray-300 w-1/5 px-2 py-1 text-center`}
-                    >
-                      <input
-                        type="text"
-                        className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                        value={objkey}
-                        onChange={(e) => {
-                          setState(1);
-                          var newItem = [...informationInput];
-                          let str: string = e.target.value;
-                          newItem[i] = { [str]: objvalue };
-                          setInformationInput(newItem);
-                        }}
-                      />
-                    </td>
-                    <td
-                      className={`${i === 0 && 'rounded-tr-xl'} ${
-                        i === informationInput.length - 1 && 'rounded-br-xl'
-                      } border h-full border-gray-300 w-4/5 px-2 pt-1`}
-                    >
-                      <div className="flex">
+              {informationInput !== null &&
+                informationInput !== undefined &&
+                informationInput.length >= 1 &&
+                Object.entries(informationInput[0]).map(([key, value], i) => {
+                  return (
+                    <tr className="h-16  relative" key={i}>
+                      <td
+                        className={`${i === 0 && 'rounded-tl-xl'} ${
+                          i === informationInput.length - 1 && 'rounded-bl-xl'
+                        } border border-gray-300 w-1/5 px-2 py-1 text-center`}
+                      >
                         <input
                           type="text"
                           className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                          value={objvalue}
+                          value={key.split('@;!')[0]}
                           onChange={(e) => {
                             setState(1);
+
                             var newItem = [...informationInput];
-                            newItem[i][objkey] = e.target.value;
-                            setInformationInput(newItem);
+                            let str: string =
+                              e.target.value + '@;!' + key.split('@;!')[1];
+                            let newObj: informationType[] = [{}];
+                            Object.keys(newItem[0]).forEach((ckey) => {
+                              if (ckey === key) {
+                                newObj[0][str] = newItem[0][key];
+                              } else {
+                                newObj[0][ckey] = newItem[0][ckey];
+                              }
+                            });
+                            setInformationInput(newObj);
                           }}
                         />
-                        <FaMinus
-                          className="my-auto cursor-pointer h-10"
-                          onClick={() => {
-                            setState(1);
-                            let tmpInfo = [...informationInput];
-                            let tmp = tmpInfo.splice(i, 1);
-                            setInformationInput(tmpInfo);
-                          }}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td
+                        className={`${i === 0 && 'rounded-tr-xl'} ${
+                          i === informationInput.length - 1 && 'rounded-br-xl'
+                        } border h-full border-gray-300 w-4/5 px-2 pt-1`}
+                      >
+                        <div className="flex">
+                          <input
+                            type="text"
+                            className="w-full resize-none outline-none truncate my-auto text-center font-bold"
+                            value={value}
+                            onChange={(e) => {
+                              setState(1);
+                              var newItem = [...informationInput];
+                              newItem[0][key] = e.target.value;
+                              setInformationInput(newItem);
+                            }}
+                          />
+                          <FaMinus
+                            className="my-auto cursor-pointer h-10"
+                            onClick={() => {
+                              setState(1);
+                              let tmpInfo: informationType[] = [
+                                ...informationInput,
+                              ];
+                              delete tmpInfo[0][key];
+                              setInformationInput(tmpInfo);
+                            }}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
           <button
             className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
             onClick={() => {
-              let newInfo: informationType[] = [
-                ...(informationInput || []),
-                { '': '' },
-              ];
-              setInformationInput(newInfo);
-              setState(1);
+              let uuid = '@;!' + self.crypto.randomUUID();
+              if (informationInput) {
+                let newInfo = [...informationInput];
+                newInfo[0][uuid] = '';
+                setInformationInput(newInfo);
+                setState(1);
+              }
             }}
           >
             <HiPlus className="text-white mx-auto font-bold" />
@@ -424,16 +430,19 @@ export default function page({ params }: Props) {
                   >
                     <input
                       type="text"
-                      className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                      value={relationshipInput[i].name}
+                      className={`${
+                        (!relationshipInput[i].targetUUID ||
+                          relationshipInput[i].targetUUID === '') &&
+                        'text-neutral-400'
+                      } w-full resize-none outline-none truncate my-auto text-center font-bold`}
+                      value={relationshipInput[i].targetName}
                       onChange={(e) => {
                         setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].name = e.target.value;
-                        newItem[i].uuid = null;
+                        newItem[i].targetName = e.target.value;
+                        newItem[i].targetUUID = null;
                         setRelationInput(newItem);
                         setSearchInput(i);
-                        //UUID null로 초기화
                       }}
                     />
                     <div
@@ -446,11 +455,10 @@ export default function page({ params }: Props) {
                         onClick={() => {
                           setState(1);
                           var newItem = [...relationshipInput];
-                          newItem[i].uuid = 'uuid';
-                          newItem[i].name = '이름이름이름이름';
+                          newItem[i].targetUUID = 'uuid';
+                          newItem[i].targetName = '이름이름이름이름';
                           setRelationInput(newItem);
                           setSearchInput(-1);
-                          //UUID
                         }}
                       >
                         <Image
@@ -474,113 +482,11 @@ export default function page({ params }: Props) {
                       <input
                         type="text"
                         className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                        value={relationshipInput[i].description}
+                        value={relationshipInput[i].content}
                         onChange={(e) => {
                           setState(1);
                           var newItem = [...relationshipInput];
-                          newItem[i].description = e.target.value;
-                          setRelationInput(newItem);
-                        }}
-                      />
-                      <FaMinus
-                        className="my-auto cursor-pointer h-10"
-                        onClick={() => {
-                          setState(1);
-                          let tmpRelation = [...relationshipInput];
-                          let tmp = tmpRelation.splice(i, 1);
-                          setRelationInput(tmpRelation);
-                        }}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button
-            className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
-            onClick={() => {
-              let newInfo: informationType[] = [
-                ...(informationInput || []),
-                { '': '' },
-              ];
-              setInformationInput(newInfo);
-              setState(1);
-            }}
-          >
-            <HiPlus className="text-white mx-auto font-bold" />
-          </button>
-        </div>
-
-        {/* 관계 */}
-        <div className="mt-8">
-          <p className="text-xl font-extrabold">관계</p>
-          <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
-            <tbody>
-              {relationshipInput?.map((info, i) => (
-                <tr className="h-16 relative" key={i}>
-                  <td
-                    className={`${i === 0 && 'rounded-tl-xl'} ${
-                      i === relationshipInput.length - 1 && 'rounded-bl-xl'
-                    } border border-gray-300 w-1/5 px-2 py-1 text-center`}
-                  >
-                    <input
-                      type="text"
-                      className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                      value={relationshipInput[i].name}
-                      onChange={(e) => {
-                        setState(1);
-                        var newItem = [...relationshipInput];
-                        newItem[i].name = e.target.value;
-                        newItem[i].uuid = null;
-                        setRelationInput(newItem);
-                        setSearchInput(i);
-                        //UUID null로 초기화
-                      }}
-                    />
-                    <div
-                      className={`${styles.scroll} ${
-                        searchInput !== i && 'hidden'
-                      } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
-                    >
-                      <div
-                        className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
-                        onClick={() => {
-                          setState(1);
-                          var newItem = [...relationshipInput];
-                          newItem[i].uuid = 'uuid';
-                          newItem[i].name = '이름이름이름이름';
-                          setRelationInput(newItem);
-                          setSearchInput(-1);
-                          //UUID
-                        }}
-                      >
-                        <Image
-                          src="/characterImages/default_character.png"
-                          alt="관계 캐릭터 이미지"
-                          priority={true}
-                          className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                          height={1000}
-                          width={1000}
-                        />
-                        <p className="truncate">이름이름이름이름이름이름</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td
-                    className={`${i === 0 && 'rounded-tr-xl'} ${
-                      i === relationshipInput.length - 1 && 'rounded-br-xl'
-                    } border h-full border-gray-300 w-4/5 px-2 pt-1`}
-                  >
-                    <div className="flex">
-                      <input
-                        type="text"
-                        className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                        value={relationshipInput[i].description}
-                        onChange={(e) => {
-                          setState(1);
-                          var newItem = [...relationshipInput];
-                          newItem[i].description = e.target.value;
+                          newItem[i].content = e.target.value;
                           setRelationInput(newItem);
                         }}
                       />
@@ -604,7 +510,7 @@ export default function page({ params }: Props) {
             onClick={() => {
               let newRelation: relationshipType[] = [
                 ...(relationshipInput || []),
-                { uuid: '', name: '', description: '' },
+                { targetUUID: '', targetName: '', content: '' },
               ];
               setRelationInput(newRelation);
               setState(1);

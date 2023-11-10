@@ -13,7 +13,7 @@ export default function Side() {
     <>
       {pathname === 'novel' && <SideMenu />}
       {pathname === 'plot' && <SideMenuPlot/>}
-      {pathname === 'character' && <>character</>}
+      {pathname === 'character' && <SideMenuPlot/>}
     </>
   );
 }
