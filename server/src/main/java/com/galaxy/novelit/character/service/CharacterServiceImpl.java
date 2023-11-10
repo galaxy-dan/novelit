@@ -16,15 +16,10 @@ import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
-import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,11 +39,6 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public CharacterDtoRes getCharacterInfo(String characterUUID, String userUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
-
-//        characterUUID가 db에 없을 때
-//        if (character == null) {
-//            throw new CharacterNotFoundException("Character not found for UUID: " + characterUUID);
-//        }
 
         CharacterDtoRes dto = new CharacterDtoRes();
         dto.setGroupUUID(character.getGroupUUID());
@@ -100,9 +90,6 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public List<CharacterSimpleDtoRes> getTopCharacter(String workspaceUUID, String userUUID) {
         List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
-
-//        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(null);
-//            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
         List<CharacterSimpleDtoRes> dto = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
@@ -128,7 +115,6 @@ public class CharacterServiceImpl implements CharacterService {
         if (groupRepository.findByGroupUUID(groupUUID) == null) {
             groupUUID = null;
         }
-
 
         RelationEntity newRelation = RelationEntity.builder()
             .characterUUID(characterUUID)
@@ -252,58 +238,64 @@ public class CharacterServiceImpl implements CharacterService {
         List<RelationDtoRes> allDto = new ArrayList<>();
 
         for (RelationEntity relation : allRelation) {
-            // 캐릭터(주체,기준) 정보 조회
-            String characterUUID = relation.getCharacterUUID();
-            String characterName = relation.getCharacterName();
-            String groupUUID = characterRepository.findByCharacterUUID(characterUUID).getGroupUUID();
-            String groupName;
-            if (groupRepository.findByGroupUUID(groupUUID) == null) {
-                groupName = null;
-            } else {
-                groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
+            // 캐릭터에 관계 정보가 없을 때 다음 캐릭터로 넘어가기
+            if (relation.getRelations() == null) {
+                continue;
             }
-
-            // 타켓 정보 조회
-            List<RelationDto> targetList = new ArrayList<>();
-
-            for (Relation target : relation.getRelations()) {
-                String targetUUID = target.getTargetUUID();
-                String targetName = target.getTargetName();
-                String targetGroupUUID;
-                String targetGroupName;
-                if (characterRepository.findByCharacterUUID(targetUUID) == null) {
-                    targetGroupUUID = null;
+            else {
+                // 캐릭터(주체,기준) 정보 조회
+                String characterUUID = relation.getCharacterUUID();
+                String characterName = relation.getCharacterName();
+                String groupUUID = characterRepository.findByCharacterUUID(characterUUID).getGroupUUID();
+                String groupName;
+                if (groupRepository.findByGroupUUID(groupUUID) == null) {
+                    groupName = null;
                 } else {
-                    targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
+                    groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
                 }
-                if (groupRepository.findByGroupUUID(targetGroupUUID) == null) {
-                    targetGroupName = null;
-                } else {
-                    targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
-                }
-                String content = target.getContent();
 
-                RelationDto targetDto = RelationDto.builder()
-                    .targetUUID(targetUUID)
-                    .targetName(targetName)
-                    .targetGroupUUID(targetGroupUUID)
-                    .targetGroupName(targetGroupName)
-                    .content(content)
+                // 타켓 정보 조회
+                List<RelationDto> targetList = new ArrayList<>();
+
+                for (Relation target : relation.getRelations()) {
+                    String targetUUID = target.getTargetUUID();
+                    String targetName = target.getTargetName();
+                    String targetGroupUUID;
+                    String targetGroupName;
+                    if (characterRepository.findByCharacterUUID(targetUUID) == null) {
+                        targetGroupUUID = null;
+                    } else {
+                        targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
+                    }
+                    if (groupRepository.findByGroupUUID(targetGroupUUID) == null) {
+                        targetGroupName = null;
+                    } else {
+                        targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
+                    }
+                    String content = target.getContent();
+
+                    RelationDto targetDto = RelationDto.builder()
+                        .targetUUID(targetUUID)
+                        .targetName(targetName)
+                        .targetGroupUUID(targetGroupUUID)
+                        .targetGroupName(targetGroupName)
+                        .content(content)
+                        .build();
+
+                    targetList.add(targetDto);
+                }
+
+                // 조회한 정보 모두 dto에 저장
+                RelationDtoRes dto = RelationDtoRes.builder()
+                    .characterUUID(characterUUID)
+                    .characterName(characterName)
+                    .groupUUID(groupUUID)
+                    .groupName(groupName)
+                    .relations(targetList)
                     .build();
 
-                targetList.add(targetDto);
+                allDto.add(dto);
             }
-
-            // 조회한 정보 모두 dto에 저장
-            RelationDtoRes dto = RelationDtoRes.builder()
-                .characterUUID(characterUUID)
-                .characterName(characterName)
-                .groupUUID(groupUUID)
-                .groupName(groupName)
-                .relations(targetList)
-                .build();
-
-            allDto.add(dto);
         }
 
         return allDto;

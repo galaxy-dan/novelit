@@ -12,12 +12,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.mapping.Collection;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
@@ -47,8 +44,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<GroupSimpleDtoRes> getTopGroup(String workspaceUUID, String userUUID) {
         List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(workspaceUUID);
-
-//        List<GroupEntity> groups = groupRepository.findAllByParentGroupUUID(null);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -61,7 +56,6 @@ public class GroupServiceImpl implements GroupService {
 
         return dto;
     }
-
 
     @Transactional
     @Override

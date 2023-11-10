@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class WordsCreateReqDTO {
-    String wordUUID;
-    String word;
-    Boolean isCharacter;
     String workspaceUUID;
+    String word;
 }

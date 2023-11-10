@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { usePathname } from 'next/navigation';
 import React from 'react';
@@ -11,8 +11,8 @@ export default function Side() {
 
   return (
     <>
-      {pathname === 'novel' && <SideMenu />}
-      {pathname === 'plot' && <SideMenuPlot/>}
+      {(pathname === 'novel' || pathname === 'editor') && <SideMenu />}
+      {pathname === 'plot' && <SideMenuPlot />}
       {pathname === 'character' && <>character</>}
     </>
   );
