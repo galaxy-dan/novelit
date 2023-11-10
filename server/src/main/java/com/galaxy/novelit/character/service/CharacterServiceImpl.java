@@ -81,12 +81,14 @@ public class CharacterServiceImpl implements CharacterService {
 //            if(infos != null) {
             if(infos.size() == 0) {
                 characterSimpleDtoRes.information(new ArrayList<>());
+            } else { // 1 번에 map으로 저장
+                Map<String, String> mappedInfo = infos.get(0);
+                List<Map<String, String>> returnval = new ArrayList<>();
+                returnval.add(mappedInfo);
+                characterSimpleDtoRes.information(returnval);
+
             }
-            else if(infos.size() < 3){
-                characterSimpleDtoRes.information(infos.subList(0, infos.size() - 1));
-            } else {
-                characterSimpleDtoRes.information(infos.subList(0, 2));
-            }
+
 //            }
             characterSimpleInfoList.add(characterSimpleDtoRes.build());
         }
@@ -232,12 +234,10 @@ public class CharacterServiceImpl implements CharacterService {
 //            if(infos != null) {
             if(infos.size() == 0) {
                 characterSearchInfoResDTO.information(new ArrayList<Map<String, String>>());
-            }
-            else if(infos.size() < 3){
-                characterSearchInfoResDTO.information(infos.subList(0, infos.size() - 1));
             } else {
-                characterSearchInfoResDTO.information(infos.subList(0, 2));
+                characterSearchInfoResDTO.information(infos);
             }
+
 //            }
 
             characterInfoList.add(characterSearchInfoResDTO.build());
