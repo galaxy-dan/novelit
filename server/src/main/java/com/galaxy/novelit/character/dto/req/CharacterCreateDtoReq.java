@@ -1,6 +1,5 @@
 package com.galaxy.novelit.character.dto.req;
 
-import com.galaxy.novelit.character.entity.RelationEntity;
 import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import java.util.List;
 import java.util.Map;
