@@ -53,7 +53,7 @@ public class CharacterServiceImpl implements CharacterService {
         dto.setCharacterUUID(character.getCharacterUUID());
         dto.setInformation(character.getInformation());
         dto.setDescription(character.getDescription());
-        dto.setRelationship(character.getRelationship());
+        dto.setRelations(character.getRelationship().getRelations());
         dto.setDeleted(character.isDeleted());
         dto.setCharacterImage(character.getCharacterImage());
 
@@ -173,8 +173,9 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public List<CharacterSearchInfoResDTO> searchCharacter(String characterName) {
-        List<CharacterEntity> characters = characterRepository.findAllByCharacterName(characterName);
+    public List<CharacterSearchInfoResDTO> searchCharacter(String workspaceUUID, String characterName) {
+        List<CharacterEntity> characters = characterRepository
+                .findAllByWorkspaceUUIDAndCharacterName(workspaceUUID, characterName);
         List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
@@ -197,16 +198,17 @@ public class CharacterServiceImpl implements CharacterService {
         List<RelationEntity> allRelation = relationRepository.findAll();
         List<RelationDtoRes> allDto = new ArrayList<>();
 
-
-
         for (RelationEntity relation : allRelation) {
-
             // 캐릭터(주체,기준) 정보 조회
             String characterUUID = relation.getCharacterUUID();
             String characterName = relation.getCharacterName();
             String groupUUID = characterRepository.findByCharacterUUID(characterUUID).getGroupUUID();
-            String groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
-
+            String groupName;
+            if (groupRepository.findByGroupUUID(groupUUID) == null) {
+                groupName = null;
+            } else {
+                groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
+            }
 
             // 타켓 정보 조회
             List<RelationDto> targetList = new ArrayList<>();
@@ -214,8 +216,18 @@ public class CharacterServiceImpl implements CharacterService {
             for (Relation target : relation.getRelations()) {
                 String targetUUID = target.getTargetUUID();
                 String targetName = target.getTargetName();
-                String targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
-                String targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
+                String targetGroupUUID;
+                String targetGroupName;
+                if (characterRepository.findByCharacterUUID(targetUUID) == null) {
+                    targetGroupUUID = null;
+                } else {
+                    targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
+                }
+                if (groupRepository.findByGroupUUID(targetGroupUUID) == null) {
+                    targetGroupName = null;
+                } else {
+                    targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
+                }
                 String content = target.getContent();
 
                 RelationDto targetDto = RelationDto.builder()

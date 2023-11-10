@@ -76,8 +76,8 @@ public class CharacterController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchCharacter(@RequestParam String characterName) {
-        List<CharacterSearchInfoResDTO> charactersList = characterService.searchCharacter(characterName);
+    public ResponseEntity<Object> searchCharacter(@RequestParam String workspaceUUID, @RequestParam String characterName) {
+        List<CharacterSearchInfoResDTO> charactersList = characterService.searchCharacter(workspaceUUID, characterName);
 
         return ResponseEntity.ok().body("");
     }
