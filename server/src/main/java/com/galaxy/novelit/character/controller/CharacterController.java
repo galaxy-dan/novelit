@@ -79,7 +79,7 @@ public class CharacterController {
     public ResponseEntity<Object> searchCharacter(@RequestParam String workspaceUUID, @RequestParam String characterName) {
         List<CharacterSearchInfoResDTO> charactersList = characterService.searchCharacter(workspaceUUID, characterName);
 
-        return ResponseEntity.ok().body("");
+        return ResponseEntity.ok().body(charactersList);
     }
 
     @GetMapping("/diagram")

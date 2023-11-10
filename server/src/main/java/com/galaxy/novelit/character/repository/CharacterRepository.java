@@ -12,5 +12,5 @@ public interface CharacterRepository extends MongoRepository<CharacterEntity, St
     List<CharacterEntity> findAllByGroupUUID(String groupUUID);
     List<CharacterEntity> findAllByCharacterName(String characterName);
     List<CharacterEntity> findAllByWorkspaceUUIDAndGroupUUIDIsNull(String workspaceUUID);
-    List<CharacterEntity> findAllByWorkspaceUUIDAndCharacterName(String workspaceUUID, String characterName);
+    List<CharacterEntity> findAllByWorkspaceUUIDAndCharacterNameLike(String workspaceUUID, String characterName);
 }
