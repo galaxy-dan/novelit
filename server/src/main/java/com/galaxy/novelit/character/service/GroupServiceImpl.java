@@ -45,8 +45,10 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<GroupSimpleDtoRes> getTopGroup(String userUUID) {
-        List<GroupEntity> groups = groupRepository.findAllByParentGroupUUID(null);
+    public List<GroupSimpleDtoRes> getTopGroup(String workspaceUUID, String userUUID) {
+        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(workspaceUUID);
+
+//        List<GroupEntity> groups = groupRepository.findAllByParentGroupUUID(null);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -69,7 +71,7 @@ public class GroupServiceImpl implements GroupService {
         GroupEntity newGroup;
 
         // 최상단 계층일 경우 (부모UUID가 없을 때)
-        if (parentGroupUUID == null) {
+        if (groupRepository.findByGroupUUID(parentGroupUUID) == null) {
             newGroup = GroupEntity.builder()
                 .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
