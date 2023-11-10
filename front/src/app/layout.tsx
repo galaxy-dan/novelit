@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Favicon from '../../public/vercel.svg';
 import SSE from '@/components/SSE';
 import NotificationButton from '@/components/NotificationButton';
-import Grammar from '@/components/editor/Grammar';
+import Side from '@/components/Side';
 
 // const nanumFont = Nanum_Myeongjo({
 //   subsets: ['latin'],
@@ -43,6 +43,7 @@ export default function RootLayout({
             <SSE />
             <ToastContainer pauseOnFocusLoss={false} />
             <NotificationButton />
+            <Side />
             <main className="flex-grow">{children}</main>
           </RecoilProvider>
         </QueryProvider>

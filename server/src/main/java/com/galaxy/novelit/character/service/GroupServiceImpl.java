@@ -3,7 +3,9 @@ package com.galaxy.novelit.character.service;
 import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
+import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
+import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,37 +23,32 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
-    private final MongoTemplate mongoTemplate;
+    private final CharacterRepository characterRepository;
 
     @Transactional(readOnly = true)
     @Override
-    public GroupDtoRes getGroupInfo(String groupUUID) {
+    public GroupDtoRes getGroupInfo(String groupUUID, String userUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
-        log.info("groupId:{}", group.getGroupId());
-//        삭제된 그룹 처리
-//        if (group.isDeleted()) {
-//            return ;
-//        }
+        List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUID(groupUUID);
+        List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUID(groupUUID);
 
         GroupDtoRes dto = new GroupDtoRes();
+        dto.setWorkspaceUUID(group.getWorkspaceUUID());
         dto.setGroupUUID(group.getGroupUUID());
         dto.setGroupName(group.getGroupName());
-        dto.setChildUUID(group.getChildUUID());
-        dto.setParentUUID(group.getParentUUID());
-        dto.setWorkspaceUUID(group.getWorkspaceUUID());
-        dto.setCharactersInfo(group.getCharactersInfo());
-        dto.setDeleted(group.isDeleted());
-
-        System.out.println(group.getGroupId());
-        System.out.println(group.getGroupName());
+        dto.setParentGroupUUID(group.getParentGroupUUID());
+        dto.setChildGroups(childGroups);
+        dto.setChildCharacters(childCharacters);
 
         return dto;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<GroupSimpleDtoRes> getTopGroup() {
-        List<GroupEntity> groups = groupRepository.findAllByParentUUID(null);
+    public List<GroupSimpleDtoRes> getTopGroup(String workspaceUUID, String userUUID) {
+        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(workspaceUUID);
+
+//        List<GroupEntity> groups = groupRepository.findAllByParentGroupUUID(null);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -68,28 +65,28 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void createGroup(GroupCreateDtoReq dto) {
+    public void createGroup(GroupCreateDtoReq dto, String userUUID) {
         String groupUUID = UUID.randomUUID().toString();
-        String parentUUID = dto.getParentUUID();
-        GroupEntity newGroup = new GroupEntity();
+        String parentGroupUUID = dto.getParentGroupUUID();
+        GroupEntity newGroup;
 
         // 최상단 계층일 경우 (부모UUID가 없을 때)
-        if (parentUUID == null) {
+        if (groupRepository.findByGroupUUID(parentGroupUUID) == null) {
             newGroup = GroupEntity.builder()
-                .parentUUID(null)
+                .userUUID(userUUID)
+                .workspaceUUID(dto.getWorkspaceUUID())
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
-                .workspaceUUID(dto.getWorkspaceUUID())
-                .userUUID(dto.getUserUUID())
+                .parentGroupUUID(null)
                 .build();
         }
         else {
             newGroup = GroupEntity.builder()
+                .userUUID(userUUID)
+                .workspaceUUID(dto.getWorkspaceUUID())
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
-                .workspaceUUID(dto.getWorkspaceUUID())
-                .userUUID(dto.getUserUUID())
-                .parentUUID(parentUUID)
+                .parentGroupUUID(parentGroupUUID)
                 .build();
         }
 
@@ -98,7 +95,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void deleteGroup(String groupUUID) {
+    public void deleteGroup(String groupUUID, String userUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
         group.deleteGroup();
         groupRepository.save(group);
@@ -106,7 +103,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void updateGroupName(String groupUUID, String newName) {
+    public void updateGroupName(String groupUUID, String newName, String userUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
         group.updateGroupName(newName);
         groupRepository.save(group);

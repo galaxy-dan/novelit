@@ -18,12 +18,14 @@ import com.galaxy.novelit.common.exception.InvalidTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 
 @Component
 public class JwtUtils {
@@ -44,11 +46,19 @@ public class JwtUtils {
 		return generateToken(userUUID, accessTokenDuration, roles);
 	}
 
+	public String generateAccessToken(String userUUID){
+		return generateToken(userUUID, accessTokenDuration, "USER");
+	}
+
 	public String generateRefreshToken(Authentication authentication) {
 		String userUUID = authentication.getPrincipal().toString();
 		String roles = getMemberRoles(authentication);
 
 		return generateToken(userUUID, refreshTokenDuration, roles);
+	}
+
+	public String generateRefreshToken(String userUUID){
+		return generateToken(userUUID, refreshTokenDuration, "USER");
 	}
 
 
@@ -64,6 +74,20 @@ public class JwtUtils {
 			.signWith(key, SignatureAlgorithm.HS256)
 			.compact();
 	}
+
+	public String generateShareToken(String directoryUUID, long duration) {
+		Date issuedTime = new Date();
+		Date expiredTime = new Date(issuedTime.getTime() + duration);
+
+		return Jwts.builder()
+			.claim("id", directoryUUID)
+			.claim("role", "EDITOR")
+			.setIssuedAt(issuedTime)
+			.setExpiration(expiredTime)
+			.signWith(key, SignatureAlgorithm.HS256)
+			.compact();
+	}
+
 	private String getMemberRoles(Authentication authentication) {
 		List<String> authorities = authentication.getAuthorities()
 			.stream()
@@ -92,15 +116,45 @@ public class JwtUtils {
 		try {
 			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 			return true;
-		} catch (SecurityException | MalformedJwtException e) {
+		} catch (SignatureException | SecurityException | MalformedJwtException e) {
 			throw new InvalidTokenException("잘못된 JWT 시그니처");
 		} catch (UnsupportedJwtException e) {
 			throw new InvalidTokenException("유효하지 않은 JWT 토큰");
 		} catch (ExpiredJwtException e) {
-			throw new InvalidTokenException("토큰 기한 만료");
+			throw new InvalidTokenException("액세스 토큰 만료");
 		} catch (IllegalArgumentException e) {
 			throw new InvalidTokenException("JWT token compact of handler are invalid.");
 		}
 
+	}
+
+	public boolean validateShareToken(String token) {
+		try {
+			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+			return true;
+		} catch (JwtException e) {
+			return false;
+		}
+
+	}
+
+	public boolean validateRefreshToken(String token) {
+		try {
+			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+			return true;
+		} catch (SignatureException | SecurityException | MalformedJwtException e) {
+			throw new InvalidTokenException("잘못된 JWT 시그니처");
+		} catch (UnsupportedJwtException e) {
+			throw new InvalidTokenException("유효하지 않은 JWT 토큰");
+		} catch (ExpiredJwtException e) {
+			throw new InvalidTokenException("리프레시 토큰 만료");
+		} catch (IllegalArgumentException e) {
+			throw new InvalidTokenException("JWT token compact of handler are invalid.");
+		}
+
+	}
+
+	public long getRefreshTokenDuration(){
+		return this.refreshTokenDuration;
 	}
 }

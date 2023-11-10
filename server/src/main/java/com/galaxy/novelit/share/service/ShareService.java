@@ -1,8 +1,12 @@
 package com.galaxy.novelit.share.service;
 
-import org.springframework.http.ResponseEntity;
+import com.galaxy.novelit.share.dto.request.EditableReqDTO;
+import com.galaxy.novelit.share.dto.response.ShareTokenResDTO;
+import com.galaxy.novelit.share.dto.response.ShareTokenValidationResDTO;
 
 public interface ShareService {
 
-    String getContent(String directoryUUID);
+    ShareTokenResDTO generateToken(String directoryUUID, String userUUID);
+    void updateEditable(EditableReqDTO dto, String userUUID);
+    ShareTokenValidationResDTO validateToken(String token);
 }

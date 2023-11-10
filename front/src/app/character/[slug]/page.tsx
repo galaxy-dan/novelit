@@ -2,15 +2,14 @@
 import CharacterCard from '@/components/character/CharacterCard';
 import SubGroupCard from '@/components/character/SubGroupCard';
 import { characterType, groupType, subGroupType } from '@/model/charactor';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
-
 type Props = {
   params: {
     slug: string;
   };
 };
-
 export default function page({ params }: Props) {
   const [subGroups, setSubgroups] = useState<subGroupType[]>([
     { id: 'subgroup1', name: '서브그룹 1' },
@@ -107,25 +106,8 @@ export default function page({ params }: Props) {
     },
   ]);
 
-  const [group, setGroup] = useState<groupType>({
-    groupUUID: 'group1',
-    groupName: '그룹 1',
-  });
-
-  const [width, setWidth] = useState(100);
-  const characterNameRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (characterNameRef !== null && characterNameRef.current !== null) {
-      if (characterNameRef.current.offsetWidth > 100) {
-        setWidth(characterNameRef.current.offsetWidth + 5);
-      } else {
-        setWidth(100);
-      }
-    }
-  }, [group.groupName]);
-
   return (
-    <div className="ml-80 mr-60 my-20 select-none">
+    <div className="ml-10 my-20 select-none">
       {/* 제목 */}
       <div className="flex items-end text-5xl">
         <BsFillPersonFill className="mr-2" />
@@ -146,31 +128,17 @@ export default function page({ params }: Props) {
       <div className="mt-6">
         {/* 캐릭터 카드 그룹 */}
         <div>
-          <span
-            ref={characterNameRef}
-            className="invisible opacity-0 absolute text-4xl font-extrabold"
-          >
-            {group.groupName}
-          </span>
-          <input
-            className="text-4xl font-extrabold max-w-[30rem] truncate"
-            style={{ width }}
-            type="text"
-            onChange={(e) => {
-              setGroup((prev) => ({ ...prev, groupName: e.target.value }));
-            }}
-            value={group.groupName}
-          />
+          <p className="text-4xl font-extrabold max-w-[30rem] truncate">전체</p>
         </div>
 
-        <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
+        <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {subGroups?.map((subGroup, i) => (
-            <SubGroupCard subGroup={subGroup} />
+            <SubGroupCard subGroup={subGroup} slug={params.slug} />
           ))}
         </div>
-        <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
+        <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
           {characters?.map((character, i) => (
-            <CharacterCard character={character} />
+            <CharacterCard character={character} slug={params.slug} />
           ))}
         </div>
       </div>

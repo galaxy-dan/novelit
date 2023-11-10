@@ -64,7 +64,11 @@ public class PlotServiceImpl implements PlotService{
 
         String plotString = plotUuid.toString();
 
-        plotRepository.save(PlotEntity.create(plotString, dto));
+        PlotEntity plotEntity = plotRepository.save(PlotEntity.create(plotString, dto));
+
+        if (plotEntity == null) {
+            throw new RuntimeException();
+        }
     }
 
     @Override
