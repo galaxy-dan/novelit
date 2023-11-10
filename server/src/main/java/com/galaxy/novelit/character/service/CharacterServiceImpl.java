@@ -109,6 +109,7 @@ public class CharacterServiceImpl implements CharacterService {
         String characterUUID = UUID.randomUUID().toString();
 
         String groupUUID = dto.getGroupUUID();
+        // 그룹이 조회되지 않을 때 그룹UUID를 null로 변경
         if (groupRepository.findByGroupUUID(groupUUID) == null) {
             groupUUID = null;
         }
