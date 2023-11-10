@@ -96,7 +96,7 @@ public class NotificationServiceImpl implements NotificationService{
             try{
                 emitter.send(SseEmitter.event()
                     .id(subscriberUUID)
-                    .name("alertComment") // alertComment stream 생성
+                    .name("connection") // alertComment stream 생성
                     .data(data));
             } catch (IOException exception)
             {
@@ -105,6 +105,7 @@ public class NotificationServiceImpl implements NotificationService{
             }
         }
     }
+
 
     // 처음 구독
     private SseEmitter createEmitter(String subscriberUUID)
