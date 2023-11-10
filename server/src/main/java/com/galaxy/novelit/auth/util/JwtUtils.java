@@ -46,11 +46,19 @@ public class JwtUtils {
 		return generateToken(userUUID, accessTokenDuration, roles);
 	}
 
+	public String generateAccessToken(String userUUID){
+		return generateToken(userUUID, accessTokenDuration, "USER");
+	}
+
 	public String generateRefreshToken(Authentication authentication) {
 		String userUUID = authentication.getPrincipal().toString();
 		String roles = getMemberRoles(authentication);
 
 		return generateToken(userUUID, refreshTokenDuration, roles);
+	}
+
+	public String generateRefreshToken(String userUUID){
+		return generateToken(userUUID, refreshTokenDuration, "USER");
 	}
 
 
@@ -113,7 +121,7 @@ public class JwtUtils {
 		} catch (UnsupportedJwtException e) {
 			throw new InvalidTokenException("유효하지 않은 JWT 토큰");
 		} catch (ExpiredJwtException e) {
-			throw new InvalidTokenException("토큰 기한 만료");
+			throw new InvalidTokenException("액세스 토큰 만료");
 		} catch (IllegalArgumentException e) {
 			throw new InvalidTokenException("JWT token compact of handler are invalid.");
 		}
@@ -128,5 +136,25 @@ public class JwtUtils {
 			return false;
 		}
 
+	}
+
+	public boolean validateRefreshToken(String token) {
+		try {
+			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+			return true;
+		} catch (SignatureException | SecurityException | MalformedJwtException e) {
+			throw new InvalidTokenException("잘못된 JWT 시그니처");
+		} catch (UnsupportedJwtException e) {
+			throw new InvalidTokenException("유효하지 않은 JWT 토큰");
+		} catch (ExpiredJwtException e) {
+			throw new InvalidTokenException("리프레시 토큰 만료");
+		} catch (IllegalArgumentException e) {
+			throw new InvalidTokenException("JWT token compact of handler are invalid.");
+		}
+
+	}
+
+	public long getRefreshTokenDuration(){
+		return this.refreshTokenDuration;
 	}
 }
