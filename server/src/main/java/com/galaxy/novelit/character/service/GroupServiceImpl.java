@@ -62,10 +62,11 @@ public class GroupServiceImpl implements GroupService {
     public void createGroup(GroupCreateDtoReq dto, String userUUID) {
         String groupUUID = UUID.randomUUID().toString();
         String parentGroupUUID = dto.getParentGroupUUID();
+        GroupEntity parentGroup = groupRepository.findByGroupUUID(parentGroupUUID);
         GroupEntity newGroup;
 
-        // 최상단 계층일 경우 (부모UUID가 없을 때)
-        if (groupRepository.findByGroupUUID(parentGroupUUID) == null) {
+        // dto에 parentGroupUUID가 잘못된 값이 들어왔을 때, null 값으로 처리
+        if (parentGroup == null) {
             newGroup = GroupEntity.builder()
                 .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
@@ -73,6 +74,8 @@ public class GroupServiceImpl implements GroupService {
                 .groupName(dto.getGroupName())
                 .parentGroupUUID(null)
                 .build();
+
+            groupRepository.save(newGroup);
         }
         else {
             newGroup = GroupEntity.builder()
@@ -82,9 +85,13 @@ public class GroupServiceImpl implements GroupService {
                 .groupName(dto.getGroupName())
                 .parentGroupUUID(parentGroupUUID)
                 .build();
-        }
 
-        groupRepository.save(newGroup);
+            groupRepository.save(newGroup);
+
+            // 부모 그룹의 childGroups 리스트에 자식 추가
+            parentGroup.addChildGroup(groupRepository.findByGroupUUID(groupUUID));
+            groupRepository.save(parentGroup);
+        }
     }
 
     @Transactional
@@ -93,6 +100,14 @@ public class GroupServiceImpl implements GroupService {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
         group.deleteGroup();
         groupRepository.save(group);
+
+        GroupEntity parentGroup = groupRepository.findByGroupUUID(group.getParentGroupUUID());
+
+        // 부모그룹의 childGroups 리스트에 자식 제거
+        if (parentGroup != null) {
+            parentGroup.removeChildGroup(groupRepository.findByGroupUUID(groupUUID));
+            groupRepository.save(parentGroup);
+        }
     }
 
     @Transactional

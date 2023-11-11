@@ -18,4 +18,5 @@ public interface CharacterService {
 
     List<CharacterSearchInfoResDTO> searchCharacter(String workspaceUUID, String characterName);
     List<RelationDtoRes> getRelationships();
+    void moveCharacter(String characterUUID, String groupUUID, String userUUID);
 }
