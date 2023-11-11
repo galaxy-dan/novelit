@@ -38,9 +38,19 @@ public class GroupEntity {
     public void updateGroupName(String groupName) {
         this.groupName = groupName;
     }
-
     public void deleteGroup() {
         this.isDeleted = true;
     }
-
+    public void addChildGroup(GroupEntity child) {
+        this.childGroups.add(child);
+    }
+    public void removeChildGroup(GroupEntity child) {
+        this.childGroups.remove(child);
+    }
+    public void addChildCharacter(CharacterEntity child) {
+        this.childCharacters.add(child);
+    }
+    public void removeChildCharacter(CharacterEntity child) {
+        this.childCharacters.remove(child);
+    }
 }

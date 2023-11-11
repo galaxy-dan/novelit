@@ -91,4 +91,16 @@ public class CharacterController {
         }
     }
 
+    @PatchMapping("/move")
+    public ResponseEntity<Object> moveCharacter(@RequestParam String characterUUID, @RequestParam String groupUUID, Authentication authentication) {
+        try {
+//            characterService.moveCharacter(characterUUID, groupUUID, authentication.getName());
+            characterService.moveCharacter(characterUUID, groupUUID, tempUser);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }

@@ -11,6 +11,7 @@ import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes.RelationDto;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.CharacterEntity.CharacterEntityBuilder;
+import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.entity.RelationEntity;
 import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import com.galaxy.novelit.character.repository.CharacterRepository;
@@ -144,6 +145,15 @@ public class CharacterServiceImpl implements CharacterService {
         }
 
         characterRepository.save(newCharacter.build());
+
+        // 소속 그룹의 엔티티에 추가
+        if (groupUUID != null) {
+            GroupEntity parentGroup = groupRepository.findByGroupUUID(groupUUID);
+            CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+            parentGroup.addChildCharacter(character);
+
+            groupRepository.save(parentGroup);
+        }
     }
 
     @Transactional
@@ -187,11 +197,32 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
+    public void moveCharacter(String characterUUID, String groupUUID, String userUUID) {
+        CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+        GroupEntity parentGroup = groupRepository.findByGroupUUID(character.getGroupUUID());
+        GroupEntity newParentGroup = groupRepository.findByGroupUUID(groupUUID);
+        parentGroup.removeChildCharacter(character);
+        newParentGroup.addChildCharacter(character);
+        character.moveCharacter(groupUUID);
+
+        characterRepository.save(character);
+        groupRepository.save(parentGroup);
+        groupRepository.save(newParentGroup);
+    }
+
+
+    @Transactional
+    @Override
     public void deleteCharacter(String characterUUID, String userUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+        GroupEntity parentGroup = groupRepository.findByGroupUUID(character.getGroupUUID());
+
         character.deleteCharacter();
+        parentGroup.addChildCharacter(character);
+
         characterRepository.save(character);
         relationRepository.deleteByCharacterUUID(characterUUID);
+        groupRepository.save(parentGroup);
     }
 
     @Transactional
