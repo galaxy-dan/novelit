@@ -164,10 +164,11 @@ public class CharacterServiceImpl implements CharacterService {
         relationRepository.save(newRelation);
 
         newCharacter = CharacterEntity.builder()
-            .userUUID(userUUID)
             .characterId(character.getCharacterId())
-            .characterUUID(characterUUID)
+            .userUUID(userUUID)
+            .workspaceUUID(character.getWorkspaceUUID())
             .groupUUID(dto.getGroupUUID())
+            .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
             .information(dto.getInformation())
