@@ -1,16 +1,12 @@
 package com.galaxy.novelit.character.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -33,9 +29,7 @@ public class CharacterEntity {
     private String characterUUID;
     @Field(name = "character_name")
     private String characterName;
-    @Field(name = "description")
     private String description;
-    @Field(name = "information")
     private List<Map<String, String>> information;
     @DBRef
     private RelationEntity relationship;

@@ -13,6 +13,7 @@ import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
 import com.galaxy.novelit.common.exception.NonUniqueException;
+import com.galaxy.novelit.common.exception.NotLoggedInException;
 import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.common.exception.dto.ExceptionResDTO;
 
@@ -64,6 +65,11 @@ public class ExceptionAdvice {
 
 	@ExceptionHandler(EditRefusedException.class)
 	public ResponseEntity<ExceptionResDTO> EditRefusedException(EditRefusedException e) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(NotLoggedInException.class)
+	public ResponseEntity<ExceptionResDTO> NotLoggedInException(NotLoggedInException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
 	}
 }

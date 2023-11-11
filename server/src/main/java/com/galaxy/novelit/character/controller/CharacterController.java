@@ -5,7 +5,6 @@ import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
-import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
 import com.galaxy.novelit.words.service.WordsService;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -76,10 +74,10 @@ public class CharacterController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchCharacter(@RequestParam String characterName) {
-        List<CharacterSearchInfoResDTO> charactersList = characterService.searchCharacter(characterName);
+    public ResponseEntity<Object> searchCharacter(@RequestParam String workspaceUUID, @RequestParam String characterName) {
+        List<CharacterSearchInfoResDTO> charactersList = characterService.searchCharacter(workspaceUUID, characterName);
 
-        return ResponseEntity.ok().body("");
+        return ResponseEntity.ok().body(charactersList);
     }
 
     @GetMapping("/diagram")

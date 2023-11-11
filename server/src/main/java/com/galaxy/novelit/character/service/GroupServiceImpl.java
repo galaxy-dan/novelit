@@ -12,12 +12,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.mapping.Collection;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
@@ -45,8 +42,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<GroupSimpleDtoRes> getTopGroup(String userUUID) {
-        List<GroupEntity> groups = groupRepository.findAllByParentGroupUUID(null);
+    public List<GroupSimpleDtoRes> getTopGroup(String workspaceUUID, String userUUID) {
+        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(workspaceUUID);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -60,7 +57,6 @@ public class GroupServiceImpl implements GroupService {
         return dto;
     }
 
-
     @Transactional
     @Override
     public void createGroup(GroupCreateDtoReq dto, String userUUID) {
@@ -69,7 +65,7 @@ public class GroupServiceImpl implements GroupService {
         GroupEntity newGroup;
 
         // 최상단 계층일 경우 (부모UUID가 없을 때)
-        if (parentGroupUUID == null) {
+        if (groupRepository.findByGroupUUID(parentGroupUUID) == null) {
             newGroup = GroupEntity.builder()
                 .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())

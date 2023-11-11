@@ -31,17 +31,17 @@ public class NotificationServiceImpl implements NotificationService{
     {
         SseEmitter emitter = createEmitter(subscriberUUID);
 
-        sendSubscribe(subscriberUUID, "이벤트 스트림 생성 [유저ID = " + subscriberUUID + "]");
+        sendSubscribe(subscriberUUID, "Connection");
         return emitter;
     }
 
 
     @Override
-    public void alertComment(String commentNickname, String directoryUUID) {
-        sseAlertComment(commentNickname, directoryUUID);
+    public void alertComment(String commentNickname, String directoryUUID, String publisherUUID) {
+        sseAlertComment(commentNickname, directoryUUID, publisherUUID);
     }
 
-    private void sseAlertComment(String commentNickname, String directoryUUID) {
+    private void sseAlertComment(String commentNickname, String directoryUUID, String publisherUUID) {
         // directoryUUID == workspaceUUID
         Directory directory = directoryRepository.findDirectoryByUuid(
                 directoryUUID)
@@ -68,8 +68,10 @@ public class NotificationServiceImpl implements NotificationService{
                     .name("alertComment")
                     .data(notificationResponseDto.getNotificationContent(), MediaType.TEXT_PLAIN));
 
-                    log.info("pubName : {}, subUUID : {}, directoryName : {}", commentNickname, subscriberUUID, directoryName);
+                    //log.info("pubName : {}, subUUID : {}, directoryName : {}", commentNickname, subscriberUUID, directoryName);
+
                     alarmRedisService.save(AlarmRedisRequestDto.builder()
+                        .pubUUID(publisherUUID)
                         .pubName(commentNickname)
                         .subUUID(subscriberUUID)
                         .directoryName(directoryName)
@@ -94,7 +96,7 @@ public class NotificationServiceImpl implements NotificationService{
             try{
                 emitter.send(SseEmitter.event()
                     .id(subscriberUUID)
-                    .name("alertComment") // alertComment stream 생성
+                    .name("connection") // alertComment stream 생성
                     .data(data));
             } catch (IOException exception)
             {
@@ -103,6 +105,7 @@ public class NotificationServiceImpl implements NotificationService{
             }
         }
     }
+
 
     // 처음 구독
     private SseEmitter createEmitter(String subscriberUUID)

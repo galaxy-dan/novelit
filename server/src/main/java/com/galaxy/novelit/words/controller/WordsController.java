@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,21 +23,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class WordsController {
 
     private final WordsService wordsService;
+    private final String tempUser = "temp";
 
     @PostMapping
     public ResponseEntity<Object> createWord(@RequestBody WordsCreateReqDTO dto) {
         try {
-            wordsService.createWord(dto);
+            wordsService.createWord(dto, tempUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @PutMapping
-    public ResponseEntity<Object> updateWord(@RequestBody WordsUpdateReqDTO dto) {
+    @PatchMapping
+    public ResponseEntity<Object> updateWord(@RequestParam String wordUUID, @RequestParam String newWord) {
         try {
-            wordsService.updateWord(dto);
+            wordsService.updateWord(wordUUID, newWord);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

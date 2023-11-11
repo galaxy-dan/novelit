@@ -1,6 +1,6 @@
 package com.galaxy.novelit.character.dto.req;
 
-import com.galaxy.novelit.character.entity.RelationEntity;
+import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -15,6 +15,6 @@ public class CharacterUpdateDtoReq {
     private String characterName;
     private String description;
     private List<Map<String, String>> information;
-    private RelationEntity relationship;
+    private List<Relation> relations;    // targetUUID,targetName,content
     private String characterImage;
 }
