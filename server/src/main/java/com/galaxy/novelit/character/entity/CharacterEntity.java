@@ -41,5 +41,7 @@ public class CharacterEntity {
     public void deleteCharacter() {
         this.isDeleted = true;
     }
-
+    public void moveCharacter(String groupUUID) {
+        this.groupUUID = groupUUID;
+    }
 }
