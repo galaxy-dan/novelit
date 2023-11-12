@@ -20,10 +20,6 @@ export default function page({ params }: Props) {
   const { data: groupData }: UseQueryResult<groupItemType> = useQuery({
     queryKey: ['group', params.slug],
     queryFn: () => getTopGroupAndCharacter(params.slug),
-    onSuccess: (data) => { 
-      console.log("캐치미 이퓨 캐앤");
-      console.log(data);
-    },
     onError: () => {
       router.push(`/main`);
     },
