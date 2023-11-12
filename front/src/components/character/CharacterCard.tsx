@@ -42,7 +42,7 @@ export default function CharacterCard({ character, slug }: Props) {
         <p className="font-extrabold text-xl">{character.characterName}</p>
         <div className="font-bold">
           {character?.information?.slice(0, 3).map((info, i) => (
-            <div className="flex mt-1 min-w-0">
+            <div className="flex mt-1 min-w-0" key={i}>
               <p className="mr-2">{info.title}</p>
               <p className="flex-1 truncate">{info.content}</p>
             </div>

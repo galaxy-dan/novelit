@@ -1,8 +1,10 @@
+import { stringList } from 'aws-sdk/clients/datapipeline';
+
 export type groupType = {
   workspaceUUID?: string;
   groupUUID?: string;
   groupName?: string;
-  parentUUID?: string;
+  parentGroupUUID?: string;
   userUUID?: string;
 };
 
@@ -32,9 +34,10 @@ export type relationshipType = {
 };
 
 export type groupItemType = {
-  name?: string;
   groups: subGroupType[];
   characters: characterType[];
+  groupName?: string;
+  parentGroupUUID: string;
 };
 
 export type characterDirectory = {
@@ -42,4 +45,3 @@ export type characterDirectory = {
   name: string;
   children?: characterDirectory[] | null;
 };
-

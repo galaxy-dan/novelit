@@ -5,8 +5,8 @@ const transformSubGroupAndCharacter = (data: any) => {
   const groupName: string = data.groupName;
   const childGroup: subGroupType[] = data.childGroups.map(
     (childGroup: groupType) => ({
-      id: childGroup.groupUUID,
-      name: childGroup.groupName,
+      groupUUID: childGroup.groupUUID,
+      groupName: childGroup.groupName,
     }),
   );
   const childCharacter: characterType[] = data.childCharacters.map(
@@ -19,7 +19,8 @@ const transformSubGroupAndCharacter = (data: any) => {
   );
 
   return {
-    name: groupName,
+    groupName: data.groupName,
+    parentGroupUUID: data.parentGroupUUID,
     groups: childGroup,
     characters: childCharacter,
   };

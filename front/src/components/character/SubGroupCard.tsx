@@ -1,4 +1,5 @@
 import { subGroupType } from '@/model/charactor';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 type Props = {
@@ -7,6 +8,7 @@ type Props = {
 };
 export default function SubGroupCard({ subGroup, slug }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return (
     <div
