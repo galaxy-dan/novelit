@@ -27,7 +27,7 @@ export default function page({ params }: Props) {
   const { data: groupData }: UseQueryResult<groupItemType> = useQuery({
     queryKey: ['group', params.group],
     queryFn: () => getSubGroupAndCharacter(params.group),
-    onSuccess: (data) => setGroupNameInput(data.name),
+    onSuccess: (data) => setGroupNameInput(data.name || ''),
     onError: () => {
       router.push(`/character/${params.slug}`);
     },
@@ -100,12 +100,12 @@ export default function page({ params }: Props) {
         </div>
 
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
-          {groupData?.childGroup?.map((group, i) => (
-            <SubGroupCard subGroup={group} slug={params.slug} key={group.id} />
+          {groupData?.groups?.map((group, i) => (
+            <SubGroupCard subGroup={group} slug={params.slug} key={group.groupUUID} />
           ))}
         </div>
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
-          {groupData?.childCharacter?.map((character, i) => (
+          {groupData?.characters?.map((character, i) => (
             <CharacterCard
               character={character}
               slug={params.slug}

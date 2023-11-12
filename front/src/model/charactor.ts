@@ -7,8 +7,8 @@ export type groupType = {
 };
 
 export type subGroupType = {
-  id: string;
-  name: string;
+  groupUUID: string;
+  groupName: string;
 };
 
 export type characterType = {
@@ -32,7 +32,14 @@ export type relationshipType = {
 };
 
 export type groupItemType = {
-  name: string;
-  childGroup: subGroupType[];
-  childCharacter: characterType[];
+  name?: string;
+  groups: subGroupType[];
+  characters: characterType[];
 };
+
+export type characterDirectory = {
+  id?: string | null;
+  name: string;
+  children?: characterDirectory[] | null;
+};
+

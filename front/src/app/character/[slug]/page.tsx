@@ -1,9 +1,11 @@
 'use client';
 import CharacterCard from '@/components/character/CharacterCard';
 import SubGroupCard from '@/components/character/SubGroupCard';
-import { characterType, groupType, subGroupType } from '@/model/charactor';
+import {  groupItemType } from '@/model/charactor';
+import { getTopGroupAndCharacter } from '@/service/api/group';
+import { UseQueryResult, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
 type Props = {
   params: {
@@ -11,100 +13,21 @@ type Props = {
   };
 };
 export default function page({ params }: Props) {
-  const [subGroups, setSubgroups] = useState<subGroupType[]>([
-    { id: 'subgroup1', name: '서브그룹 1' },
-    { id: 'subgroup2', name: '서브그룹 2' },
-  ]);
-  const [characters, setCharacters] = useState<characterType[]>([
-    {
-      characterUUID: 'character1',
-      characterName: '배트맨',
-      characterImage:
-        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '나이',
-          content: '24',
-        },
-      ],
-      relations: [],
+
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  
+  const { data: groupData }: UseQueryResult<groupItemType> = useQuery({
+    queryKey: ['group', params.slug],
+    queryFn: () => getTopGroupAndCharacter(params.slug),
+    onSuccess: (data) => { 
+      console.log("캐치미 이퓨 캐앤");
+      console.log(data);
     },
-    {
-      characterUUID: 'character2',
-      characterName: '배트맨',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-      ],
-      relations: [],
+    onError: () => {
+      router.push(`/main`);
     },
-    {
-      characterUUID: 'character3',
-      characterName: '배트맨',
-      characterImage:
-        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-      ],
-      relations: [],
-    },
-    {
-      characterUUID: 'character4',
-      characterName: '배트맨',
-      characterImage:
-        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-      ],
-      relations: [],
-    },
-  ]);
+  });
 
   return (
     <div className="ml-10 my-20 select-none">
@@ -132,16 +55,16 @@ export default function page({ params }: Props) {
         </div>
 
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
-          {subGroups?.map((subGroup, i) => (
+          {groupData?.groups?.map((group, i) => (
             <SubGroupCard
-              subGroup={subGroup}
+              subGroup={group}
               slug={params.slug}
-              key={subGroup.id}
+              key={group.groupUUID}
             />
           ))}
         </div>
         <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
-          {characters?.map((character, i) => (
+          {groupData?.characters?.map((character, i) => (
             <CharacterCard
               character={character}
               slug={params.slug}
