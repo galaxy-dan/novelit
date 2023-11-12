@@ -74,14 +74,12 @@ export default function page({ params }: Props) {
 
   const [otherCharacterNameInput, setOtherCharacterNameInput] =
     useState<string>('');
+  const [otherCharacterName, setOtherCharacterName] = useState<string>('');
 
   const { data: otherCharacterData }: UseQueryResult<characterType[]> =
     useQuery({
-      queryKey: ['otherCharacter', otherCharacterNameInput],
-      queryFn: () => getCharacterByName(params.slug, otherCharacterNameInput),
-      onSuccess: (data) => {
-        console.log('새로운 값 불러옴');
-      },
+      queryKey: ['otherCharacter', otherCharacterName],
+      queryFn: () => getCharacterByName(params.slug, otherCharacterName)
     });
 
   const putCharacterMutation = useMutation({
@@ -148,7 +146,7 @@ export default function page({ params }: Props) {
     useState<number>(-1);
   const [loadingState, setLoadingState] = useState<number>(0);
 
-  const hello = () => {
+  const updateCharacter = () => {
     setCharacter((prev) => ({
       ...prev,
       characterName: nameInput,
@@ -173,13 +171,26 @@ export default function page({ params }: Props) {
     );
   }, [
     otherCharacterData,
-    otherCharacterNameInput,
+    otherCharacterName,
     relationCharacterSearchInput,
   ]);
 
+  const sayYeah = () => { 
+    setOtherCharacterName(otherCharacterNameInput);
+  }
+
   useEffect(() => {
     const debounce = setTimeout(() => {
-      return hello();
+      return sayYeah();
+    }, 500);
+    return () => {
+      clearTimeout(debounce);
+    };
+  }, [otherCharacterNameInput]);
+
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      return updateCharacter();
     }, 1300);
     return () => {
       clearTimeout(debounce);
