@@ -79,18 +79,21 @@ export default function page({ params }: Props) {
     useQuery({
       queryKey: ['otherCharacter', otherCharacterNameInput],
       queryFn: () => getCharacterByName(params.slug, otherCharacterNameInput),
+      onSuccess: (data) => {
+        console.log("새로운 값 불러옴");
+      },
     });
 
   const putCharacterMutation = useMutation({
     mutationFn: () => patchCharacter(params.character, character),
     onSuccess: () => {
-      setState(3);
+      setLoadingState(3);
     },
     onError: () => {
-      setState(4);
+      setLoadingState(4);
     },
     onMutate: () => {
-      setState(2);
+      setLoadingState(2);
     },
   });
 
@@ -104,7 +107,7 @@ export default function page({ params }: Props) {
       }
     },
     onError: () => {
-      setState(4);
+      setLoadingState(4);
     },
   });
 
@@ -141,8 +144,9 @@ export default function page({ params }: Props) {
 
   const [groupUUID, setGroupUUID] = useState<string | null>('');
 
-  const [searchInput, setSearchInput] = useState<number>(-1);
-  const [state, setState] = useState<number>(0);
+  const [relationCharacterSearchInput, setRelationCharacterSearchInput] =
+    useState<number>(-1);
+  const [loadingState, setLoadingState] = useState<number>(0);
 
   const hello = () => {
     setCharacter((prev) => ({
@@ -154,6 +158,20 @@ export default function page({ params }: Props) {
       information: informationInput,
     }));
   };
+  const [filteredRelationCharacterData, setFilteredRelationCharacterData] =
+    useState<characterType[]>([]);
+
+  useEffect(() => {
+    setFilteredRelationCharacterData(
+      otherCharacterData?.filter(
+        (obj) =>
+          !relationshipInput
+            ?.map((obj) => obj.targetUUID)
+            .includes(obj.characterUUID),
+      ) || [],
+    );
+    console.log("새로워랏!");
+  }, [otherCharacterData, otherCharacterNameInput,relationCharacterSearchInput]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -185,7 +203,7 @@ export default function page({ params }: Props) {
         setIsFetched(true);
       }
     } else {
-      setState(0);
+      setLoadingState(0);
     }
     ref.current = JSON.parse(JSON.stringify(character));
   }, [character]);
@@ -206,16 +224,21 @@ export default function page({ params }: Props) {
   };
 
   useEffect(() => {
-    if (state === 1 || state === 2) {
+    if (loadingState === 1 || loadingState === 2) {
       enablePrevent();
     } else {
       disablePrevent();
     }
-  }, [state]);
+  }, [loadingState]);
 
   return (
-    <div className="select-none w-full" onClick={() => setSearchInput(-1)}>
-      <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 my-20 ">
+    <div
+      className="select-none w-full"
+      onClick={() => {
+        setRelationCharacterSearchInput(-1);
+      }}
+    >
+      <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 py-20 ">
         {/* 상단 타이틀 메뉴 + 로딩 상태 */}
         <div className="flex items-end justify-between">
           <div className="flex items-center">
@@ -232,7 +255,7 @@ export default function page({ params }: Props) {
                 type="text"
                 onChange={(e) => {
                   setNameInput(e.target.value);
-                  setState(1);
+                  setLoadingState(1);
                 }}
                 value={nameInput || ''}
               />
@@ -246,7 +269,7 @@ export default function page({ params }: Props) {
             />
           </div>
 
-          <UploadState state={state} />
+          <UploadState state={loadingState} />
         </div>
         {/* 캐릭터 이미지 및 설명 */}
         <div className="flex h-64 mt-6">
@@ -314,7 +337,7 @@ export default function page({ params }: Props) {
                   }
                 }
 
-                setState(1);
+                setLoadingState(1);
               }}
             />
           </div>
@@ -325,7 +348,7 @@ export default function page({ params }: Props) {
                 className={`${styles.scroll} resize-none outline-none font-bold text-lg w-full h-full`}
                 value={descriptionInput || ''}
                 onChange={(e) => {
-                  setState(1);
+                  setLoadingState(1);
                   if (e.target.value.length < 1000) {
                     setdescriptionInput(e.target.value);
                   } else {
@@ -358,7 +381,7 @@ export default function page({ params }: Props) {
                           className="w-full resize-none outline-none truncate my-auto text-center font-bold"
                           value={key.split('@;!')[0]}
                           onChange={(e) => {
-                            setState(1);
+                            setLoadingState(1);
 
                             var newItem = [...informationInput];
                             let str: string =
@@ -386,7 +409,7 @@ export default function page({ params }: Props) {
                             className="w-full resize-none outline-none truncate my-auto text-center font-bold"
                             value={value}
                             onChange={(e) => {
-                              setState(1);
+                              setLoadingState(1);
                               var newItem = [...informationInput];
                               newItem[0][key] = e.target.value;
                               setInformationInput(newItem);
@@ -395,7 +418,7 @@ export default function page({ params }: Props) {
                           <FaMinus
                             className="my-auto cursor-pointer h-10"
                             onClick={() => {
-                              setState(1);
+                              setLoadingState(1);
                               let tmpInfo: informationType[] = [
                                 ...informationInput,
                               ];
@@ -418,7 +441,7 @@ export default function page({ params }: Props) {
                 let newInfo = [...informationInput];
                 newInfo[0][uuid] = '';
                 setInformationInput(newInfo);
-                setState(1);
+                setLoadingState(1);
               }
             }}
           >
@@ -447,61 +470,85 @@ export default function page({ params }: Props) {
                       } w-full resize-none outline-none truncate my-auto text-center font-bold`}
                       value={relationshipInput[i].targetName}
                       onChange={(e) => {
-                        setState(1);
+                        setLoadingState(1);
                         var newItem = [...relationshipInput];
                         newItem[i].targetName = e.target.value;
                         newItem[i].targetUUID = null;
+                        if (e.target.value.length > 0) {
+                          setRelationCharacterSearchInput(i);
+                        } else {
+                          setRelationCharacterSearchInput(-1);
+                        }
                         setRelationInput(newItem);
                         setOtherCharacterNameInput(e.target.value);
-                        setSearchInput(i);
+                      }}
+                      onClick={(e) => {
+                        if (
+                          relationshipInput[i].targetName !==
+                          otherCharacterNameInput
+                        ) {
+                          setFilteredRelationCharacterData([]);
+                        }
+
+                        if (
+                          !relationshipInput[i].targetUUID &&
+                          relationshipInput[i].targetName.length > 0
+                        ) {
+                          setRelationCharacterSearchInput(i);
+                          setOtherCharacterNameInput(
+                            relationshipInput[i].targetName,
+                          );
+                          e.stopPropagation();
+                        }
                       }}
                     />
                     <div
                       className={`${styles.scroll} ${
-                        searchInput !== i && 'hidden'
+                        relationCharacterSearchInput !== i && 'hidden'
                       } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
                     >
-                      {otherCharacterData?.filter(obj => relationshipInput?.map(obj => obj.targetUUID).includes(obj.characterUUID||" ")).map((otherCharacter, j) => (
-                        
-                        <div
-                          className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
-                          onClick={() => {
-                            setState(1);
-                            var newItem = [...relationshipInput];
-                            newItem[i].targetUUID =
-                              otherCharacter.characterUUID;
-                            newItem[i].targetName =
-                              otherCharacter.characterName || '';
-                            setRelationInput(newItem);
-
-                            setSearchInput(-1);
-                          }}
-                          key={otherCharacter.characterUUID}
-                        >
-                          {!otherCharacter.characterImage ? (
-                            <Image
-                              src="/images/default_character.png"
-                              alt="관계 캐릭터 이미지 없음"
-                              priority={true}
-                              className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                              height={1000}
-                              width={1000}
-                            />
-                          ) : (
-                            <Image
-                              src={otherCharacter.characterImage || ''}
-                              alt="관계 캐릭터 이미지"
-                              priority={true}
-                              className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                              height={1000}
-                              width={1000}
-                            />
-                          )}
-                          <p className="truncate">
-                            {otherCharacter.characterName}
-                          </p>
-                        </div>
-                      ))}
+                      {filteredRelationCharacterData.map(
+                        (otherCharacter, j) => (
+                          <div
+                            className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                            onClick={() => {
+                              setLoadingState(1);
+                              var newItem = [...relationshipInput];
+                              newItem[i].targetUUID =
+                                otherCharacter.characterUUID;
+                              newItem[i].targetName =
+                                otherCharacter.characterName || '';
+                              setRelationInput(newItem);
+                              setRelationCharacterSearchInput(-1);
+                              setFilteredRelationCharacterData([]);
+                            }}
+                            key={otherCharacter.characterUUID}
+                          >
+                            {!otherCharacter.characterImage ? (
+                              <Image
+                                src="/images/default_character.png"
+                                alt="관계 캐릭터 이미지 없음"
+                                priority={true}
+                                className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                                height={1000}
+                                width={1000}
+                              />
+                            ) : (
+                              <Image
+                                src={otherCharacter.characterImage || ''}
+                                alt="관계 캐릭터 이미지"
+                                priority={true}
+                                className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                                height={1000}
+                                width={1000}
+                              />
+                            )}
+                            <p className="truncate">
+                              {otherCharacter.characterName}
+                            </p>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </td>
                   <td
@@ -515,7 +562,7 @@ export default function page({ params }: Props) {
                         className="w-full resize-none outline-none truncate my-auto text-center font-bold"
                         value={relationshipInput[i].content}
                         onChange={(e) => {
-                          setState(1);
+                          setLoadingState(1);
                           var newItem = [...relationshipInput];
                           newItem[i].content = e.target.value;
                           setRelationInput(newItem);
@@ -524,7 +571,7 @@ export default function page({ params }: Props) {
                       <FaMinus
                         className="my-auto cursor-pointer h-10"
                         onClick={() => {
-                          setState(1);
+                          setLoadingState(1);
                           let tmpRelation = [...relationshipInput];
                           let tmp = tmpRelation.splice(i, 1);
                           setRelationInput(tmpRelation);
@@ -544,7 +591,7 @@ export default function page({ params }: Props) {
                 { targetUUID: null, targetName: '', content: '' },
               ];
               setRelationInput(newRelation);
-              setState(1);
+              setLoadingState(1);
             }}
           >
             <HiPlus className="text-white mx-auto font-bold" />
