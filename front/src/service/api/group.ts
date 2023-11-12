@@ -20,9 +20,13 @@ const transformSubGroupAndCharacter = (data: any) => {
 
   return {
     name: groupName,
-    childGroup: childGroup,
-    childCharacter: childCharacter,
+    groups: childGroup,
+    characters: childCharacter,
   };
+};
+export const getTopGroupAndCharacter = async (workspaceUUID: string) => {
+  const data = await get(`/group/top?workspaceUUID=${workspaceUUID}`);
+  return data;
 };
 
 export const getGroup = async (uuid: string) => {
@@ -40,7 +44,7 @@ export const postGroup = async (body: groupType) => {
   return data;
 };
 
-export const patchGroup = async (groupUUID : string, newName: string) => {
+export const patchGroup = async (groupUUID: string, newName: string) => {
   const data = await patch(`/group?groupUUID=${groupUUID}&newName=${newName}`);
   return data;
 };
