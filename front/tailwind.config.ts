@@ -23,22 +23,22 @@ const config: Config = {
       },
     },
     screens: {
-      f: { min: '2400px' },
+      f: { min: '2040px' },
       // => @media (max-width: 1279px) { ... }
 
-      e: { max: '2400px' },
+      e: { max: '2040px' },
       // => @media (max-width: 1279px) { ... }
 
-      d: { max: '1900px' },
+      d: { max: '1750px' },
       // => @media (max-width: 1279px) { ... }
 
-      c: { max: '1420px' },
+      c: { max: '1460px' },
       // => @media (max-width: 1023px) { ... }
 
-      b: { max: '1150px' },
+      b: { max: '1170px' },
       // => @media (max-width: 767px) { ... }
 
-      a: { max: '839px' },
+      a: { max: '880px' },
       // => @media (max-width: 639px) { ... }
       f2: {min: '3840px' },
       e2: {max: '3190px' },
