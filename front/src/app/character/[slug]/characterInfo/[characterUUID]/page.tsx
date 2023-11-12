@@ -79,7 +79,7 @@ export default function page({ params }: Props) {
   const { data: otherCharacterData }: UseQueryResult<characterType[]> =
     useQuery({
       queryKey: ['otherCharacter', otherCharacterName],
-      queryFn: () => getCharacterByName(params.slug, otherCharacterName)
+      queryFn: () => getCharacterByName(params.slug, otherCharacterName),
     });
 
   const putCharacterMutation = useMutation({
@@ -169,19 +169,11 @@ export default function page({ params }: Props) {
           obj.characterUUID !== params.characterUUID,
       ) || [],
     );
-  }, [
-    otherCharacterData,
-    otherCharacterName,
-    relationCharacterSearchInput,
-  ]);
-
-  const sayYeah = () => { 
-    setOtherCharacterName(otherCharacterNameInput);
-  }
+  }, [otherCharacterData, otherCharacterName, relationCharacterSearchInput]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-      return sayYeah();
+      return setOtherCharacterName(otherCharacterNameInput);
     }, 500);
     return () => {
       clearTimeout(debounce);
@@ -514,13 +506,13 @@ export default function page({ params }: Props) {
                         ) {
                           setFilteredRelationCharacterData([]);
                         }
-
+                        
                         if (
                           !relationshipInput[i].targetUUID &&
                           relationshipInput[i].targetName.length > 0
                         ) {
                           setRelationCharacterSearchInput(i);
-                          setOtherCharacterNameInput(
+                          setOtherCharacterName(
                             relationshipInput[i].targetName,
                           );
                           e.stopPropagation();
@@ -530,8 +522,13 @@ export default function page({ params }: Props) {
                     <div
                       className={`${styles.scroll} ${
                         relationCharacterSearchInput !== i && 'hidden'
-                      } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
+                      } absolute w-1/5 border max-h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
                     >
+                      {filteredRelationCharacterData.length === 0 && (
+                        <div className="px-2 py-2 hover:bg-gray-200">
+                          검색 결과가 없습니다!
+                        </div>
+                      )}
                       {filteredRelationCharacterData.map(
                         (otherCharacter, j) => (
                           <div
