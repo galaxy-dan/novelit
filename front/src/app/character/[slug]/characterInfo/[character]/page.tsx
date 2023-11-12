@@ -461,7 +461,8 @@ export default function page({ params }: Props) {
                         searchInput !== i && 'hidden'
                       } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
                     >
-                      {otherCharacterData?.map((otherCharacter, j) => (
+                      {otherCharacterData?.filter(obj => relationshipInput?.map(obj => obj.targetUUID).includes(obj.characterUUID||" ")).map((otherCharacter, j) => (
+                        
                         <div
                           className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
                           onClick={() => {
