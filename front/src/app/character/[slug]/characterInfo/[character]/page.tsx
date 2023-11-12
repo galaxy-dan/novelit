@@ -19,17 +19,17 @@ import {
   patchCharacter,
 } from '@/service/api/character';
 import {
-  UseMutationResult,
   UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { GiCancel } from 'react-icons/gi';
 
 type Props = {
   params: {
-    character: string;
+    characterUUID: string;
     slug: string;
   };
 };
@@ -55,8 +55,8 @@ export default function page({ params }: Props) {
   const [isNameChanged, setIsNameChanged] = useState<boolean>(false);
 
   const { data: characterData }: UseQueryResult<characterType> = useQuery({
-    queryKey: ['character', params.character],
-    queryFn: () => getCharacter(params.character),
+    queryKey: ['character', params.characterUUID],
+    queryFn: () => getCharacter(params.characterUUID),
     onSuccess: (data) => {
       setImageInput(data?.characterImage || '');
       setImageUrl(data?.characterImage || '');
@@ -80,12 +80,12 @@ export default function page({ params }: Props) {
       queryKey: ['otherCharacter', otherCharacterNameInput],
       queryFn: () => getCharacterByName(params.slug, otherCharacterNameInput),
       onSuccess: (data) => {
-        console.log("새로운 값 불러옴");
+        console.log('새로운 값 불러옴');
       },
     });
 
   const putCharacterMutation = useMutation({
-    mutationFn: () => patchCharacter(params.character, character),
+    mutationFn: () => patchCharacter(params.characterUUID, character),
     onSuccess: () => {
       setLoadingState(3);
     },
@@ -98,7 +98,7 @@ export default function page({ params }: Props) {
   });
 
   const deleteCharacterMutation = useMutation({
-    mutationFn: () => deleteCharacter(params.character),
+    mutationFn: () => deleteCharacter(params.characterUUID),
     onSuccess: () => {
       if (groupUUID) {
         router.push(`/character/${params.slug}/${groupUUID}`);
@@ -167,11 +167,15 @@ export default function page({ params }: Props) {
         (obj) =>
           !relationshipInput
             ?.map((obj) => obj.targetUUID)
-            .includes(obj.characterUUID),
+            .includes(obj.characterUUID) &&
+          obj.characterUUID !== params.characterUUID,
       ) || [],
     );
-    console.log("새로워랏!");
-  }, [otherCharacterData, otherCharacterNameInput,relationCharacterSearchInput]);
+  }, [
+    otherCharacterData,
+    otherCharacterNameInput,
+    relationCharacterSearchInput,
+  ]);
 
   useEffect(() => {
     const debounce = setTimeout(() => {
@@ -277,19 +281,29 @@ export default function page({ params }: Props) {
             {characterImageUrl !== '' &&
             characterImageUrl !== undefined &&
             characterImageUrl !== null ? (
-              <Image
-                src={characterImageUrl}
-                alt="캐릭터 상세 이미지"
-                priority={true}
-                className="object-cover w-full h-full cursor-pointer"
-                height={1000}
-                width={1000}
-                onClick={() => {
-                  imgRef?.current?.click();
-                }}
-                loader={loaderProp}
-                unoptimized={true}
-              />
+              <div>
+                <Image
+                  src={characterImageUrl}
+                  alt="캐릭터 상세 이미지"
+                  priority={true}
+                  className="object-cover w-full h-full cursor-pointer"
+                  height={1000}
+                  width={1000}
+                  onClick={() => {
+                    imgRef?.current?.click();
+                  }}
+                  loader={loaderProp}
+                  unoptimized={true}
+                />
+                <GiCancel
+                  className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-red-600 font-extrabold z-10"
+                  onClick={() => {
+                    setImageUrl(null);
+                    setImageInput(null);
+                    setLoadingState(1);
+                  }}
+                ></GiCancel>
+              </div>
             ) : (
               <Image
                 src="/images/default_character.png"
