@@ -2,15 +2,17 @@ import { stringList } from 'aws-sdk/clients/datapipeline';
 
 export type groupType = {
   workspaceUUID?: string;
-  groupUUID?: string;
+  groupUUID?: string | null;
   groupName?: string;
-  parentGroupUUID?: string;
+  parentGroupUUID?: string | null;
   userUUID?: string;
+  deleted?: boolean;
 };
 
 export type subGroupType = {
   groupUUID: string;
   groupName: string;
+  deleted?: boolean;
 };
 
 export type characterType = {
@@ -21,7 +23,7 @@ export type characterType = {
   characterImage?: string | null;
   information?: informationType[] | null;
   relations: relationshipType[];
-  deleted?: boolean | null;
+  deleted?: boolean;
 };
 
 export type informationType = {
@@ -40,6 +42,7 @@ export type groupItemType = {
   characters: characterType[];
   groupName?: string;
   parentGroupUUID: string;
+  deleted?: boolean;
 };
 
 export type characterDirectory = {
@@ -80,9 +83,9 @@ export type graphType = {
 };
 
 export type poop = {
-  characterUUID : string;
+  characterUUID: string;
   characterName: string;
-  groupUUID: string| null;
-  groupName: string|null;
+  groupUUID: string | null;
+  groupName: string | null;
   relations: relationshipType[];
-}
+};

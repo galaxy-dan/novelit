@@ -7,6 +7,7 @@ const transformSubGroupAndCharacter = (data: any) => {
     (childGroup: groupType) => ({
       groupUUID: childGroup.groupUUID,
       groupName: childGroup.groupName,
+      deleted: childGroup.deleted
     }),
   );
   const childCharacter: characterType[] = data.childCharacters.map(
@@ -15,6 +16,7 @@ const transformSubGroupAndCharacter = (data: any) => {
       characterName: childCharacter.characterName,
       characterImage: childCharacter.characterImage,
       characterInformation: childCharacter.information,
+      deleted: childCharacter.deleted
     }),
   );
 
@@ -41,12 +43,13 @@ export const getSubGroupAndCharacter = async (uuid: string) => {
 };
 
 export const postGroup = async (body: groupType) => {
+  console.log(body);
   const data = await post(`/group`, body);
   return data;
 };
 
-export const patchGroup = async (groupUUID: string, newName: string) => {
-  const data = await patch(`/group?groupUUID=${groupUUID}&newName=${newName}`);
+export const patchGroup = async (req: { groupUUID: string, newName: string }) => {
+  const data = await patch(`/group?groupUUID=${req.groupUUID}&newName=${req.newName}`);
   return data;
 };
 

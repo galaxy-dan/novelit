@@ -7,8 +7,8 @@ type Props = {
 export default function CharacterHomeTitle({ slug }: Props) {
   return (
     <div className="flex items-end text-5xl">
-        <BsFillPersonFill className="mr-2" />
-        <p className="text-3xl font-extrabold">캐릭터 설정</p>
-      </div>
+      <BsFillPersonFill className="mr-2" />
+      <p className="text-3xl font-extrabold">캐릭터 설정</p>
+    </div>
   );
 }

@@ -87,9 +87,12 @@ export default function page({ params }: Props) {
   const putCharacterMutation = useMutation({
     mutationKey: ['otherCharacter', otherCharacterName],
     mutationFn: () =>
-      patchCharacter(params.characterUUID, {
-        ...character,
-        groupUUID: groupUUID,
+      patchCharacter({
+        params: params.characterUUID,
+        body: {
+          ...character,
+          groupUUID: groupUUID,
+        },
       }),
     onSuccess: () => {
       setLoadingState(3);

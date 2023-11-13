@@ -2,11 +2,11 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 type Props = {
-    slug: string
-}
+  slug: string;
+};
 export default function CharacterNameSearch({ slug }: Props) {
   const [inputText, setInputText] = useState<string>('');
-    const router = useRouter();
+  const router = useRouter();
   return (
     <div className="flex items-center bg-neutral-200 rounded-md w-fit px-2 py-1 mt-14 text-2xl">
       <label htmlFor="hm">
