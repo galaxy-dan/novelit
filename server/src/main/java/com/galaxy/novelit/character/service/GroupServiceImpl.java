@@ -181,5 +181,20 @@ public class GroupServiceImpl implements GroupService {
         return dtoList;
     }
 
+    @Transactional
+    @Override
+    public void moveGroupNode(String groupUUID, Double x, Double y, String userUUID) {
+        GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+
+        if (group.getGroupNode() == null) {
+            Map<String, Double> groupNode = new HashMap<>();
+            groupNode.put("x", x);
+            groupNode.put("y", y);
+            group.setGroupNode(groupNode);
+        }
+        group.moveGroupNode(x, y);
+
+        groupRepository.save(group);
+    }
 
 }
