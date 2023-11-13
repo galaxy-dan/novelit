@@ -26,6 +26,7 @@ import {
 } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { GiCancel } from 'react-icons/gi';
+import CharacterUpperGroup from '@/components/character/CharacterUpperGroup';
 
 type Props = {
   params: {
@@ -69,7 +70,8 @@ export default function page({ params }: Props) {
     onError: () => {
       router.push(`/character/${params.slug}`);
     },
-    enabled: !isFetched,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   const [otherCharacterNameInput, setOtherCharacterNameInput] =
@@ -83,7 +85,12 @@ export default function page({ params }: Props) {
     });
 
   const putCharacterMutation = useMutation({
-    mutationFn: () => patchCharacter(params.characterUUID, character),
+    mutationKey: ['otherCharacter', otherCharacterName],
+    mutationFn: () =>
+      patchCharacter(params.characterUUID, {
+        ...character,
+        groupUUID: groupUUID,
+      }),
     onSuccess: () => {
       setLoadingState(3);
     },
@@ -183,7 +190,7 @@ export default function page({ params }: Props) {
   useEffect(() => {
     const debounce = setTimeout(() => {
       return updateCharacter();
-    }, 1300);
+    }, 1000);
     return () => {
       clearTimeout(debounce);
     };
@@ -245,6 +252,7 @@ export default function page({ params }: Props) {
         setRelationCharacterSearchInput(-1);
       }}
     >
+      <CharacterUpperGroup parentUUID={groupUUID || ''} slug={params.slug} />
       <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 py-20 ">
         {/* 상단 타이틀 메뉴 + 로딩 상태 */}
         <div className="flex items-end justify-between">
@@ -284,7 +292,7 @@ export default function page({ params }: Props) {
             {characterImageUrl !== '' &&
             characterImageUrl !== undefined &&
             characterImageUrl !== null ? (
-              <div>
+              <>
                 <Image
                   src={characterImageUrl}
                   alt="캐릭터 상세 이미지"
@@ -299,14 +307,14 @@ export default function page({ params }: Props) {
                   unoptimized={true}
                 />
                 <GiCancel
-                  className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-red-600 font-extrabold z-10"
+                  className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-red-600 hover:text-red-800 font-extrabold z-10"
                   onClick={() => {
                     setImageUrl(null);
                     setImageInput(null);
                     setLoadingState(1);
                   }}
                 ></GiCancel>
-              </div>
+              </>
             ) : (
               <Image
                 src="/images/default_character.png"
@@ -506,7 +514,7 @@ export default function page({ params }: Props) {
                         ) {
                           setFilteredRelationCharacterData([]);
                         }
-                        
+
                         if (
                           !relationshipInput[i].targetUUID &&
                           relationshipInput[i].targetName.length > 0
