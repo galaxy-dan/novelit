@@ -34,12 +34,12 @@ public class CharacterEntity {
     @DBRef
     private RelationEntity relationship;
     @Field(name = "is_deleted")
-    private boolean isDeleted;
+    private boolean deleted;
     @Field(name = "character_image")
     private String characterImage;
 
     public void deleteCharacter() {
-        this.isDeleted = true;
+        this.deleted = true;
     }
     public void moveCharacter(String groupUUID) {
         this.groupUUID = groupUUID;

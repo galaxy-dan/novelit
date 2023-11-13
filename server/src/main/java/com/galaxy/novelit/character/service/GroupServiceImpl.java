@@ -1,6 +1,7 @@
 package com.galaxy.novelit.character.service;
 
 import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
+import com.galaxy.novelit.character.dto.res.AllGroupsCharactersDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
@@ -8,7 +9,10 @@ import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,4 +121,61 @@ public class GroupServiceImpl implements GroupService {
         group.updateGroupName(newName);
         groupRepository.save(group);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<GroupSimpleDtoRes> getAllGroups(String workspaceUUID, String userUUID) {
+        List<GroupEntity> allGroups = groupRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
+        List<GroupSimpleDtoRes> dtoList = new ArrayList<>();
+
+        for (GroupEntity group : allGroups) {
+            GroupSimpleDtoRes dto = GroupSimpleDtoRes.builder()
+                .groupUUID(group.getGroupUUID())
+                .groupName(group.getGroupName())
+                .build();
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<AllGroupsCharactersDtoRes> getAllGroupsAndCharacters(String workspaceUUID, String userUUID) {
+        List<GroupEntity> allGroups = groupRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
+        List<AllGroupsCharactersDtoRes> dtoList = new ArrayList<>();
+
+        for (GroupEntity group : allGroups) {
+
+            List<GroupEntity> childGroups = group.getChildGroups();
+            Map<String, String> childGroupMap = new LinkedHashMap<>();
+            if (childGroups != null) {
+                for (GroupEntity childGroup : childGroups) {
+                    childGroupMap.put(childGroup.getGroupUUID(), childGroup.getGroupName());
+                }
+            }
+
+            List<CharacterEntity> childCharacters = group.getChildCharacters();
+            Map<String, String> childCharacterMap = new LinkedHashMap<>();
+            if (childCharacters != null) {
+                for (CharacterEntity childCharacter : childCharacters) {
+                    childCharacterMap.put(childCharacter.getCharacterUUID(), childCharacter.getCharacterName());
+                }
+            }
+
+            AllGroupsCharactersDtoRes dto = AllGroupsCharactersDtoRes.builder()
+                .groupUUID(group.getGroupUUID())
+                .groupName(group.getGroupName())
+                .childGroups(childGroupMap)
+                .childCharacters(childCharacterMap)
+                .build();
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
+
 }

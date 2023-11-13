@@ -19,6 +19,6 @@ public class CharacterDtoRes {
     private String description;
     private List<Map<String, String>> information;
     private List<Relation> relations;
-    private boolean isDeleted;
+    private boolean deleted;
     private String characterImage;
 }
