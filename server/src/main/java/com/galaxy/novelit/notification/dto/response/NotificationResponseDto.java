@@ -18,13 +18,13 @@ public class NotificationResponseDto {
     private String notificationContent;
 
 
-    public static NotificationResponseDto createAlarmComment(String commentNickname, String subscriberUUID){
+    public static NotificationResponseDto createAlarmComment(String commentNickname, String id){
         UUID uuid = UUID.randomUUID();
 
         String notiUUID = uuid.toString();
 
         return NotificationResponseDto.builder()
-            .subscriberUUID(subscriberUUID) // 받는사람 UUID
+            .subscriberUUID(id) // 받는사람 UUID
             .notificationUUID(notiUUID)
             .notificationContent(commentNickname + " 님이 댓글을 남겼습니다.")
             .build();
