@@ -22,4 +22,5 @@ public interface CharacterService {
     List<RelationDtoRes> getRelationships();
     void moveCharacter(String characterUUID, String groupUUID, String userUUID);
     List<CharacterSimpleDtoRes> getAllCharacters(String workspaceUUID, String userUUID);
+    void moveCharacterNode(String characterUUID, Double x, Double y, String userUUID);
 }
