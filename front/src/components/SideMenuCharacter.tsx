@@ -17,7 +17,6 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { PostDirectory } from '@/model/novel';
 import {
   deleteDirectory,
   patchDirectory,
@@ -30,63 +29,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Link from 'next/link';
 import { characterDirectory } from '@/model/charactor';
-import { getCharacterDirectory } from '@/service/api/character';
-
-const temp = {
-  name: 'root',
-  toggled: true,
-  children: [
-    {
-      name: 'parent',
-      children: [{ name: 'child1' }, { name: 'child2' }],
-    },
-    {
-      name: 'loading parent',
-      loading: true,
-      children: [],
-    },
-    {
-      name: 'parent',
-      children: [
-        {
-          name: 'nested parent',
-          children: [{ name: 'nested child 1' }, { name: 'nested child 2' }],
-        },
-      ],
-    },
-  ],
-};
-
-const temp2 = [
-  { id: '1', name: '역사', children: null },
-  { id: '2', name: '에세이', children: [] },
-  {
-    id: '3',
-    name: '액션',
-    children: [
-      { id: 'c1', name: '원피스' },
-      { id: 'c2', name: '상남자' },
-      { id: 'c3', name: '화산귀환' },
-    ],
-  },
-  {
-    id: '4',
-    name: '로맨스',
-    children: [
-      { id: 'd1', name: '궁' },
-      { id: 'd2', name: 'ㅇ' },
-      { id: 'd3', name: 'ㄴ' },
-    ],
-  },
-  {
-    id: '5',
-    name: '로맨스',
-    children: [],
-  },
-];
+import {
+  deleteCharacter,
+  getCharacterDirectory,
+  patchCharacter,
+  patchCharacterName,
+  postCharacter,
+} from '@/service/api/character';
+import { deleteGroup, patchGroup, postGroup } from '@/service/api/group';
 
 export default function SideMenuCharacter() {
-  const [data, setData] = useState<any>(temp);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const treeRef = useRef<any>(null);
   const [term, setTerm] = useState<string>('');
@@ -155,7 +107,6 @@ export default function SideMenuCharacter() {
                   <div>
                     <button
                       onClick={() => {
-                        // console.log(treeRef.current.root.id);
                         treeRef.current.createLeaf(treeRef.current.root.id);
                       }}
                     >
@@ -216,24 +167,47 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     ? searchParams.slug[0]
     : searchParams.slug;
 
-  const postMutate = useMutation({
-    mutationFn: postDirectory,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['workspace']);
+  const postCharacterMutate = useMutation({
+    mutationFn: postCharacter,
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries(['group']);
     },
   });
 
-  const patchMutate = useMutation({
-    mutationFn: patchDirectory,
+  const postGroupMutate = useMutation({
+    mutationFn: postGroup,
     onSuccess: () => {
-      queryClient.invalidateQueries(['workspace']);
+      queryClient.invalidateQueries(['group']);
     },
   });
 
-  const deleteMutate = useMutation({
-    mutationFn: deleteDirectory,
+  const patchCharacterMutate = useMutation({
+    mutationFn: patchCharacterName,
     onSuccess: () => {
-      queryClient.invalidateQueries(['workspace']);
+      queryClient.invalidateQueries(['group']);
+      queryClient.invalidateQueries(['character']);
+    },
+  });
+
+  const patchGroupMutate = useMutation({
+    mutationFn: patchGroup,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['group']);
+    },
+  });
+
+  const deleteCharacterMutate = useMutation({
+    mutationFn: deleteCharacter,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['group']);
+    },
+  });
+
+  const deleteGroupMutate = useMutation({
+    mutationFn: deleteGroup,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['group']);
     },
   });
 
@@ -243,13 +217,12 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
         className={`flex justify-between items-center text-violet-50 hover:text-black hover:bg-slate-50 ${
           node.isSelected ? 'bg-slate-50' : 'bg-violet-50'
         }`}
-        ref={dragHandle}
         onClick={() => {
           node.toggle();
         }}
         onDoubleClick={() => {
           if (node.isLeaf) {
-            router.push(`/editor/${slug}/${node.id}`);
+            //router.push(`/character/${slug}/characterInfo/${node.id}`);
           }
         }}
       >
@@ -263,29 +236,46 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
               onKeyDown={(e) => {
                 if (e.key === 'Escape') node.reset();
                 if (e.key === 'Enter') {
+                  let parentUUID =
+                    node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
+                      ? null
+                      : node.parent?.id;
+                  console.log("부모 uuid는?: "+ parentUUID);
                   if (node.id.includes('simple')) {
-                    // 생성
+                    // 캐릭터 생성
+                    if (node.isLeaf) {
+                      postCharacterMutate.mutate({
+                        workspace: slug,
+                        group: parentUUID || null,
+                        name: e.currentTarget.value,
+                      });
+                    }
+                    // 폴더 생성
+                    else {
+                      postGroupMutate.mutate({
+                        workspaceUUID: slug,
+                        groupName: e.currentTarget.value,
+                        parentGroupUUID: parentUUID,
+                      });
+                    }
                     const uuid = uuidv4();
                     node.data.id = uuid;
-
-                    postMutate.mutate({
-                      name: e.currentTarget.value,
-                      workspaceUUID: slug,
-                      directory: !node.isLeaf,
-                      parentUUID:
-                        node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
-                          ? slug
-                          : node.parent?.id,
-                      uuid,
-                    });
                   } else {
-                    // 수정
-                    patchMutate.mutate({
-                      uuid: node.data.id,
-                      name: e.currentTarget.value,
-                    });
+                    // 캐릭터 수정
+                    if (node.isLeaf) {
+                      patchCharacterMutate.mutate({
+                        name: e.currentTarget.value,
+                        uuid: node.data.id,
+                      });
+                    }
+                    // 그룹 수정
+                    else {
+                      patchGroupMutate.mutate({
+                        groupUUID: node.data.id,
+                        newName: e.currentTarget.value,
+                      });
+                    }
                   }
-
                   node.submit(e.currentTarget.value);
                 }
               }}
@@ -306,8 +296,13 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
             </button>
             <button
               onClick={() => {
-                deleteMutate.mutate({ uuid: node.id });
                 tree.delete(node.id);
+                console.log("삭제 uuid "+node.data.id);
+                if (node.isLeaf) {
+                  deleteCharacterMutate.mutate(node.data.id);
+                } else {
+                  deleteGroupMutate.mutate(node.data.id);
+                }
               }}
               title="Delete"
             >

@@ -64,69 +64,92 @@ const transformDiagramData = (characterData: any, groupData: any) => {
 };
 
 const transformCharacterDirectory = (data: any) => {
+
   const result: any[] = [];
   const skip: boolean[] = new Array(data.allGroupsAndCharacters.length).fill(
     false,
   );
 
-  data.allGroupsAndCharacters.forEach((dat: any, i: number) => {
+  data.allGroupsAndCharacters.forEach((groups: any, i: number) => {
     //자식의 자식을 타고 가는 함수
+
     if (skip[i]) {
       return;
     }
     const goDeep = (key: string, name: string) => {
       let child: any[] = [];
-      let childId = key;
-      let childName = name;
-      let childIndex = data.allGroupsAndCharacters.findIndex(
-        (obj: any) => obj.groupUUID === childId,
+      let curId = key;
+      let curName = name;
+      let curIndex = data.allGroupsAndCharacters.findIndex(
+        (obj: any) => obj.groupUUID === curId,
       );
-      let childData = data.allGroupsAndCharacters.find(
-        (obj: any) => obj.groupUUID === childId,
+      let curData = data.allGroupsAndCharacters.find(
+        (obj: any) => obj.groupUUID === curId,
       );
+      if (curIndex === -1) {
+        return null;
+      }
+      Object.keys(curData.childGroups).forEach((key2) => {
+        let newData = goDeep(key2, curData.childGroups[key2]);
+        console.log(newData);
+        if (newData !== null) {
+          child.push(newData);
+        } else { 
+          console.log("null 제외"+ key2);
+        }
+      });
 
-      Object.keys(childData.childGroups).forEach((key) => {
+      Object.keys(curData.childCharacters).forEach((key2) => {
         child.push({
-          id: key,
-          name: childData.childGroups[key],
-          child: goDeep(key, dat.childGroups[key]),
+          id: key2,
+          name: curData.childCharacters[key2],
         });
       });
 
-      Object.keys(childData.childCharacters).forEach((key) => {
-        child.push({
-          id: key,
-          name: childData.childCharacters[key],
-        });
-      });
-      skip[childIndex] = true;
+      skip[curIndex] = true;
+
       return {
-        id: childId,
-        name: childName,
-        child: child,
+        id: curId,
+        name: curName,
+        children: child,
       };
     };
 
     let childrenData: any[] = [];
 
-    Object.keys(dat.childGroups).forEach((key) => {
+    Object.keys(groups.childGroups).forEach((key) => {
       // 초기 자식에 goDeep(key 추가)
-      childrenData.push(goDeep(key, dat.childGroups[key]));
+      let newData = goDeep(key, groups.childGroups[key]);
+      console.log(newData);
+      if (newData !== null) {
+        childrenData.push(newData);
+      } else { 
+        
+      }
+      //childrenData.push(goDeep(key, groups.childGroups[key]));
     });
 
-    Object.keys(dat.childCharacters).forEach((key) => {
+    Object.keys(groups.childCharacters).forEach((key) => {
       childrenData.push({
         id: key,
-        name: dat.childCharacters[key],
+        name: groups.childCharacters[key],
       });
     });
 
     result.push({
-      id: dat.groupUUID,
-      name: dat.groupName,
+      id: groups.groupUUID,
+      name: groups.groupName,
       children: childrenData,
     });
   });
+
+  data.noGroupCharacters.forEach((character: any) => {
+    result.push({
+      id: character.characterUUID,
+      name: character.characterName,
+    });
+  });
+
   return { name: '', children: result };
 };
 
@@ -146,19 +169,26 @@ export const getCharacter = async (uuid: string) => {
   return data;
 };
 
-export const postCharacter = async (workspace: string, group: string) => {
+export const postCharacter = async (req: {
+  workspace: string;
+  group: string | null;
+  name: string;
+}) => {
   const data = await post(`/character`, {
-    workspaceUUID: workspace,
-    groupUUID: group,
-    characterName: '새 캐릭터',
+    workspaceUUID: req.workspace,
+    groupUUID: req.group,
+    characterName: req.name,
     information: [{ '': '' }],
     relations: [{ content: '', targetName: '', targetUUID: null }],
   });
   return data;
 };
 
-export const patchCharacter = async (params: string, body: characterType) => {
-  const data = await patch(`/character?characterUUID=${params}`, body);
+export const patchCharacter = async (req: {
+  params: string;
+  body: characterType;
+}) => {
+  const data = await patch(`/character?characterUUID=${req.params}`, req.body);
   return data;
 };
 
@@ -179,4 +209,14 @@ export const getCharacterDirectory = async (workspace: string) => {
   const data = await get(`/group/character/all?workspaceUUID=${workspace}`);
   const newData = transformCharacterDirectory(data);
   return newData;
+};
+
+export const patchCharacterName = async (req: {
+  name: string;
+  uuid: string;
+}) => {
+  const data = await get(`/character?characterUUID=${req.uuid}`);
+  const newData = { ...data, characterName: req.name };
+  const response = await patch(`/character?characterUUID=${req.uuid}`, newData);
+  return response;
 };
