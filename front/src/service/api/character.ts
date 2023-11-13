@@ -1,9 +1,10 @@
 import { EdgeType, NodeType, characterType, poop } from '@/model/charactor';
 import { del, get, patch, post, put } from './http';
 
-const transformDiagramData = (data: any) => {
+const transformDiagramData = (characterData: any, groupData: any) => {
   let nodeDatas: NodeType[] = [];
-  data.forEach((dat: any) =>
+
+  characterData.forEach((dat: any) =>
     nodeDatas.push({
       data: {
         id: dat.characterUUID,
@@ -18,8 +19,9 @@ const transformDiagramData = (data: any) => {
       }),
     }),
   );
+
   let edgeDatas: EdgeType[] = [];
-  data.forEach((dat: any) => {
+  characterData.forEach((dat: any) => {
     dat.relations.forEach((element: any) => {
       if (element.targetUUID) {
         edgeDatas.push({
@@ -27,13 +29,33 @@ const transformDiagramData = (data: any) => {
             source: dat.characterUUID,
             target: element.targetUUID,
             label: element.content,
-            type: 'character'
+            type: 'character',
           },
         });
       }
     });
   });
-  console.log(nodeDatas);
+
+  groupData.allGroupsAndCharacters.forEach((dat: any) => {
+    nodeDatas.push({
+      data: {
+        id: dat.groupUUID,
+        label: dat.groupName,
+        type: 'group',
+      },
+    });
+    Object.keys(dat.childGroups).forEach((target) => {
+      edgeDatas.push({
+        data: { source: dat.groupUUID, target: target, type: 'group' },
+      });
+    });
+    Object.keys(dat.childCharacters).forEach((target) => {
+      edgeDatas.push({
+        data: { source: dat.groupUUID, target: target, type: 'group' },
+      });
+    });
+  });
+
   return {
     nodes: nodeDatas,
     edges: edgeDatas,
@@ -41,10 +63,14 @@ const transformDiagramData = (data: any) => {
 };
 
 export const getCharacterByName = async (worksapce: string, name: string) => {
-  const data = await get(
-    `/character/search?workspaceUUID=${worksapce}&characterName=${name}`,
-  );
-  return data;
+  if (name !== '') {
+    const data = await get(
+      `/character/search?workspaceUUID=${worksapce}&characterName=${name}`,
+    );
+    return data;
+  } else {
+    return [];
+  }
 };
 
 export const getCharacter = async (uuid: string) => {
@@ -74,7 +100,10 @@ export const deleteCharacter = async (uuid: string) => {
 };
 
 export const getRelationDiagramInformation = async (workspace: string) => {
-  const data = await get(`/character/diagram`);
-  console.log(data);
-  return transformDiagramData(data);
+  const characterData = await get(`/character/diagram`);
+  console.log(characterData);
+  const groupData = await get(
+    `/group/character/all?workspaceUUID=${workspace}`,
+  );
+  return transformDiagramData(characterData, groupData);
 };

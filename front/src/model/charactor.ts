@@ -58,7 +58,7 @@ export type NodeType = {
     x: number;
     y: number;
   };
-  style: {
+  style?: {
     backgroundImage?: string;
     backgroundFit?: string;
   };
