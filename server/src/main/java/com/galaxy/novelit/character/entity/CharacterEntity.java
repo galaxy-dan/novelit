@@ -37,6 +37,7 @@ public class CharacterEntity {
     private boolean deleted;
     @Field(name = "character_image")
     private String characterImage;
+    private Map<String, Double> coordinate;
 
     public void deleteCharacter() {
         this.deleted = true;

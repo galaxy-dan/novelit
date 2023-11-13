@@ -77,6 +77,8 @@ public class GroupServiceImpl implements GroupService {
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
                 .parentGroupUUID(null)
+                .childGroups(new ArrayList<>())
+                .childCharacters(new ArrayList<>())
                 .build();
 
             groupRepository.save(newGroup);
@@ -88,6 +90,8 @@ public class GroupServiceImpl implements GroupService {
                 .groupUUID(groupUUID)
                 .groupName(dto.getGroupName())
                 .parentGroupUUID(parentGroupUUID)
+                .childGroups(new ArrayList<>())
+                .childCharacters(new ArrayList<>())
                 .build();
 
             groupRepository.save(newGroup);
