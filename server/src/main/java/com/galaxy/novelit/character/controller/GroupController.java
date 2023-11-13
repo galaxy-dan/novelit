@@ -2,7 +2,9 @@ package com.galaxy.novelit.character.controller;
 
 
 import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
+import com.galaxy.novelit.character.dto.res.AllGroupsCharactersDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
+import com.galaxy.novelit.character.dto.res.CharacterThumbnailDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
 import com.galaxy.novelit.character.service.CharacterService;
@@ -45,7 +47,7 @@ public class GroupController {
     @GetMapping("/characters")
     public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String groupUUID, Authentication authentication) {
 //        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName());
-        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, tempUser);
+        List<CharacterThumbnailDtoRes> dto = characterService.getCharacters(groupUUID, tempUser);
         return ResponseEntity.ok().body(dto);
     }
 
@@ -56,7 +58,7 @@ public class GroupController {
 //            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
 
             List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(workspaceUUID, tempUser);
-            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(workspaceUUID, tempUser);
+            List<CharacterThumbnailDtoRes> characterDto = characterService.getTopCharacter(workspaceUUID, tempUser);
 
             Map<String, Object> response = new HashMap<>();
             response.put("groups", groupDto);
@@ -97,6 +99,23 @@ public class GroupController {
 //            groupService.deleteGroup(groupUUID, authentication.getName());
             groupService.deleteGroup(groupUUID, tempUser);
             return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/character/all")
+    public ResponseEntity<Object> getGroupAndCharatcter(@RequestParam String workspaceUUID, Authentication authentication) {
+        try {
+//            List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, authentication.getName());
+            List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, tempUser);
+            List<CharacterSimpleDtoRes> noGroupDto = characterService.getNoGroupCharacters(workspaceUUID, tempUser);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("allGroupsAndCharacters", dto);
+            response.put("noGroupCharacters", noGroupDto);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

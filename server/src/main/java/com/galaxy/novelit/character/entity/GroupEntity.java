@@ -33,13 +33,13 @@ public class GroupEntity {
     @DBRef
     private List<CharacterEntity> childCharacters;
     @Field(name = "is_deleted")
-    private boolean isDeleted;
+    private boolean deleted;
 
     public void updateGroupName(String groupName) {
         this.groupName = groupName;
     }
     public void deleteGroup() {
-        this.isDeleted = true;
+        this.deleted = true;
     }
     public void addChildGroup(GroupEntity child) {
         this.childGroups.add(child);
