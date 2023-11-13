@@ -54,6 +54,11 @@ public class CharacterServiceImpl implements CharacterService {
         dto.setDeleted(character.isDeleted());
         dto.setCharacterImage(character.getCharacterImage());
 
+//        Map<String, Double> xy = new HashMap<>();
+//        xy.put("x", character.getCharacterNode().get("x"));
+//        xy.put("y", character.getCharacterNode().get("y"));
+//        dto.setCharacterNode(xy);
+//        dto.setCharacterNode(character.getCharacterNode());
         return dto;
     }
 
@@ -296,10 +301,20 @@ public class CharacterServiceImpl implements CharacterService {
             String characterName = relation.getCharacterName();
             CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
             String characterImage = character.getCharacterImage();
+            Map<String, Double> characterNode = null;
+            if (character.getCharacterNode() != null) {
+                characterNode = new HashMap<>(character.getCharacterNode());
+            }
+
             String groupUUID = character.getGroupUUID();
             String groupName = null;
-            if (groupRepository.findByGroupUUID(groupUUID) != null) {
-                groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
+            Map<String, Double> groupNode = null;
+            GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+            if (group != null) {
+                groupName = group.getGroupName();
+                if (group.getGroupNode() != null) {
+                    groupNode = new HashMap<>(group.getGroupNode());
+                }
             }
 
             // 타켓 정보 조회
@@ -343,8 +358,10 @@ public class CharacterServiceImpl implements CharacterService {
                 .characterUUID(characterUUID)
                 .characterName(characterName)
                 .characterImage(characterImage)
+                .characterNode(characterNode)
                 .groupUUID(groupUUID)
                 .groupName(groupName)
+                .groupNode(groupNode)
                 .relations(targetList)
                 .build();
 
