@@ -39,6 +39,7 @@ public class CharacterEntity {
     private boolean deleted;
     @Field(name = "character_image")
     private String characterImage;
+    @Field(name = "character_node")
     private Map<String, Double> characterNode;
 
     public void deleteCharacter() {
