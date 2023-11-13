@@ -297,7 +297,9 @@ public class CharacterServiceImpl implements CharacterService {
                 // 캐릭터(주체,기준) 정보 조회
                 String characterUUID = relation.getCharacterUUID();
                 String characterName = relation.getCharacterName();
-                String groupUUID = characterRepository.findByCharacterUUID(characterUUID).getGroupUUID();
+                CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+                String characterImage = character.getCharacterImage();
+                String groupUUID = character.getGroupUUID();
                 String groupName;
                 if (groupRepository.findByGroupUUID(groupUUID) == null) {
                     groupName = null;
@@ -311,23 +313,30 @@ public class CharacterServiceImpl implements CharacterService {
                 for (Relation target : relation.getRelations()) {
                     String targetUUID = target.getTargetUUID();
                     String targetName = target.getTargetName();
+                    CharacterEntity targetCharacter = characterRepository.findByCharacterUUID(targetUUID);
+                    String targetImage = null;
                     String targetGroupUUID;
                     String targetGroupName;
-                    if (characterRepository.findByCharacterUUID(targetUUID) == null) {
+
+                    if (targetCharacter == null) {
                         targetGroupUUID = null;
                     } else {
-                        targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
+                        targetGroupUUID = targetCharacter.getGroupUUID();
+                        targetImage = targetCharacter.getCharacterImage();
                     }
-                    if (groupRepository.findByGroupUUID(targetGroupUUID) == null) {
+
+                    GroupEntity targetGroup = groupRepository.findByGroupUUID(targetGroupUUID);
+                    if (targetGroup == null) {
                         targetGroupName = null;
                     } else {
-                        targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
+                        targetGroupName = targetGroup.getGroupName();
                     }
                     String content = target.getContent();
 
                     RelationDto targetDto = RelationDto.builder()
                         .targetUUID(targetUUID)
                         .targetName(targetName)
+                        .targetImage(targetImage)
                         .targetGroupUUID(targetGroupUUID)
                         .targetGroupName(targetGroupName)
                         .content(content)
@@ -340,6 +349,7 @@ public class CharacterServiceImpl implements CharacterService {
                 RelationDtoRes dto = RelationDtoRes.builder()
                     .characterUUID(characterUUID)
                     .characterName(characterName)
+                    .characterImage(characterImage)
                     .groupUUID(groupUUID)
                     .groupName(groupName)
                     .relations(targetList)
