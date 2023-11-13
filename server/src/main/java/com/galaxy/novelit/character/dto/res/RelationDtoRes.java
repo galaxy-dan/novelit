@@ -15,6 +15,7 @@ import lombok.Setter;
 public class RelationDtoRes {
     private String characterUUID;
     private String characterName;
+    private String characterImage;
     private String groupUUID;
     private String groupName;
     private List<RelationDto> relations;
@@ -25,6 +26,7 @@ public class RelationDtoRes {
     public static class RelationDto {
         private String targetUUID;
         private String targetName;
+        private String targetImage;
         private String targetGroupUUID;
         private String targetGroupName;
         private String content;
