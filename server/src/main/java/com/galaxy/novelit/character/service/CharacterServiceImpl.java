@@ -6,7 +6,8 @@ import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO.CharacterSearchInfoResDTOBuilder;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
-import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes.CharacterSimpleDtoResBuilder;
+import com.galaxy.novelit.character.dto.res.CharacterThumbnailDtoRes;
+import com.galaxy.novelit.character.dto.res.CharacterThumbnailDtoRes.CharacterThumbnailDtoResBuilder;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes.RelationDto;
 import com.galaxy.novelit.character.entity.CharacterEntity;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,40 +58,59 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID, String userUUID) {
+    public List<CharacterThumbnailDtoRes> getCharacters(String groupUUID, String userUUID) {
         List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID);
 //            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
 
-        List<CharacterSimpleDtoRes> characterSimpleInfoList = new ArrayList<>();
+        List<CharacterThumbnailDtoRes> characterThumbnailInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
             List<Map<String, String>> infos = character.getInformation();
-            CharacterSimpleDtoResBuilder characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
+            CharacterThumbnailDtoResBuilder characterThumbnailDtoRes = CharacterThumbnailDtoRes.builder()
                 .characterUUID(character.getCharacterUUID())
                 .characterImage(character.getCharacterImage())
                 .characterName(character.getCharacterName());
 
 //            if(infos != null) {
             if(infos.size() == 0) {
-                characterSimpleDtoRes.information(new ArrayList<>());
+                characterThumbnailDtoRes.information(new ArrayList<>());
             } else { // 1 번에 map으로 저장
                 Map<String, String> mappedInfo = infos.get(0);
                 List<Map<String, String>> returnval = new ArrayList<>();
                 returnval.add(mappedInfo);
-                characterSimpleDtoRes.information(returnval);
+                characterThumbnailDtoRes.information(returnval);
 
             }
 
 //            }
-            characterSimpleInfoList.add(characterSimpleDtoRes.build());
+            characterThumbnailInfoList.add(characterThumbnailDtoRes.build());
         }
 
-        return characterSimpleInfoList;
+        return characterThumbnailInfoList;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterSimpleDtoRes> getTopCharacter(String workspaceUUID, String userUUID) {
+    public List<CharacterThumbnailDtoRes> getTopCharacter(String workspaceUUID, String userUUID) {
+        List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
+        List<CharacterThumbnailDtoRes> dto = new ArrayList<>();
+
+        for (CharacterEntity character : characters) {
+            CharacterThumbnailDtoRes characterThumbnailDtoRes = CharacterThumbnailDtoRes.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterName(character.getCharacterName())
+                .information(character.getInformation())
+                .characterImage(character.getCharacterImage())
+                .build();
+            dto.add(characterThumbnailDtoRes);
+        }
+
+        return dto;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CharacterSimpleDtoRes> getNoGroupCharacters(String workspaceUUID, String userUUID) {
         List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
         List<CharacterSimpleDtoRes> dto = new ArrayList<>();
 
@@ -99,8 +118,6 @@ public class CharacterServiceImpl implements CharacterService {
             CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
                 .characterUUID(character.getCharacterUUID())
                 .characterName(character.getCharacterName())
-                .information(character.getInformation())
-                .characterImage(character.getCharacterImage())
                 .build();
             dto.add(characterSimpleDtoRes);
         }
@@ -184,7 +201,7 @@ public class CharacterServiceImpl implements CharacterService {
             .information(dto.getInformation())
             .relationship(newRelation)
             .characterImage(dto.getCharacterImage())
-            .isDeleted(character.isDeleted());
+            .deleted(character.isDeleted());
 
         if(dto.getInformation() != null) {
             newCharacter.information(dto.getInformation());
@@ -333,5 +350,23 @@ public class CharacterServiceImpl implements CharacterService {
         }
 
         return allDto;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CharacterSimpleDtoRes> getAllCharacters(String workspaceUUID, String userUUID) {
+        List<CharacterEntity> allCharacters = characterRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
+        List<CharacterSimpleDtoRes> dtoList = new ArrayList<>();
+
+        for (CharacterEntity character : allCharacters) {
+            CharacterSimpleDtoRes dto = CharacterSimpleDtoRes.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterName(character.getCharacterName())
+                .build();
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
     }
 }
