@@ -1,6 +1,7 @@
 package com.galaxy.novelit.character.dto.res;
 
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,8 +17,10 @@ public class RelationDtoRes {
     private String characterUUID;
     private String characterName;
     private String characterImage;
+    private Map<String, Double> characterNode;
     private String groupUUID;
     private String groupName;
+    private Map<String, Double> groupNode;
     private List<RelationDto> relations;
 
     @Getter

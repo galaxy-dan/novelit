@@ -21,4 +21,6 @@ public class CharacterDtoRes {
     private List<Relation> relations;
     private boolean deleted;
     private String characterImage;
+//    private Map<String, Double> characterNode;
+
 }
