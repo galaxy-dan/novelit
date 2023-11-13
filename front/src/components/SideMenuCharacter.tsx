@@ -30,6 +30,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Link from 'next/link';
 import { characterDirectory } from '@/model/charactor';
+import { getCharacterDirectory } from '@/service/api/character';
 
 const temp = {
   name: 'root',
@@ -90,7 +91,6 @@ export default function SideMenuCharacter() {
   const treeRef = useRef<any>(null);
   const [term, setTerm] = useState<string>('');
   const queryClient = useQueryClient();
-
   const router = useRouter();
 
   const searchParams = useParams();
@@ -100,8 +100,8 @@ export default function SideMenuCharacter() {
     : searchParams.slug;
 
   const { data: characters }: UseQueryResult<characterDirectory> = useQuery({
-    queryKey: ['characters', slug],
-    queryFn: () => getWorkspace({ workspaceUUID: slug }),
+    queryKey: ['characterDirectory', slug],
+    queryFn: () => getCharacterDirectory(slug),
     enabled: !!slug,
   });
 
