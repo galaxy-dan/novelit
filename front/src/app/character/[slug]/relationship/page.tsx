@@ -60,6 +60,8 @@ export default function RelationshipDiagram({ params }: Props) {
     onError: () => {
       router.push(`/character/${params.slug}`);
     },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   // const [graphData, setGraphData] = useState<graphType>({
@@ -269,7 +271,7 @@ export default function RelationshipDiagram({ params }: Props) {
   // });
 
   const layout = {
-    name: 'cose',
+    name: 'breadthfirst',
     fit: true,
     directed: true,
     padding: 50,
@@ -459,8 +461,10 @@ export default function RelationshipDiagram({ params }: Props) {
   const handleDragFree = (event: any, cy: Core) => {
     //여기서 position 변경해서 저장하기
     //이거도 저장만 하고 받을 필요는 없음
-    console.log(prevNode);
-
+    event.target.position({
+      x: Math.round(event.target.position('x')),
+      y: Math.round(event.target.position('y')),
+    });
     prevNode = { id: event.target.data().id, count: 0 };
     cy.$(':selected').unselect();
     cy.elements().style({ opacity: 1 });
