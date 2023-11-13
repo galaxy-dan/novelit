@@ -19,7 +19,6 @@ export default function CharacterNameSearch({ slug }: Props) {
         placeholder="캐릭터 이름으로 검색..."
         value={inputText}
         onKeyUp={(e) => {
-          console.log(e.key + ' ' + inputText.trim().length);
           if (e.key === 'Enter' && inputText.trim().length > 0) {
             router.push(`/character/${slug}/search/${inputText}`);
           }

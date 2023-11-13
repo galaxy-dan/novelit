@@ -9,7 +9,7 @@ export default function CharacterUpperGroup({ parentUUID, slug }: Props) {
   return (
     <p
       onClick={() => {
-        if (parentUUID) {
+        if (parentUUID && parentUUID !== '') {
           router.push(`/character/${slug}/${parentUUID}`);
         } else {
           router.push(`/character/${slug}`);
