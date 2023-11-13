@@ -44,12 +44,12 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
 
         List<AlarmRedis> all = (List<AlarmRedis>) alarmRedisRepository.findAll();
 
-        log.info("d : {}" , all.get(0).getNoti().getSubUUID());
+        //log.info("d : {}" , all.get(0).getNoti().getSubUUID());
 
         for (AlarmRedis alarmRedis : all) {
             if (alarmRedis.getNoti().getSubUUID().equals(subUUID)) {
                 list.add(AlarmGetResponseDto.domainToGetResDto(alarmRedis));
-                log.info(alarmRedis.getNoti().getSubUUID());
+                //og.info(alarmRedis.getNoti().getSubUUID());
             }
         }
 
