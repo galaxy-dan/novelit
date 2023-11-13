@@ -1,4 +1,9 @@
-import { DeleteDirectory, PatchDirectory, PostDirectory } from '@/model/novel';
+import {
+  DeleteDirectory,
+  Drag,
+  PatchDirectory,
+  PostDirectory,
+} from '@/model/novel';
 import { del, get, patch, post } from './http';
 
 export const getDirectory = async (req: { uuid: string }) => {
@@ -18,5 +23,10 @@ export const patchDirectory = async (req: PatchDirectory) => {
 
 export const deleteDirectory = async (req: DeleteDirectory) => {
   const data = await del('/directory', req);
+  return data;
+};
+
+export const patchDrag = async (req: Drag) => {
+  const data = await patch('/workspace/tree', req);
   return data;
 };

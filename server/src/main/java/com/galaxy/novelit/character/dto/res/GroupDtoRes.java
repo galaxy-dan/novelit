@@ -19,5 +19,5 @@ public class GroupDtoRes {
     private String parentGroupUUID;
     private List<GroupEntity> childGroups;
     private List<CharacterEntity> childCharacters;
-    private boolean isDeleted;
+    private boolean deleted;
 }

@@ -40,6 +40,7 @@ import Comment from './Comment';
 import { get } from '@/service/api/http';
 import UploadState from '../state/UploadState';
 import { getShareToken } from '@/service/api/share';
+import Word from './Word';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -373,6 +374,7 @@ export default function Editor() {
           )}
         </div>
       </div>
+      <Word />
     </>
   );
 }

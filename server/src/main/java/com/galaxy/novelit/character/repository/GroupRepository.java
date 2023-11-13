@@ -10,4 +10,5 @@ public interface GroupRepository extends MongoRepository<GroupEntity, String> {
     GroupEntity findByGroupUUID(String groupUUID);
     List<GroupEntity> findAllByParentGroupUUID(String parentGroupUUID);
     List<GroupEntity> findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(String workspaceUUID);
+    List<GroupEntity> findAllByWorkspaceUUIDAndDeletedIsFalse(String workspaceUUID);
 }

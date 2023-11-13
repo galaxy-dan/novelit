@@ -6,7 +6,8 @@ import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO.CharacterSearchInfoResDTOBuilder;
 import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes;
-import com.galaxy.novelit.character.dto.res.CharacterSimpleDtoRes.CharacterSimpleDtoResBuilder;
+import com.galaxy.novelit.character.dto.res.CharacterThumbnailDtoRes;
+import com.galaxy.novelit.character.dto.res.CharacterThumbnailDtoRes.CharacterThumbnailDtoResBuilder;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes.RelationDto;
 import com.galaxy.novelit.character.entity.CharacterEntity;
@@ -18,10 +19,10 @@ import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,45 +54,69 @@ public class CharacterServiceImpl implements CharacterService {
         dto.setDeleted(character.isDeleted());
         dto.setCharacterImage(character.getCharacterImage());
 
+//        Map<String, Double> xy = new HashMap<>();
+//        xy.put("x", character.getCharacterNode().get("x"));
+//        xy.put("y", character.getCharacterNode().get("y"));
+//        dto.setCharacterNode(xy);
+//        dto.setCharacterNode(character.getCharacterNode());
         return dto;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterSimpleDtoRes> getCharacters(String groupUUID, String userUUID) {
+    public List<CharacterThumbnailDtoRes> getCharacters(String groupUUID, String userUUID) {
         List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID);
 //            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
 
-        List<CharacterSimpleDtoRes> characterSimpleInfoList = new ArrayList<>();
+        List<CharacterThumbnailDtoRes> characterThumbnailInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
             List<Map<String, String>> infos = character.getInformation();
-            CharacterSimpleDtoResBuilder characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
+            CharacterThumbnailDtoResBuilder characterThumbnailDtoRes = CharacterThumbnailDtoRes.builder()
                 .characterUUID(character.getCharacterUUID())
                 .characterImage(character.getCharacterImage())
                 .characterName(character.getCharacterName());
 
 //            if(infos != null) {
             if(infos.size() == 0) {
-                characterSimpleDtoRes.information(new ArrayList<>());
+                characterThumbnailDtoRes.information(new ArrayList<>());
             } else { // 1 번에 map으로 저장
                 Map<String, String> mappedInfo = infos.get(0);
                 List<Map<String, String>> returnval = new ArrayList<>();
                 returnval.add(mappedInfo);
-                characterSimpleDtoRes.information(returnval);
+                characterThumbnailDtoRes.information(returnval);
 
             }
 
 //            }
-            characterSimpleInfoList.add(characterSimpleDtoRes.build());
+            characterThumbnailInfoList.add(characterThumbnailDtoRes.build());
         }
 
-        return characterSimpleInfoList;
+        return characterThumbnailInfoList;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterSimpleDtoRes> getTopCharacter(String workspaceUUID, String userUUID) {
+    public List<CharacterThumbnailDtoRes> getTopCharacter(String workspaceUUID, String userUUID) {
+        List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
+        List<CharacterThumbnailDtoRes> dto = new ArrayList<>();
+
+        for (CharacterEntity character : characters) {
+            CharacterThumbnailDtoRes characterThumbnailDtoRes = CharacterThumbnailDtoRes.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterName(character.getCharacterName())
+                .information(character.getInformation())
+                .characterImage(character.getCharacterImage())
+                .build();
+            dto.add(characterThumbnailDtoRes);
+        }
+
+        return dto;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CharacterSimpleDtoRes> getNoGroupCharacters(String workspaceUUID, String userUUID) {
         List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
         List<CharacterSimpleDtoRes> dto = new ArrayList<>();
 
@@ -99,8 +124,6 @@ public class CharacterServiceImpl implements CharacterService {
             CharacterSimpleDtoRes characterSimpleDtoRes = CharacterSimpleDtoRes.builder()
                 .characterUUID(character.getCharacterUUID())
                 .characterName(character.getCharacterName())
-                .information(character.getInformation())
-                .characterImage(character.getCharacterImage())
                 .build();
             dto.add(characterSimpleDtoRes);
         }
@@ -184,7 +207,7 @@ public class CharacterServiceImpl implements CharacterService {
             .information(dto.getInformation())
             .relationship(newRelation)
             .characterImage(dto.getCharacterImage())
-            .isDeleted(character.isDeleted());
+            .deleted(character.isDeleted());
 
         if(dto.getInformation() != null) {
             newCharacter.information(dto.getInformation());
@@ -272,45 +295,55 @@ public class CharacterServiceImpl implements CharacterService {
         List<RelationDtoRes> allDto = new ArrayList<>();
 
         for (RelationEntity relation : allRelation) {
-            // 캐릭터에 관계 정보가 없을 때 다음 캐릭터로 넘어가기
-            if (relation.getRelations() == null) {
-                continue;
+
+            // 캐릭터(주체,기준) 정보 조회
+            String characterUUID = relation.getCharacterUUID();
+            String characterName = relation.getCharacterName();
+            CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+            String characterImage = character.getCharacterImage();
+            Map<String, Double> characterNode = null;
+            if (character.getCharacterNode() != null) {
+                characterNode = new HashMap<>(character.getCharacterNode());
             }
-            else {
-                // 캐릭터(주체,기준) 정보 조회
-                String characterUUID = relation.getCharacterUUID();
-                String characterName = relation.getCharacterName();
-                String groupUUID = characterRepository.findByCharacterUUID(characterUUID).getGroupUUID();
-                String groupName;
-                if (groupRepository.findByGroupUUID(groupUUID) == null) {
-                    groupName = null;
-                } else {
-                    groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
+
+            String groupUUID = character.getGroupUUID();
+            String groupName = null;
+            Map<String, Double> groupNode = null;
+            GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+            if (group != null) {
+                groupName = group.getGroupName();
+                if (group.getGroupNode() != null) {
+                    groupNode = new HashMap<>(group.getGroupNode());
                 }
+            }
 
-                // 타켓 정보 조회
-                List<RelationDto> targetList = new ArrayList<>();
+            // 타켓 정보 조회
+            List<RelationDto> targetList = new ArrayList<>();
 
+            if (relation.getRelations() != null) {
                 for (Relation target : relation.getRelations()) {
                     String targetUUID = target.getTargetUUID();
                     String targetName = target.getTargetName();
-                    String targetGroupUUID;
-                    String targetGroupName;
-                    if (characterRepository.findByCharacterUUID(targetUUID) == null) {
-                        targetGroupUUID = null;
-                    } else {
-                        targetGroupUUID = characterRepository.findByCharacterUUID(targetUUID).getGroupUUID();
+                    CharacterEntity targetCharacter = characterRepository.findByCharacterUUID(targetUUID);
+                    String targetImage = null;
+                    String targetGroupUUID = null;
+                    String targetGroupName = null;
+
+                    if (targetCharacter != null) {
+                        targetGroupUUID = targetCharacter.getGroupUUID();
+                        targetImage = targetCharacter.getCharacterImage();
                     }
-                    if (groupRepository.findByGroupUUID(targetGroupUUID) == null) {
-                        targetGroupName = null;
-                    } else {
-                        targetGroupName = groupRepository.findByGroupUUID(targetGroupUUID).getGroupName();
+
+                    GroupEntity targetGroup = groupRepository.findByGroupUUID(targetGroupUUID);
+                    if (targetGroup != null) {
+                        targetGroupName = targetGroup.getGroupName();
                     }
                     String content = target.getContent();
 
                     RelationDto targetDto = RelationDto.builder()
                         .targetUUID(targetUUID)
                         .targetName(targetName)
+                        .targetImage(targetImage)
                         .targetGroupUUID(targetGroupUUID)
                         .targetGroupName(targetGroupName)
                         .content(content)
@@ -318,20 +351,59 @@ public class CharacterServiceImpl implements CharacterService {
 
                     targetList.add(targetDto);
                 }
-
-                // 조회한 정보 모두 dto에 저장
-                RelationDtoRes dto = RelationDtoRes.builder()
-                    .characterUUID(characterUUID)
-                    .characterName(characterName)
-                    .groupUUID(groupUUID)
-                    .groupName(groupName)
-                    .relations(targetList)
-                    .build();
-
-                allDto.add(dto);
             }
+
+            // 조회한 정보 모두 dto에 저장
+            RelationDtoRes dto = RelationDtoRes.builder()
+                .characterUUID(characterUUID)
+                .characterName(characterName)
+                .characterImage(characterImage)
+                .characterNode(characterNode)
+                .groupUUID(groupUUID)
+                .groupName(groupName)
+                .groupNode(groupNode)
+                .relations(targetList)
+                .build();
+
+            allDto.add(dto);
         }
 
         return allDto;
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CharacterSimpleDtoRes> getAllCharacters(String workspaceUUID, String userUUID) {
+        List<CharacterEntity> allCharacters = characterRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
+        List<CharacterSimpleDtoRes> dtoList = new ArrayList<>();
+
+        for (CharacterEntity character : allCharacters) {
+            CharacterSimpleDtoRes dto = CharacterSimpleDtoRes.builder()
+                .characterUUID(character.getCharacterUUID())
+                .characterName(character.getCharacterName())
+                .build();
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
+    @Transactional
+    @Override
+    public void moveCharacterNode(String characterUUID, Double x, Double y, String userUUID) {
+        CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+
+        if (character.getCharacterNode() == null) {
+            Map<String, Double> characterNode = new HashMap<>();
+            characterNode.put("x", x);
+            characterNode.put("y", y);
+            character.setCharacterNode(characterNode);
+        }
+        character.moveCharacterNode(x, y);
+
+        characterRepository.save(character);
+    }
+
+
 }

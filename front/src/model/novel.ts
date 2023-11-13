@@ -24,3 +24,10 @@ export type DirectoryList = {
   directories: Directory[];
   files: Directory[];
 };
+
+export type Drag = {
+  workspaceUUID: string;
+  directoryUUID: string;
+  parentUUID: string | null | undefined;
+  nextUUID: string | null;
+};
