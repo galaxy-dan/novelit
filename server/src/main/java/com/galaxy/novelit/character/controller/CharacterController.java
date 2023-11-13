@@ -103,4 +103,15 @@ public class CharacterController {
         }
     }
 
+    @PatchMapping("/node")
+    public ResponseEntity<Object> moveCharacterNode(@RequestParam String characterUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
+        try {
+//            characterService.moveCharacterNode(characterUUID, x, y, authentication.getName());
+            characterService.moveCharacterNode(characterUUID, x, y, tempUser);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

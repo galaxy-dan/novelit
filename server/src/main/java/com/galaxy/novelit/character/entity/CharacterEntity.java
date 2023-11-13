@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "character")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -37,7 +39,7 @@ public class CharacterEntity {
     private boolean deleted;
     @Field(name = "character_image")
     private String characterImage;
-    private Map<String, Double> coordinate;
+    private Map<String, Double> characterNode;
 
     public void deleteCharacter() {
         this.deleted = true;
@@ -45,4 +47,9 @@ public class CharacterEntity {
     public void moveCharacter(String groupUUID) {
         this.groupUUID = groupUUID;
     }
+    public void moveCharacterNode(Double x, Double y) {
+        this.characterNode.replace("x", x);
+        this.characterNode.replace("y", y);
+    }
+
 }
