@@ -31,10 +31,8 @@ public class NotificationController {
         @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
         HttpServletResponse response)
     {
-        //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
-        response.setHeader("X-Accel-Buffering", "no");
         String subscriberUUID = authentication.getName();
-        return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID));
+        return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID, response));
     }
 
     @GetMapping("/alarmlist")

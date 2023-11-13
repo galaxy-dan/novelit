@@ -9,6 +9,7 @@ import com.galaxy.novelit.notification.dto.response.NotificationResponseDto;
 import com.galaxy.novelit.notification.redis.dto.request.AlarmRedisRequestDto;
 import com.galaxy.novelit.notification.redis.service.AlarmRedisService;
 import com.galaxy.novelit.notification.repository.EmitterRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -21,23 +22,31 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService{
-    private static final Long DEFAULT_TIMEOUT = 5L;
+    private static final Long DEFAULT_TIMEOUT = 10L * 1000 * 60;
 
     private final EmitterRepository emitterRepository;
     private final DirectoryRepository directoryRepository;
     private final UserRepository userRepository;
     private final AlarmRedisService alarmRedisService;
 
-    public SseEmitter subscribe(String subscriberUUID, String lastEventId)
+    public SseEmitter subscribe(String subscriberUUID, String lastEventId, HttpServletResponse response)
     {
         String id = subscriberUUID + "_" + System.currentTimeMillis();
 
-        SseEmitter emitter = createEmitter(id);
+
+
+        SseEmitter emitter = emitterRepository.save(id, new SseEmitter(DEFAULT_TIMEOUT));
+        //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
+        response.setHeader("X-Accel-Buffering", "no");
+
+        emitter.onCompletion(() -> emitterRepository.deleteAllStartByWithId(id));
+        emitter.onTimeout(() -> emitterRepository.deleteAllStartByWithId(id));
+        emitter.onError((e) -> emitterRepository.deleteAllStartByWithId(id));
 
         sendSubscribe(emitter, id, "Connection");
 
         if (!lastEventId.isEmpty()) {
-            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(subscriberUUID);
+            Map<String, SseEmitter> events = emitterRepository.findAllStartById(subscriberUUID);
             events.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
                 .forEach(entry -> sendSubscribe(emitter, entry.getKey(), entry.getValue()));
@@ -58,12 +67,11 @@ public class NotificationServiceImpl implements NotificationService{
             .orElseThrow(() -> new NoSuchElementFoundException("작품이 없습니다!"));
 
         String id = directory.getUserUUID();
-        //log.info("subscriberUUID : {}", subscriberUUID);
         String directoryName = directory.getName();
         NotificationResponseDto notificationResponseDto = NotificationResponseDto.createAlarmComment(
             commentNickname, id);
 
-        Map<String,SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(id);
+        Map<String,SseEmitter> sseEmitters = emitterRepository.findAllStartById(id);
 
         sseEmitters.forEach(
             (key, emitter) -> {
@@ -88,7 +96,7 @@ public class NotificationServiceImpl implements NotificationService{
 
                 } catch (IOException e) {
                     // exception되면 알람UUID 삭제
-                    emitterRepository.deleteById(id);
+                    emitterRepository.deleteAllStartByWithId(id);
                     emitter.completeWithError(e);
                 }
             }
@@ -112,23 +120,19 @@ public class NotificationServiceImpl implements NotificationService{
                 .data(data));
         } catch (IOException exception)
         {
-            emitterRepository.deleteById(id);
+            emitterRepository.deleteAllStartByWithId(id);
             emitter.completeWithError(exception);
         }
     }
 
 
-    // 처음 구독
+/*    // 처음 구독
     private SseEmitter createEmitter(String id)
     {
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        emitterRepository.save(id, emitter);
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(id));
-        emitter.onTimeout(() -> emitterRepository.deleteById(id));
 
         return emitter;
-    }
+    }*/
 
     //redis pub시 pub UUID와 notiResDto을 합쳐서 보낸다.
     // @param String pubUUID
