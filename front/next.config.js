@@ -8,6 +8,7 @@ const nextConfig = {
       'i.ibb.co',
     ],
   },
+  reactStrictMode: false
 };
 
 module.exports = nextConfig;

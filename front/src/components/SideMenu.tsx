@@ -1,5 +1,5 @@
 'use client';
-import { ForwardedRef, useRef, useState } from 'react';
+import { ForwardedRef, useEffect, useRef, useState } from 'react';
 import { NodeRendererProps, Tree, TreeApi } from 'react-arborist';
 
 import { MdOutlineStickyNote2 } from 'react-icons/md';
@@ -21,6 +21,7 @@ import { PostDirectory } from '@/model/novel';
 import {
   deleteDirectory,
   patchDirectory,
+  patchDrag,
   postDirectory,
 } from '@/service/api/novel';
 import { getWorkspace } from '@/service/api/workspace';
@@ -29,6 +30,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Link from 'next/link';
+import { useDidMountEffect } from '@/hooks/useDidMountEffect';
 
 const temp = {
   name: 'root',
@@ -229,6 +231,31 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
       queryClient.invalidateQueries(['workspace']);
     },
   });
+
+  const dragMutate = useMutation({
+    mutationFn: patchDrag,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['workspace']);
+    },
+  });
+
+  useDidMountEffect(() => {
+    if (node.isDragging) return;
+    const debounce = setTimeout(() => {
+      dragMutate.mutate({
+        workspaceUUID: slug,
+        directoryUUID: node.id,
+        parentUUID:
+          node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
+            ? null
+            : node.parent?.id,
+        nextUUID: node.next ? node.next.id : null,
+      });
+    }, 100);
+    return () => {
+      clearTimeout(debounce);
+    };
+  }, [node.isDragging]);
 
 
   return (
