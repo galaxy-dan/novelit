@@ -9,9 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -25,7 +26,7 @@ public class NotificationController {
     private final AlarmRedisService alarmRedisService;
 
     // 처음 구독
-    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    /*@GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(Authentication authentication, HttpServletResponse response)
     {
         //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
@@ -38,21 +39,23 @@ public class NotificationController {
     public ResponseEntity<List<AlarmGetResponseDto>> getAllAlarmlist(Authentication authentication) {
         String subUUID = authentication.getName();
         return ResponseEntity.ok(alarmRedisService.getAllList(subUUID));
-    }
+    }*/
 
-    /*@GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> subscribe(@RequestParam("subscriberUUID") String subUUID, HttpServletResponse response)
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> subscribe(@RequestParam("subscriberUUID") String subUUID,
+        @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
+        HttpServletResponse response)
     {
         //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
         response.setHeader("X-Accel-Buffering", "no");
         String subscriberUUID = subUUID;
-        return ResponseEntity.ok(notificationService.subscribe(subscriberUUID));
+        return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID));
     }
 
     @GetMapping("/alarmlist")
     public ResponseEntity<List<AlarmGetResponseDto>> getAllAlarmlist(@RequestParam("subscriberUUID") String subUUID) {
         return ResponseEntity.ok(alarmRedisService.getAllList(subUUID));
-    }*/
+    }
 
     // 코멘트 알람 테스트
     /*@PostMapping("/send")

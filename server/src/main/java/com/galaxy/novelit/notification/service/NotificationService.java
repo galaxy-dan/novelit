@@ -3,7 +3,7 @@ package com.galaxy.novelit.notification.service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface NotificationService {
-    SseEmitter subscribe(String subscriberUUID);
+    SseEmitter subscribe(String lastEventId, String subscriberUUID);
 
     //void alertComment(NotificationRequestDto notificationRequestDto);
 
