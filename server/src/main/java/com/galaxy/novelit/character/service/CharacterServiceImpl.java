@@ -19,6 +19,7 @@ import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -289,46 +290,37 @@ public class CharacterServiceImpl implements CharacterService {
         List<RelationDtoRes> allDto = new ArrayList<>();
 
         for (RelationEntity relation : allRelation) {
-            // 캐릭터에 관계 정보가 없을 때 다음 캐릭터로 넘어가기
-            if (relation.getRelations() == null) {
-                continue;
+
+            // 캐릭터(주체,기준) 정보 조회
+            String characterUUID = relation.getCharacterUUID();
+            String characterName = relation.getCharacterName();
+            CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+            String characterImage = character.getCharacterImage();
+            String groupUUID = character.getGroupUUID();
+            String groupName = null;
+            if (groupRepository.findByGroupUUID(groupUUID) != null) {
+                groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
             }
-            else {
-                // 캐릭터(주체,기준) 정보 조회
-                String characterUUID = relation.getCharacterUUID();
-                String characterName = relation.getCharacterName();
-                CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
-                String characterImage = character.getCharacterImage();
-                String groupUUID = character.getGroupUUID();
-                String groupName;
-                if (groupRepository.findByGroupUUID(groupUUID) == null) {
-                    groupName = null;
-                } else {
-                    groupName = groupRepository.findByGroupUUID(groupUUID).getGroupName();
-                }
 
-                // 타켓 정보 조회
-                List<RelationDto> targetList = new ArrayList<>();
+            // 타켓 정보 조회
+            List<RelationDto> targetList = new ArrayList<>();
 
+            if (relation.getRelations() != null) {
                 for (Relation target : relation.getRelations()) {
                     String targetUUID = target.getTargetUUID();
                     String targetName = target.getTargetName();
                     CharacterEntity targetCharacter = characterRepository.findByCharacterUUID(targetUUID);
                     String targetImage = null;
-                    String targetGroupUUID;
-                    String targetGroupName;
+                    String targetGroupUUID = null;
+                    String targetGroupName = null;
 
-                    if (targetCharacter == null) {
-                        targetGroupUUID = null;
-                    } else {
+                    if (targetCharacter != null) {
                         targetGroupUUID = targetCharacter.getGroupUUID();
                         targetImage = targetCharacter.getCharacterImage();
                     }
 
                     GroupEntity targetGroup = groupRepository.findByGroupUUID(targetGroupUUID);
-                    if (targetGroup == null) {
-                        targetGroupName = null;
-                    } else {
+                    if (targetGroup != null) {
                         targetGroupName = targetGroup.getGroupName();
                     }
                     String content = target.getContent();
@@ -344,19 +336,19 @@ public class CharacterServiceImpl implements CharacterService {
 
                     targetList.add(targetDto);
                 }
-
-                // 조회한 정보 모두 dto에 저장
-                RelationDtoRes dto = RelationDtoRes.builder()
-                    .characterUUID(characterUUID)
-                    .characterName(characterName)
-                    .characterImage(characterImage)
-                    .groupUUID(groupUUID)
-                    .groupName(groupName)
-                    .relations(targetList)
-                    .build();
-
-                allDto.add(dto);
             }
+
+            // 조회한 정보 모두 dto에 저장
+            RelationDtoRes dto = RelationDtoRes.builder()
+                .characterUUID(characterUUID)
+                .characterName(characterName)
+                .characterImage(characterImage)
+                .groupUUID(groupUUID)
+                .groupName(groupName)
+                .relations(targetList)
+                .build();
+
+            allDto.add(dto);
         }
 
         return allDto;
@@ -379,4 +371,22 @@ public class CharacterServiceImpl implements CharacterService {
 
         return dtoList;
     }
+
+    @Transactional
+    @Override
+    public void moveCharacterNode(String characterUUID, Double x, Double y, String userUUID) {
+        CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+
+        if (character.getCharacterNode() == null) {
+            Map<String, Double> characterNode = new HashMap<>();
+            characterNode.put("x", x);
+            characterNode.put("y", y);
+            character.setCharacterNode(characterNode);
+        }
+        character.moveCharacterNode(x, y);
+
+        characterRepository.save(character);
+    }
+
+
 }
