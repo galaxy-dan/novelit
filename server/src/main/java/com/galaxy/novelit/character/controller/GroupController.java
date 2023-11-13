@@ -121,4 +121,16 @@ public class GroupController {
         }
     }
 
+    @PatchMapping("/node")
+    public ResponseEntity<Object> moveGroupNode(@RequestParam String groupUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
+        try {
+//            groupService.moveGroupNode(groupUUID, x, y, authentication.getName());
+            groupService.moveGroupNode(groupUUID, x, y, tempUser);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }

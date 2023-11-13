@@ -14,4 +14,5 @@ public interface GroupService {
     void updateGroupName(String groupUUID, String newName, String userUUID);
     List<GroupSimpleDtoRes> getAllGroups(String workspaceUUID, String userUUID);
     List<AllGroupsCharactersDtoRes> getAllGroupsAndCharacters(String workspaceUUID, String userUUID);
+    void moveGroupNode(String groupUUID, Double x, Double y, String userUUID);
 }

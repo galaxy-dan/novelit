@@ -1,10 +1,12 @@
 package com.galaxy.novelit.character.entity;
 
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "group")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -34,6 +37,8 @@ public class GroupEntity {
     private List<CharacterEntity> childCharacters;
     @Field(name = "is_deleted")
     private boolean deleted;
+    @Field(name = "group_node")
+    private Map<String, Double> groupNode;
 
     public void updateGroupName(String groupName) {
         this.groupName = groupName;
@@ -52,5 +57,9 @@ public class GroupEntity {
     }
     public void removeChildCharacter(CharacterEntity child) {
         this.childCharacters.remove(child);
+    }
+    public void moveGroupNode(Double x, Double y) {
+        this.groupNode.replace("x", x);
+        this.groupNode.replace("y", y);
     }
 }
