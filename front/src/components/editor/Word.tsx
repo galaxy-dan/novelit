@@ -2,7 +2,7 @@ import hanspell from 'hanspell';
 
 export default function Word() {
   async function sendContactEmail(email: any) {
-    const response = await fetch('/api/word', {
+    const response = await fetch('/bpi/word', {
       method: 'POST',
       body: JSON.stringify(email),
       headers: {
