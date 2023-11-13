@@ -31,6 +31,8 @@ export type relationshipType = {
   targetUUID?: string | null;
   targetName: string;
   content: string;
+  targetGroupUUID?: string | null;
+  targetGroupName?: string | null;
 };
 
 export type groupItemType = {
@@ -45,3 +47,42 @@ export type characterDirectory = {
   name: string;
   children?: characterDirectory[] | null;
 };
+
+export type NodeType = {
+  data: {
+    id: string;
+    label?: string;
+    type?: string;
+  };
+  position?: {
+    x: number;
+    y: number;
+  };
+  style: {
+    backgroundImage?: string;
+    backgroundFit?: string;
+  };
+};
+export type EdgeType = {
+  data: {
+    id?: string;
+    source: string;
+    target: string;
+    type?: string;
+    label?: string;
+    // 추가적으로 필요한 필드들
+  };
+};
+
+export type graphType = {
+  nodes: NodeType[];
+  edges: EdgeType[];
+};
+
+export type poop = {
+  characterUUID : string;
+  characterName: string;
+  groupUUID: string| null;
+  groupName: string|null;
+  relations: relationshipType[];
+}

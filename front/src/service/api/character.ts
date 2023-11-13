@@ -1,5 +1,44 @@
-import { characterType } from '@/model/charactor';
+import { EdgeType, NodeType, characterType, poop } from '@/model/charactor';
 import { del, get, patch, post, put } from './http';
+
+const transformDiagramData = (data: any) => {
+  let nodeDatas: NodeType[] = [];
+  data.forEach((dat: any) =>
+    nodeDatas.push({
+      data: {
+        id: dat.characterUUID,
+        label: dat.characterName,
+        type: 'character',
+      },
+      ...(dat.characterImage && {
+        style: {
+          backgroundImage: dat.characterImage,
+          backgroundFit: 'cover cover',
+        },
+      }),
+    }),
+  );
+  let edgeDatas: EdgeType[] = [];
+  data.forEach((dat: any) => {
+    dat.relations.forEach((element: any) => {
+      if (element.targetUUID) {
+        edgeDatas.push({
+          data: {
+            source: dat.characterUUID,
+            target: element.targetUUID,
+            label: element.content,
+            type: 'character'
+          },
+        });
+      }
+    });
+  });
+  console.log(nodeDatas);
+  return {
+    nodes: nodeDatas,
+    edges: edgeDatas,
+  };
+};
 
 export const getCharacterByName = async (worksapce: string, name: string) => {
   const data = await get(
@@ -32,4 +71,10 @@ export const patchCharacter = async (params: string, body: characterType) => {
 export const deleteCharacter = async (uuid: string) => {
   const data = await del(`/character?characterUUID=${uuid}`);
   return data;
+};
+
+export const getRelationDiagramInformation = async (workspace: string) => {
+  const data = await get(`/character/diagram`);
+  console.log(data);
+  return transformDiagramData(data);
 };
