@@ -8,6 +8,7 @@ import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
+import com.galaxy.novelit.character.repository.RelationRepository;
 import com.galaxy.novelit.common.exception.DeletedElementException;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
     private final CharacterRepository characterRepository;
+    private final RelationRepository relationRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -51,7 +53,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(readOnly = true)
     @Override
     public List<GroupSimpleDtoRes> getTopGroup(String workspaceUUID, String userUUID) {
-        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(workspaceUUID);
+        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNullAndDeletedIsFalse(workspaceUUID);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -131,6 +133,21 @@ public class GroupServiceImpl implements GroupService {
             parentGroup.removeChildGroup(groupRepository.findByGroupUUID(groupUUID));
             groupRepository.save(parentGroup);
         }
+
+        // 그룹에 속한 자식 캐릭터 삭제
+        List<CharacterEntity> childCharacters = group.getChildCharacters();
+        for (CharacterEntity childCharacter : childCharacters) {
+            childCharacter.deleteCharacter();
+            characterRepository.save(childCharacter);
+            relationRepository.deleteByCharacterUUID(childCharacter.getCharacterUUID());
+        }
+
+        // 그룹에 속한 자식 그룹들 삭제 재귀
+        List<GroupEntity> childGroups = group.getChildGroups();
+        for (GroupEntity childGroup : childGroups) {
+            deleteGroup(childGroup.getGroupUUID(), userUUID, workspaceUUID);
+        }
+
     }
 
     @Transactional
