@@ -257,7 +257,6 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     };
   }, [node.isDragging]);
 
-
   return (
     <>
       <div
@@ -313,7 +312,10 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
               autoFocus
             />
           ) : (
-            <div style={style} className="text-sm font-bold">
+            <div
+              style={style}
+              className="text-sm font-bold overflow-ellipsis whitespace-nowrap overflow-hidden break-all w-40"
+            >
               {node.isLeaf ? '📖' : node.isOpen ? '📂' : '📁'}
               {node.data.name}
             </div>

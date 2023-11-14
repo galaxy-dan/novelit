@@ -5,6 +5,7 @@ import NewDirectoryModal from './NewDirectoryModal';
 type Props = {
   title: string;
   parentUUID: string;
+  directoryName: string;
 };
 
 type Modal = {
@@ -12,7 +13,11 @@ type Modal = {
   isDirectory: boolean;
 };
 
-export default function CardListHeader({ title, parentUUID }: Props) {
+export default function CardListHeader({
+  title,
+  parentUUID,
+  directoryName,
+}: Props) {
   const [modal, setModal] = useState<Modal>({
     isOpen: false,
     isDirectory: false,
@@ -36,8 +41,13 @@ export default function CardListHeader({ title, parentUUID }: Props) {
           <CreateButton onClick={() => buttonClick(true)} content="폴더" />
         </div>
       </div>
+      <div>{directoryName}</div>
       {modal.isOpen && (
-        <NewDirectoryModal setModal={setModal} isDirectory={modal.isDirectory} parentUUID={parentUUID} />
+        <NewDirectoryModal
+          setModal={setModal}
+          isDirectory={modal.isDirectory}
+          parentUUID={parentUUID}
+        />
       )}
     </>
   );
