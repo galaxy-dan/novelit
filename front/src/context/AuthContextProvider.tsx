@@ -14,9 +14,10 @@ export default function AuthContextProvider({ children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, setUser } = useAuth();
-  const token = localStorage.getItem('accessToken');
-  
+  let token = null;
+
   useEffect(() => {
+    token = localStorage.getItem('accessToken');
     if (pathname === '/' || pathname.startsWith('/login')) return;
 
     if (!token) {
