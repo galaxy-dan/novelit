@@ -12,6 +12,7 @@ import Favicon from '../../public/vercel.svg';
 import SSE from '@/components/SSE';
 import NotificationButton from '@/components/NotificationButton';
 import Side from '@/components/Side';
+import TopMenu from '@/components/TopMenu';
 
 // const nanumFont = Nanum_Myeongjo({
 //   subsets: ['latin'],
@@ -42,7 +43,7 @@ export default function RootLayout({
           <RecoilProvider>
             <SSE />
             <ToastContainer pauseOnFocusLoss={false} />
-            <NotificationButton />
+            <TopMenu />
             <Side />
             <main className="flex-grow">{children}</main>
           </RecoilProvider>
