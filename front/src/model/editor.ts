@@ -27,3 +27,9 @@ export type Editable = {
   directoryUUID: string;
   editable: boolean;
 };
+
+export type Word = {
+  info: string;
+  suggestions: string[];
+  token: string;
+};

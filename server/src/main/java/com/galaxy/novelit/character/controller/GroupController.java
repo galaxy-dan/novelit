@@ -34,103 +34,75 @@ public class GroupController {
     private final String tempUser = "temp";
 
     @GetMapping
-    public ResponseEntity<Object> getGroupInfo(@RequestParam String groupUUID, Authentication authentication) {
-        try {
-//            GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName());
-            GroupDtoRes dto = groupService.getGroupInfo(groupUUID, tempUser);
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<Object> getGroupInfo(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
+//        GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName(), workspaceUUID);
+        GroupDtoRes dto = groupService.getGroupInfo(groupUUID, tempUser, workspaceUUID);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/characters")
-    public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String groupUUID, Authentication authentication) {
-//        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName());
-        List<CharacterThumbnailDtoRes> dto = characterService.getCharacters(groupUUID, tempUser);
+    public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
+//        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName(), workspaceUUID);
+        List<CharacterThumbnailDtoRes> dto = characterService.getCharacters(groupUUID, tempUser, workspaceUUID);
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/top")
     public ResponseEntity<Object> getTopGroupAndCharacter(@RequestParam String workspaceUUID, Authentication authentication) {
-        try {
-//            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(authentication.getName());
-//            List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
+//        List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(authentication.getName());
+//        List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
 
-            List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(workspaceUUID, tempUser);
-            List<CharacterThumbnailDtoRes> characterDto = characterService.getTopCharacter(workspaceUUID, tempUser);
+        List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(workspaceUUID, tempUser);
+        List<CharacterThumbnailDtoRes> characterDto = characterService.getTopCharacter(workspaceUUID, tempUser);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("groups", groupDto);
-            response.put("characters", characterDto);
+        Map<String, Object> response = new HashMap<>();
+        response.put("groups", groupDto);
+        response.put("characters", characterDto);
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.ok(response);
     }
 
 
     @PostMapping
     public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto, Authentication authentication) {
-        try {
-//            groupService.createGroup(dto, authentication.getName());
-            groupService.createGroup(dto, tempUser);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+//        groupService.createGroup(dto, authentication.getName());
+        groupService.createGroup(dto, tempUser);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping
-    public ResponseEntity<Object> updateGroupName(@RequestParam String groupUUID, @RequestParam String newName, Authentication authentication) {
-        try {
-//            groupService.updateGroupName(groupUUID, newName, authentication.getName());
-            groupService.updateGroupName(groupUUID, newName, tempUser);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<Object> updateGroupName(@RequestParam String workspaceUUID, @RequestParam String groupUUID, @RequestParam String newName, Authentication authentication) {
+//        groupService.updateGroupName(groupUUID, newName, authentication.getName(), workspaceUUID);
+        groupService.updateGroupName(groupUUID, newName, tempUser, workspaceUUID);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Object> deleteGroup(@RequestParam String groupUUID, Authentication authentication) {
-        try {
-//            groupService.deleteGroup(groupUUID, authentication.getName());
-            groupService.deleteGroup(groupUUID, tempUser);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<Object> deleteGroup(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
+//        groupService.deleteGroup(groupUUID, authentication.getName(),workspaceUUID);
+        groupService.deleteGroup(groupUUID, tempUser,workspaceUUID);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/character/all")
     public ResponseEntity<Object> getGroupAndCharatcter(@RequestParam String workspaceUUID, Authentication authentication) {
-        try {
-//            List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, authentication.getName());
-            List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, tempUser);
-            List<CharacterSimpleDtoRes> noGroupDto = characterService.getNoGroupCharacters(workspaceUUID, tempUser);
+//        List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, authentication.getName());
+        List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, tempUser);
+        List<CharacterSimpleDtoRes> noGroupDto = characterService.getNoGroupCharacters(workspaceUUID, tempUser);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("allGroupsAndCharacters", dto);
-            response.put("noGroupCharacters", noGroupDto);
+        Map<String, Object> response = new HashMap<>();
+        response.put("allGroupsAndCharacters", dto);
+        response.put("noGroupCharacters", noGroupDto);
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/node")
-    public ResponseEntity<Object> moveGroupNode(@RequestParam String groupUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
-        try {
-//            groupService.moveGroupNode(groupUUID, x, y, authentication.getName());
-            groupService.moveGroupNode(groupUUID, x, y, tempUser);
+    public ResponseEntity<Object> moveGroupNode(@RequestParam String workspaceUUID, @RequestParam String groupUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
+//        groupService.moveGroupNode(groupUUID, x, y, authentication.getName(), workspaceUUID);
+        groupService.moveGroupNode(groupUUID, x, y, tempUser, workspaceUUID);
 
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.ok().build();
     }
 
 }

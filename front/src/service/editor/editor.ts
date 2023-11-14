@@ -14,3 +14,20 @@ export const getJwtPayload = (token: string) => {
   const result = JSON.parse(payload.toString());
   return result;
 };
+
+export async function wordCheck(req: { word: string }) {
+  const response = await fetch('/bpi/word', {
+    method: 'POST',
+    body: JSON.stringify(req),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || '서버 요청에 실패함');
+  }
+  return data;
+}

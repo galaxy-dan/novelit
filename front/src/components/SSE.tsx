@@ -15,8 +15,6 @@ export default function SSE() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  
-
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     if (!accessToken) return;
@@ -38,7 +36,10 @@ export default function SSE() {
     );
 
     eventSource.addEventListener('alertComment', function (event: any) {
-      toast(event.data);
+      const data = JSON.parse(event.data);
+      if (data.type !== 'Connection') {
+        toast(data.content);
+      }
     });
     eventSource.onmessage = (error) => {
       console.log(error);

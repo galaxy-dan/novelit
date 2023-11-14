@@ -10,7 +10,9 @@ export default function Card({ subject, isDirectory }: Props) {
         isDirectory ? 'bg-yellow-200' : 'bg-gray-200'
       }`}
     >
-      <div className="w-full h-1/2 bg-white rounded-b-lg p-2">{subject}</div>
+      <div className="w-full h-1/2 bg-white rounded-b-lg p-2 overflow-ellipsis whitespace-nowrap overflow-hidden break-all">
+        {subject}
+      </div>
     </div>
   );
 }

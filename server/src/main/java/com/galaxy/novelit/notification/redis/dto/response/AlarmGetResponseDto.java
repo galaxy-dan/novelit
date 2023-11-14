@@ -1,6 +1,8 @@
 package com.galaxy.novelit.notification.redis.dto.response;
 
 import com.galaxy.novelit.notification.redis.domain.AlarmRedis;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,4 +26,14 @@ public class AlarmGetResponseDto {
             .build();
     }
 
+    public static List<AlarmGetResponseDto> domainListToGetResDtoList(
+        List<AlarmRedis> alarmRedisList) {
+        List<AlarmGetResponseDto> list = new ArrayList<>();
+
+        for (AlarmRedis alarmRedis : alarmRedisList) {
+            list.add(domainToGetResDto(alarmRedis));
+        }
+
+        return list;
+    }
 }

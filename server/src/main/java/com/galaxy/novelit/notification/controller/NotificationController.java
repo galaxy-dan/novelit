@@ -32,12 +32,14 @@ public class NotificationController {
         HttpServletResponse response)
     {
         String subscriberUUID = authentication.getName();
+        log.info("subscribe: {}" ,subscriberUUID);
         return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID, response));
     }
 
     @GetMapping("/alarmlist")
     public ResponseEntity<List<AlarmGetResponseDto>> getAllAlarmlist(Authentication authentication) {
         String subUUID = authentication.getName();
+        log.info("getAllAlarmlist: {}" ,subUUID);
         return ResponseEntity.ok(alarmRedisService.getAllList(subUUID));
     }
 
@@ -46,10 +48,7 @@ public class NotificationController {
         @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
         HttpServletResponse response)
     {
-        //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
-        response.setHeader("X-Accel-Buffering", "no");
-        String subscriberUUID = subUUID;
-        return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID));
+        return ResponseEntity.ok(notificationService.subscribe(lastEventId, subUUID, response));
     }
 
     @GetMapping("/alarmlist")

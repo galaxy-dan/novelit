@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class CharacterCreateDtoReq {
     private String workspaceUUID;
     private String groupUUID;
+    private String characterUUID;
     private String characterName;
     private String description;
     private List<Map<String, String>> information;
