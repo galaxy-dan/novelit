@@ -62,7 +62,7 @@ public class NotificationServiceImpl implements NotificationService{
         try{
             emitter.send(SseEmitter.event()
                 .id(id)
-                .name("alertComment") // alertComment stream 생성
+                .name("alertComment")
                 .data(data));
         } catch (IOException exception)
         {
@@ -108,71 +108,6 @@ public class NotificationServiceImpl implements NotificationService{
             }
         );
     }
-
-
-    /*@Override
-    public void alertComment(String commentNickname, String directoryUUID, String publisherUUID) {
-        sseAlertComment(commentNickname, directoryUUID, publisherUUID);
-    }*/
-
-   /* private void sseAlertComment(String commentNickname, String directoryUUID, String publisherUUID) {
-        // directoryUUID == workspaceUUID
-        Directory directory = directoryRepository.findDirectoryByUuid(
-                directoryUUID)
-            .orElseThrow(() -> new NoSuchElementFoundException("작품이 없습니다!"));
-
-        String id = directory.getUserUUID();
-        String directoryName = directory.getName();
-        NotificationResponseDto notificationResponseDto = NotificationResponseDto.createAlarmComment(
-            commentNickname, id);
-
-        Map<String,SseEmitter> sseEmitters = emitterRepository.findAllStartById(id);
-
-        sseEmitters.forEach(
-            (key, emitter) -> {
-                emitterRepository.saveEventCache(key, notificationResponseDto);
-
-                try {
-                    // 알람UUID, 함수, 텍스트 보내주기
-                    emitter.send(SseEmitter.event()
-                        .id(id) // publisher
-                        .name("alertComment")
-                        .data(notificationResponseDto.getNotificationContent(), MediaType.TEXT_PLAIN));
-
-                    //log.info("pubName : {}, subUUID : {}, directoryName : {}", commentNickname, subscriberUUID, directoryName);
-
-                    alarmRedisService.save(AlarmRedisRequestDto.builder()
-                        .pubUUID(publisherUUID)
-                        .pubName(commentNickname)
-                        .subUUID(id)
-                        .directoryName(directoryName)
-                        .build());
-
-
-                } catch (IOException e) {
-                    // exception되면 알람UUID 삭제
-                    emitterRepository.deleteAllStartByWithId(id);
-                    emitter.completeWithError(e);
-                }
-            }
-        );
-
-        //log.info(emitter.toString());
-
-        *//*if (emitter != null) {
-
-        }*//*
-    }*/
-
-
-
-/*    // 처음 구독
-    private SseEmitter createEmitter(String id)
-    {
-
-
-        return emitter;
-    }*/
 
     //redis pub시 pub UUID와 notiResDto을 합쳐서 보낸다.
     // @param String pubUUID
