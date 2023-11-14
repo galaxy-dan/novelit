@@ -30,10 +30,11 @@ public class NotificationServiceImpl implements NotificationService{
     private final UserRepository userRepository;
     private final AlarmRedisService alarmRedisService;
 
-    public SseEmitter subscribe(String subscriberUUID, String lastEventId, HttpServletResponse response)
+    public SseEmitter subscribe(String lastEventId, String subscriberUUID, HttpServletResponse response)
     {
         String id = subscriberUUID + "_" + System.currentTimeMillis();
 
+        // subscriberUUID
         SseEmitter emitter = emitterRepository.save(id, new SseEmitter(DEFAULT_TIMEOUT));
         //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
         response.setHeader("X-Accel-Buffering", "no");
