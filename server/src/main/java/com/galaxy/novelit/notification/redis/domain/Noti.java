@@ -14,7 +14,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @Builder
 public class Noti {
 
-    private String pubName; // 보내는 사람
+    private String pubName;
     @Indexed
     private String subUUID;
     @Indexed
