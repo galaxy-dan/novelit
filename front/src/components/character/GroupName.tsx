@@ -17,7 +17,7 @@ export default function GroupName({
   const patchMutate = useMutation({
     mutationFn: () => patchGroup({ groupUUID: groupUUID, newName: groupName }),
     onError: () => queryClient.refetchQueries(['group', groupUUID]),
-    onSuccess: ()=> queryClient.refetchQueries(['group'])
+    onSuccess: () => queryClient.refetchQueries(['group']),
   });
 
   const [width, setWidth] = useState(100);

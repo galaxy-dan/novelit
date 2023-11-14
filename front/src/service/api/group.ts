@@ -1,5 +1,6 @@
 import { characterType, groupType, subGroupType } from '@/model/charactor';
 import { del, get, patch, post } from './http';
+import { v4 as uuidv4 } from 'uuid';
 
 const transformSubGroupAndCharacter = (data: any) => {
   const groupName: string = data.groupName;
@@ -32,18 +33,24 @@ export const getTopGroupAndCharacter = async (workspaceUUID: string) => {
   return data;
 };
 
-export const getGroup = async (uuid: string) => {
-  const data = await get(`/group?groupUUID=${uuid}`);
+export const getGroup = async (uuid: string, workspace: string) => {
+  const data = await get(`/group?groupUUID=${uuid}&workspaceUUID=${workspace}`);
   return data;
 };
 
-export const getSubGroupAndCharacter = async (uuid: string) => {
-  const data = await get(`/group?groupUUID=${uuid}`);
+export const getSubGroupAndCharacter = async (req: {
+  uuid: string;
+  workspace: string;
+}) => {
+  const data = await get(
+    `/group?groupUUID=${req.uuid}&workspaceUUID=${req.workspace}`,
+  );
   return transformSubGroupAndCharacter(data);
 };
 
 export const postGroup = async (body: groupType) => {
-  const data = await post(`/group`, body);
+  const uuid = uuidv4();
+  const data = await post(`/group`, { ...body, groupUUID: uuid });
   return data;
 };
 
@@ -57,13 +64,15 @@ export const patchGroup = async (req: {
   return data;
 };
 
-export const deleteGroup = async (uuid: string) => {
-  const data = await del(`/group?groupUUID=${uuid}`);
+export const deleteGroup = async (req: { uuid: string; workspace: string }) => {
+  const data = await del(
+    `/group?groupUUID=${req.uuid}&workspaceUUID=${req.workspace}`,
+  );
   return data;
 };
 
-export const getGroupTop = async () => {
-  const data = await get(`/group/top`);
+export const getGroupTop = async (workspace: string) => {
+  const data = await get(`/group/top?workspaceUUID=${workspace}`);
   return data;
 };
 
