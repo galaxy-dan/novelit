@@ -32,12 +32,14 @@ public class NotificationController {
         HttpServletResponse response)
     {
         String subscriberUUID = authentication.getName();
+        log.info("getAllAlarmlist: {}" ,subscriberUUID);
         return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID, response));
     }
 
     @GetMapping("/alarmlist")
     public ResponseEntity<List<AlarmGetResponseDto>> getAllAlarmlist(Authentication authentication) {
         String subUUID = authentication.getName();
+        log.info("getAllAlarmlist: {}" ,subUUID);
         return ResponseEntity.ok(alarmRedisService.getAllList(subUUID));
     }
 
