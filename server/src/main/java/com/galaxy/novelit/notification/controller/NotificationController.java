@@ -32,7 +32,7 @@ public class NotificationController {
         HttpServletResponse response)
     {
         String subscriberUUID = authentication.getName();
-        log.info("getAllAlarmlist: {}" ,subscriberUUID);
+        log.info("subscribe: {}" ,subscriberUUID);
         return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID, response));
     }
 
