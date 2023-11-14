@@ -251,11 +251,14 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                       : node.parent?.id;
                   if (node.id.includes('simple')) {
                     // 캐릭터 생성
+                    const uuid = uuidv4();
+                    node.data.id = uuid;
                     if (node.isLeaf) {
                       postCharacterMutate.mutate({
                         workspace: slug,
                         group: parentUUID || null,
                         name: e.currentTarget.value,
+                        uuid: uuid,
                       });
                     }
                     // 폴더 생성
@@ -264,10 +267,10 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                         workspaceUUID: slug,
                         groupName: e.currentTarget.value,
                         parentGroupUUID: parentUUID,
+                        groupUUID: uuid,
                       });
                     }
-                    const uuid = uuidv4();
-                    node.data.id = uuid;
+                    
                   } else {
                     // 캐릭터 수정
                     if (node.isLeaf) {

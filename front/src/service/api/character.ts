@@ -194,10 +194,10 @@ export const postCharacter = async (req: {
   workspace: string;
   group: string | null;
   name: string;
+  uuid: string;
 }) => {
-  const uuid = uuidv4();
   const data = await post(`/character`, {
-    characterUUID: uuid,
+    characterUUID: req.uuid,
     workspaceUUID: req.workspace,
     groupUUID: req.group,
     characterName: req.name,
