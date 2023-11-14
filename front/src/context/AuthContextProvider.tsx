@@ -17,8 +17,13 @@ export default function AuthContextProvider({ children }: Props) {
   let token = null;
 
   useEffect(() => {
-    token = localStorage.getItem('accessToken');
-    if (pathname === '/' || pathname.startsWith('/login')) return;
+    token = localStorage.getItem('refreshToken');
+    if (
+      pathname === '/' ||
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/share')
+    )
+      return;
 
     if (!token) {
       toast('로그인 해주세요!');
