@@ -16,4 +16,5 @@ public class GroupSimpleWithNodeDtoRes {
     private String groupUUID;
     private String groupName;
     private Map<String, Double> groupNode;
+    private String parentGroupUUID;
 }
