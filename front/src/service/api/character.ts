@@ -185,7 +185,7 @@ export const getCharacter = async (req: {
   uuid: string;
 }) => {
   const data = await get(
-    `/character?workspace=${req.workspace}&characterUUID=${req.uuid}`,
+    `/character?workspaceUUID=${req.workspace}&characterUUID=${req.uuid}`,
   );
   return data;
 };
