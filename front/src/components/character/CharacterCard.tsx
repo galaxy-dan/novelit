@@ -11,7 +11,7 @@ export default function CharacterCard({ character, slug }: Props) {
 
   return (
     <div
-      className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8 cursor-pointer"
+      className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8 cursor-pointer hover:bg-neutral-200"
       onClick={() => {
         router.push(
           `/character/${slug}/characterInfo/${character.characterUUID}`,

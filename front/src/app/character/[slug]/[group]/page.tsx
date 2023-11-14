@@ -42,7 +42,7 @@ export default function page({ params }: Props) {
   const [groupNameInput, setGroupNameInput] = useState<string>('');
 
   return (
-    <div className="ml-10 my-20 select-none">
+    <div className="ml-14 my-20 select-none">
       {/* 제목 */}
       <CharacterUpperGroup
         parentUUID={groupData?.parentGroupUUID}

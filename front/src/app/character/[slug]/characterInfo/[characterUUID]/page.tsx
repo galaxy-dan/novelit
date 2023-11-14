@@ -259,9 +259,10 @@ export default function page({ params }: Props) {
         setRelationCharacterSearchInput(-1);
       }}
     >
-      <CharacterUpperGroup parentUUID={groupUUID || ''} slug={params.slug} />
+      
       <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 py-20 ">
         {/* 상단 타이틀 메뉴 + 로딩 상태 */}
+        <CharacterUpperGroup parentUUID={groupUUID || ''} slug={params.slug}/>
         <div className="flex items-end justify-between">
           <div className="flex items-center">
             <div>

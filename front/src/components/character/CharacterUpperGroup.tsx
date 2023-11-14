@@ -1,5 +1,6 @@
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { FaFolderTree } from 'react-icons/fa6';
 type Props = {
   parentUUID: string | undefined;
   slug: string;
@@ -7,7 +8,8 @@ type Props = {
 export default function CharacterUpperGroup({ parentUUID, slug }: Props) {
   const router = useRouter();
   return (
-    <p
+    <div
+      className="flex items-center font-bold mb-4 ml-2 cursor-pointer"
       onClick={() => {
         if (parentUUID && parentUUID !== '') {
           router.push(`/character/${slug}/${parentUUID}`);
@@ -16,7 +18,8 @@ export default function CharacterUpperGroup({ parentUUID, slug }: Props) {
         }
       }}
     >
-      상위 폴더로 이동
-    </p>
+      <FaFolderTree />
+      <p className="ml-2">상위 항목으로 이동</p>
+    </div>
   );
 }
