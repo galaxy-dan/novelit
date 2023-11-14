@@ -4,6 +4,7 @@ import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
 import com.galaxy.novelit.character.dto.res.AllGroupsCharactersDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
+import com.galaxy.novelit.character.dto.res.GroupSimpleWithNodeDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
@@ -162,14 +163,15 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<GroupSimpleDtoRes> getAllGroups(String workspaceUUID, String userUUID) {
+    public List<GroupSimpleWithNodeDtoRes> getAllGroupsWithNode(String workspaceUUID, String userUUID) {
         List<GroupEntity> allGroups = groupRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
-        List<GroupSimpleDtoRes> dtoList = new ArrayList<>();
+        List<GroupSimpleWithNodeDtoRes> dtoList = new ArrayList<>();
 
         for (GroupEntity group : allGroups) {
-            GroupSimpleDtoRes dto = GroupSimpleDtoRes.builder()
+            GroupSimpleWithNodeDtoRes dto = GroupSimpleWithNodeDtoRes.builder()
                 .groupUUID(group.getGroupUUID())
                 .groupName(group.getGroupName())
+                .groupNode(group.getGroupNode())
                 .build();
 
             dtoList.add(dto);
