@@ -407,9 +407,7 @@ export default function RelationshipDiagram({ params }: Props) {
       let renderCount = 0;
       const fitGraph = () => {
         renderCount++;
-        console.log(renderCount);
         if (renderCount < 10) {
-          console.log('fit해요~');
           cy.fit(cy.nodes(), 40);
         } else {
           cy.off('render', fitGraph);

@@ -43,7 +43,6 @@ export const getSubGroupAndCharacter = async (uuid: string) => {
 };
 
 export const postGroup = async (body: groupType) => {
-  console.log(body);
   const data = await post(`/group`, body);
   return data;
 };

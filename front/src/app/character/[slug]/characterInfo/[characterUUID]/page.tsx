@@ -214,7 +214,6 @@ export default function page({ params }: Props) {
       if (isFetched) {
         putCharacterMutation.mutate();
         if (isNameChanged) {
-          console.log("이름 수정");
           queryClient.invalidateQueries(['characterDirectory']);
           setIsNameChanged(false);
         }
