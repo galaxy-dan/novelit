@@ -18,6 +18,7 @@ export default function CardList() {
     : searchParams.slug;
 
   const [directory, setDirectory] = useState<string[]>([slug]);
+  const [directoryName, setDirectoryName] = useState<string[]>(['']);
 
   const { data: workspace }: UseQueryResult<Novel> = useQuery({
     queryKey: ['workspace', slug],
@@ -33,7 +34,11 @@ export default function CardList() {
 
   return (
     <>
-      <CardListHeader title={workspace?.title ?? ''} parentUUID={directory[directory.length - 1]} />
+      <CardListHeader
+        title={workspace?.title ?? ''}
+        parentUUID={directory[directory.length - 1]}
+        directoryName={directoryName[directoryName.length - 1]}
+      />
       {directory.length > 1 && (
         <button
           className="border-2 px-2 py-1 rounded-lg my-4"
@@ -44,30 +49,46 @@ export default function CardList() {
               newData.pop();
               return newData;
             });
+
+            setDirectoryName((prev) => {
+              const newData = [...prev];
+              newData.pop();
+              return newData;
+            });
           }}
         >
           뒤로 가기
         </button>
       )}
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap gap-6">
-          {directoryList?.directories?.map((el, index) => (
-            <div
-              className="cursor-pointer"
-              onClick={() => setDirectory((prev) => [...prev, el.uuid])}
-            >
-              <Card subject={`${el.name}`} isDirectory={true} />
-            </div>
-          ))}
+
+      {directoryList?.directories.length == 0 &&
+      directoryList.files.length == 0 ? (
+        <div>현재 폴더 안에 파일이 없습니다!</div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap gap-6">
+            {directoryList?.directories?.map((el, index) => (
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  setDirectory((prev) => [...prev, el.uuid]);
+                  setDirectoryName((prev) => [...prev, el.name]);
+                }}
+                key={el.uuid}
+              >
+                <Card subject={`${el.name}`} isDirectory={true} />
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-6">
+            {directoryList?.files?.map((el, index) => (
+              <Link key={index} href={`/editor/${slug}/${el.uuid}`}>
+                <Card subject={`${el.name}`} isDirectory={false} />
+              </Link>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-6">
-          {directoryList?.files?.map((el, index) => (
-            <Link key={index} href={`/editor/${slug}/${el.uuid}`}>
-              <Card subject={`${el.name}`} isDirectory={false} />
-            </Link>
-          ))}
-        </div>
-      </div>
+      )}
     </>
   );
 }

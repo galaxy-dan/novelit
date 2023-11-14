@@ -2,13 +2,15 @@ package com.galaxy.novelit.workspace.mapper;
 
 import java.util.List;
 
+import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
+
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.workspace.domain.Workspace;
 import com.galaxy.novelit.workspace.dto.WorkSpaceDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceElementDTO;
 
-import org.mapstruct.Mapper;
-
+@Component
 @Mapper(componentModel = "spring")
 public interface WorkspaceMapper {
     Workspace toEntity(WorkSpaceDTO workSpaceDTO);

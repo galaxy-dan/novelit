@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 span[id] {
-  background-color: rgba(255, 236, 213, 0.568);
-  border-left: 2px solid black;
+  /* background-color: rgba(197, 209, 100, 0.568); */
+  background-color: rgb(255, 223, 223);
+  border-left: 1px solid gray;
   cursor: pointer;
   /* border-left-color: rgba(192, 192, 192, 0.111); */
 }
@@ -24,4 +25,14 @@ span[id] {
 @font-face {
   font-family: 'Nanum Pen Script';
   src: url('/fonts/NanumPenScript-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Jalnan';
+  src: url('/fonts/Jalnan2TTF.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'JalnanGothic';
+  src: url('/fonts/JalnanGothicTTF.ttf') format('truetype');
 }

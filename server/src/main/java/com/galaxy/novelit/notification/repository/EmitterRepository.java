@@ -2,6 +2,7 @@ package com.galaxy.novelit.notification.repository;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -9,19 +10,30 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @Repository
 public class EmitterRepository {
-
     // <UUID, SseEmitter>
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
 
-    public void save(String subscriberUUID, SseEmitter emitter) {
-        emitters.put(subscriberUUID, emitter);
+    public SseEmitter save(String subscriberUUID, SseEmitter sseEmitter) {
+        emitters.put(subscriberUUID, sseEmitter);
+        return sseEmitter;
     }
 
-    public void deleteById(String subscriberUUID) {
-        emitters.remove(subscriberUUID);
+    public void saveEventCache(String id, Object object) {
+        eventCache.put(id, object);
     }
 
-    public SseEmitter get(String subscriberUUID) {
-        return emitters.get(subscriberUUID);
+    public Map<String, SseEmitter> findAllStartById(String id) {
+        return emitters.entrySet().stream()
+            .filter(entry -> entry.getKey().startsWith(id))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
+
+
+    public void deleteAllStartByWithId(String id) {
+        emitters.forEach((key, emitter) -> {
+            if (key.startsWith(id)) emitters.remove(key);
+        });
+    }
+
 }

@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class GroupCreateDtoReq {
-    private String userUUID;
     private String workspaceUUID;
+    private String groupUUID;
     private String groupName;
-    private String parentUUID;
+    private String parentGroupUUID;
 }

@@ -31,7 +31,7 @@ type Inputs = {
 
 type Props = {
   spaceUUID: string;
-  directoryUUID: string;
+  directoryUUID: string | string[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -64,8 +64,8 @@ export default function Comment({
       spaceUUID,
       directoryUUID,
       commentContent: data.commentContent,
-      commentNickname: 'john',
-      commentPassword: 'bye',
+      commentNickname: localStorage.getItem('name') ?? '',
+      // commentPassword: 'bye',
     });
   };
 
@@ -73,14 +73,12 @@ export default function Comment({
     mutationFn: patchEditor,
     onSuccess: () => {
       queryClient.invalidateQueries(['editor']);
-      toast('저장 성공');
     },
   });
 
   const postMutate = useMutation({
     mutationFn: postComment,
     onSuccess: () => {
-      toast('댓글 작성 성공');
       queryClient.invalidateQueries(['comment', spaceUUID]);
 
       // 글도 최신화
@@ -99,7 +97,7 @@ export default function Comment({
     },
   });
   return (
-    <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-black rounded-md shadow-md p-2">
+    <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-black rounded-md shadow-md p-2 bg-white">
       <div className="flex justify-between">
         <div>Comment</div>
         <button onClick={() => setIsOpen((prev) => !prev)}>
@@ -107,25 +105,27 @@ export default function Comment({
         </button>
       </div>
 
-      <div className="flex">
+      <div className="flex flex-col">
         {commentList?.map((el, index) => (
-          <div className='flex justify-between'>
+          <div className="flex justify-between" key={el.commentUUID}>
             <div className="flex gap-2">
               <div>{el.commentNickname}</div>
               <div>{el.commentContent}</div>
             </div>
-            <button
-              onClick={() => {
-                deleteMutate.mutate({
-                  spaceUUID,
-                  commentUUID: el.commentUUID,
-                  commentNickname: el.commentNickname,
-                  commentPassword: el.commentPassword,
-                });
-              }}
-            >
-              <RxCross2 />
-            </button>
+            {el.commentNickname === localStorage.getItem('name') && (
+              <button
+                onClick={() => {
+                  deleteMutate.mutate({
+                    spaceUUID,
+                    commentUUID: el.commentUUID,
+                    commentNickname: el.commentNickname,
+                    // commentPassword: el.commentPassword,
+                  });
+                }}
+              >
+                <RxCross2 />
+              </button>
+            )}
           </div>
         ))}
       </div>

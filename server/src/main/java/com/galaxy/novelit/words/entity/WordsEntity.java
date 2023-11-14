@@ -20,12 +20,18 @@ public class WordsEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "word_id")
     private Long wordId;
-    @Column(name = "workspace_id")
-    private String workspaceUuid;
+    @Column(name = "user_uuid")
+    private String userUUID;
+    @Column(name = "workspace_uuid")
+    private String workspaceUUID;
     @Column(name = "word_uuid")
-    private String wordUuid;
+    private String wordUUID;
     @Column(name = "word")
     private String word;
     @Column(name = "is_character")
     private boolean isCharacter;
+
+    public void updateWord(String word) {
+        this.word = word;
+    }
 }

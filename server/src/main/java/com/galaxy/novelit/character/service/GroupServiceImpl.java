@@ -1,16 +1,23 @@
 package com.galaxy.novelit.character.service;
 
 import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
+import com.galaxy.novelit.character.dto.res.AllGroupsCharactersDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
+import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
+import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
+import com.galaxy.novelit.common.exception.DeletedElementException;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.mapping.Collection;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,34 +26,32 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
-    private final MongoTemplate mongoTemplate;
+    private final CharacterRepository characterRepository;
 
     @Transactional(readOnly = true)
     @Override
-    public GroupDtoRes getGroupInfo(String groupUUID) {
-        GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+    public GroupDtoRes getGroupInfo(String groupUUID, String userUUID, String workspaceUUID) {
+        GroupEntity group = groupRepository.findByGroupUUIDAndWorkspaceUUID(groupUUID, workspaceUUID);
+        checkGroupException(group);
 
-//        삭제된 그룹 처리
-//        if (group.isDeleted()) {
-//            return ;
-//        }
+        List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUIDAndDeletedIsFalse(groupUUID);
+        List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUIDAndDeletedIsFalse(groupUUID);
 
         GroupDtoRes dto = new GroupDtoRes();
+        dto.setWorkspaceUUID(group.getWorkspaceUUID());
         dto.setGroupUUID(group.getGroupUUID());
         dto.setGroupName(group.getGroupName());
-        dto.setChildUUID(group.getChildUUID());
-        dto.setParentUUID(group.getParentUUID());
-        dto.setWorkspaceUUID(group.getWorkspaceUUID());
-        dto.setCharactersInfo(group.getCharactersInfo());
-        dto.setDeleted(group.isDeleted());
+        dto.setParentGroupUUID(group.getParentGroupUUID());
+        dto.setChildGroups(childGroups);
+        dto.setChildCharacters(childCharacters);
 
         return dto;
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<GroupSimpleDtoRes> getTopGroup() {
-        List<GroupEntity> groups = groupRepository.findAllByParentUUID(null);
+    public List<GroupSimpleDtoRes> getTopGroup(String workspaceUUID, String userUUID) {
+        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(workspaceUUID);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -60,76 +65,163 @@ public class GroupServiceImpl implements GroupService {
         return dto;
     }
 
-
     @Transactional
     @Override
-    public void createGroup(GroupCreateDtoReq dto) {
-        String groupUUID = UUID.randomUUID().toString();
-        String parentUUID = dto.getParentUUID();
-        GroupEntity newGroup = new GroupEntity();
+    public void createGroup(GroupCreateDtoReq dto, String userUUID) {
+        // UUID 프론트에서 받아서 사용
+//        String groupUUID = UUID.randomUUID().toString();
 
-        // 최상단 계층일 경우 (부모UUID가 없을 때)
-        if (parentUUID == null) {
+        GroupEntity newGroup;
+        String parentGroupUUID = dto.getParentGroupUUID();
+
+        if (parentGroupUUID == null) {
             newGroup = GroupEntity.builder()
-                .parentUUID(null)
-                .groupUUID(groupUUID)
-                .groupName(dto.getGroupName())
+                .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
-                .userUUID(dto.getUserUUID())
+                .groupUUID(dto.getGroupUUID())
+                .groupName(dto.getGroupName())
+                .parentGroupUUID(null)
+                .childGroups(new ArrayList<>())
+                .childCharacters(new ArrayList<>())
                 .build();
+
+            groupRepository.save(newGroup);
         }
         else {
+            GroupEntity parentGroup = groupRepository.findByGroupUUID(parentGroupUUID);
+            checkGroupException(parentGroup);
+
             newGroup = GroupEntity.builder()
-                .groupUUID(groupUUID)
-                .groupName(dto.getGroupName())
+                .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
-                .userUUID(dto.getUserUUID())
-                .parentUUID(parentUUID)
+                .groupUUID(dto.getGroupUUID())
+                .groupName(dto.getGroupName())
+                .parentGroupUUID(parentGroupUUID)
+                .childGroups(new ArrayList<>())
+                .childCharacters(new ArrayList<>())
                 .build();
+
+            groupRepository.save(newGroup);
+
+            // 부모 그룹의 childGroups 리스트에 자식 추가
+            parentGroup.addChildGroup(groupRepository.findByGroupUUID(dto.getGroupUUID()));
+            groupRepository.save(parentGroup);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void deleteGroup(String groupUUID, String userUUID, String workspaceUUID) {
+        GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+
+        if (group == null) {
+            throw new NoSuchElementFoundException("유효하지 않은 그룹 UUID 입니다.");
+        }
+        if (group.isDeleted()) {
+            throw new DeletedElementException("이미 삭제된 그룹 입니다.");
         }
 
-        groupRepository.save(newGroup);
+        group.deleteGroup();
+        groupRepository.save(group);
+
+        GroupEntity parentGroup = groupRepository.findByGroupUUID(group.getParentGroupUUID());
+
+        // 부모그룹의 childGroups 리스트에 자식 제거
+        if (parentGroup != null) {
+            parentGroup.removeChildGroup(groupRepository.findByGroupUUID(groupUUID));
+            groupRepository.save(parentGroup);
+        }
     }
 
     @Transactional
     @Override
-    public void deleteGroup(String groupUUID) {
+    public void updateGroupName(String groupUUID, String newName, String userUUID, String workspaceUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+        checkGroupException(group);
 
-        GroupEntity newGroup = GroupEntity.builder()
-            .groupId(group.getGroupId())
-            .groupUUID(group.getGroupUUID())
-            .userUUID(group.getUserUUID())
-            .workspaceUUID(group.getWorkspaceUUID())
-            .groupName(group.getGroupName())
-            .parentUUID(group.getParentUUID())
-            .childUUID(group.getChildUUID())
-            .charactersInfo(group.getCharactersInfo())
-            .isDeleted(true)
-            .build();
+        group.updateGroupName(newName);
+        groupRepository.save(group);
+    }
 
-        groupRepository.save(newGroup);
+    @Transactional(readOnly = true)
+    @Override
+    public List<GroupSimpleDtoRes> getAllGroups(String workspaceUUID, String userUUID) {
+        List<GroupEntity> allGroups = groupRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
+        List<GroupSimpleDtoRes> dtoList = new ArrayList<>();
 
+        for (GroupEntity group : allGroups) {
+            GroupSimpleDtoRes dto = GroupSimpleDtoRes.builder()
+                .groupUUID(group.getGroupUUID())
+                .groupName(group.getGroupName())
+                .build();
 
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<AllGroupsCharactersDtoRes> getAllGroupsAndCharacters(String workspaceUUID, String userUUID) {
+        List<GroupEntity> allGroups = groupRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
+        List<AllGroupsCharactersDtoRes> dtoList = new ArrayList<>();
+
+        for (GroupEntity group : allGroups) {
+
+            List<GroupEntity> childGroups = group.getChildGroups();
+            Map<String, String> childGroupMap = new LinkedHashMap<>();
+            if (childGroups != null) {
+                for (GroupEntity childGroup : childGroups) {
+                    childGroupMap.put(childGroup.getGroupUUID(), childGroup.getGroupName());
+                }
+            }
+
+            List<CharacterEntity> childCharacters = group.getChildCharacters();
+            Map<String, String> childCharacterMap = new LinkedHashMap<>();
+            if (childCharacters != null) {
+                for (CharacterEntity childCharacter : childCharacters) {
+                    childCharacterMap.put(childCharacter.getCharacterUUID(), childCharacter.getCharacterName());
+                }
+            }
+
+            AllGroupsCharactersDtoRes dto = AllGroupsCharactersDtoRes.builder()
+                .groupUUID(group.getGroupUUID())
+                .groupName(group.getGroupName())
+                .childGroups(childGroupMap)
+                .childCharacters(childCharacterMap)
+                .build();
+
+            dtoList.add(dto);
+        }
+
+        return dtoList;
     }
 
     @Transactional
     @Override
-    public void updateGroupName(String groupUUID, String newName) {
+    public void moveGroupNode(String groupUUID, Double x, Double y, String userUUID, String workspaceUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+        checkGroupException(group);
 
-        GroupEntity newGroup = GroupEntity.builder()
-            .groupId(group.getGroupId())
-            .groupUUID(group.getGroupUUID())
-            .userUUID(group.getUserUUID())
-            .workspaceUUID(group.getWorkspaceUUID())
-            .groupName(newName)
-            .parentUUID(group.getParentUUID())
-            .childUUID(group.getChildUUID())
-            .charactersInfo(group.getCharactersInfo())
-            .isDeleted(group.isDeleted())
-            .build();
+        if (group.getGroupNode() == null) {
+            Map<String, Double> groupNode = new HashMap<>();
+            groupNode.put("x", x);
+            groupNode.put("y", y);
+            group.setGroupNode(groupNode);
+        }
+        group.moveGroupNode(x, y);
 
-        groupRepository.save(newGroup);
+        groupRepository.save(group);
     }
+
+    public void checkGroupException(GroupEntity group) {
+        if (group == null) {
+            throw new NoSuchElementFoundException("유효하지 않은 그룹 UUID 입니다.");
+        }
+        if (group.isDeleted()) {
+            throw new DeletedElementException("삭제된 그룹 입니다.");
+        }
+    }
+
 }
