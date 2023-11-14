@@ -13,6 +13,7 @@ import SSE from '@/components/SSE';
 import NotificationButton from '@/components/NotificationButton';
 import Side from '@/components/Side';
 import TopMenu from '@/components/TopMenu';
+import AuthContextProvider from '@/context/AuthContextProvider';
 
 // const nanumFont = Nanum_Myeongjo({
 //   subsets: ['latin'],
@@ -41,11 +42,13 @@ export default function RootLayout({
       <body className="w-full flex">
         <QueryProvider>
           <RecoilProvider>
-            <SSE />
-            <ToastContainer pauseOnFocusLoss={false} />
-            <TopMenu />
-            <Side />
-            <main className="flex-grow">{children}</main>
+            <AuthContextProvider>
+              <SSE />
+              <ToastContainer pauseOnFocusLoss={false} />
+              <TopMenu />
+              <Side />
+              <main className="flex-grow">{children}</main>
+            </AuthContextProvider>
           </RecoilProvider>
         </QueryProvider>
       </body>
