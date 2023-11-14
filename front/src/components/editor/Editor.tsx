@@ -2,8 +2,8 @@
 
 import { MouseEvent, RefObject } from 'react';
 
-import { Editor, Reply } from '@/model/editor';
-import { fontFamily, fontSize } from '@/service/editor/editor';
+import { Editor, Reply, Word } from '@/model/editor';
+import { fontFamily, fontSize, wordCheck } from '@/service/editor/editor';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -17,11 +17,13 @@ import {
   BiCommentDetail,
   BiFontSize,
   BiFontFamily,
+  BiSolidDownload,
 } from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
 import { MdEdit, MdEditOff } from 'react-icons/md';
 import { GiToken } from 'react-icons/gi';
+import { AiOutlineFileSearch, AiFillCaretDown } from 'react-icons/ai';
 import { useParams } from 'next/navigation';
 import {
   UseQueryResult,
@@ -40,7 +42,7 @@ import Comment from './Comment';
 import { get } from '@/service/api/http';
 import UploadState from '../state/UploadState';
 import { getShareToken } from '@/service/api/share';
-import Word from './Word';
+import WordModal from './WordModal';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -58,6 +60,9 @@ export default function Editor() {
   const comment = useRef<Reply[]>([]);
 
   const [uploadIndex, setUploadIndex] = useState<number>(0);
+
+  const [wordList, setWordList] = useState<Word[]>([]);
+  const [isOpenWord, setIsOpenWord] = useState<boolean>(false);
 
   const edit = useRef<HTMLDivElement>(null);
 
@@ -92,9 +97,8 @@ export default function Editor() {
         } else {
           // const id = e.target.id;
           setSpaceUUID(id);
-          // console.log(e.target.id);
+
           setIsOpen(true);
-          toast('버블');
         }
       };
 
@@ -160,15 +164,12 @@ export default function Editor() {
       return;
     }
     const selection = window.getSelection();
-    console.log(selection?.rangeCount);
-    console.log(selection?.isCollapsed);
 
     // 선택한 부분이 없으면 return
     if (selection?.isCollapsed) return;
 
     if (!selection?.rangeCount) return;
 
-    console.log('여기까지?');
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
@@ -190,8 +191,6 @@ export default function Editor() {
 
   const addReply2 = () => {
     // const selection = window.getSelection();
-    // console.log(selection?.rangeCount);
-    // console.log(selection?.isCollapsed);
     // // 선택한 부분이 없으면 return
     // if (selection?.isCollapsed) return;
     // if (!selection?.rangeCount) return;
@@ -244,7 +243,7 @@ export default function Editor() {
   const getToken = () => {
     // get('/share/token', { directoryUUID: searchParams.slug?.[1] }).then(
     //   (data: any) => {
-    //     // console.log(data);
+
     //     toast(data.token);
     //     localStorage.setItem('accessToken', data.token);
     //   },
@@ -271,7 +270,7 @@ export default function Editor() {
   return (
     <>
       <div
-        className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
+        className={`flex justify-center text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
       >
         <div className="flex justify-between w-[1160px]">
           <div>{editor?.title}</div>
@@ -299,72 +298,108 @@ export default function Editor() {
             onChange={handleChange}
             // onBlur={sanitize}
           />
-          <h3>source</h3>
+          {/* <h3>source</h3>
           <textarea
             className="ml-2 w-3/4 min-h-[100px] border-gray-100 border-2 p-1 resize-none"
             value={html}
             onChange={handleChange}
             onBlur={sanitize}
-          />
+          /> */}
         </div>
 
-        <div className="flex flex-col w-[200px] justify-start items-center gap-6">
+        <div className="flex flex-col w-[180px] justify-start items-center gap-6">
           {/* <div>{document && document?.getElementById('edit')?.innerText.length && 0}</div> */}
+          <button
+            onClick={() => {
+              setIsOpenWord(true);
+            }}
+          >
+            <AiFillCaretDown size={20} />
+          </button>
           <div className="text-2xl">{length && `${length}자`}</div>
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={toggleEditable}
-          >
-            {editor?.editable ? <MdEdit size={20} /> : <MdEditOff size={20} />}
-          </button>
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={() => {
-              setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
-            }}
-          >
-            <BiFontFamily size={20} />
-          </button>
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={() => {
-              setFontIndex((prev) => (prev + 1) % fontSize.length);
-            }}
-          >
-            <BiFontSize size={20} />
-          </button>
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={(e) => {
-              clickExecCommand(e, 'bold');
-            }}
-          >
-            <BiBold size={20} />
-          </button>
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={addReply}
-          >
-            <BiCommentDetail size={20} />
-          </button>
-          {/* <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={addReply2}
-          >
-            <BiSolidTrashAlt size={20} />
-          </button> */}
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={shareDoc}
-          >
-            <FaShareSquare size={20} />
-          </button>
-          <button
-            className="p-4 bg-green-50 bg-opacity-40 rounded-lg"
-            onClick={getToken}
-          >
-            <GiToken size={20} />
-          </button>
+
+          <div className="flex items-center">
+            <button className="p-4 rounded-lg" onClick={toggleEditable}>
+              {editor?.editable ? (
+                <MdEdit size={20} />
+              ) : (
+                <MdEditOff size={20} />
+              )}
+            </button>
+            <div className="text-xs font-bold">쓰기</div>
+          </div>
+
+          <div className="flex items-center">
+            <button
+              className="p-4 rounded-lg"
+              onClick={() => {
+                setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
+              }}
+            >
+              <BiFontFamily size={20} />
+            </button>
+            <div className="text-xs font-bold">글꼴</div>
+          </div>
+
+          <div className="flex items-center">
+            <button
+              className="p-4 rounded-lg"
+              onClick={() => {
+                setFontIndex((prev) => (prev + 1) % fontSize.length);
+              }}
+            >
+              <BiFontSize size={20} />
+            </button>
+            <div className="text-xs font-bold">크기</div>
+          </div>
+
+          <div className="flex items-center">
+            <button
+              className="p-4 rounded-lg"
+              onClick={(e) => {
+                clickExecCommand(e, 'bold');
+              }}
+            >
+              <BiBold size={20} />
+            </button>
+            <div className="text-xs font-bold">굵기</div>
+          </div>
+
+          <div className="flex items-center">
+            <button className="p-4 rounded-lg" onClick={addReply}>
+              <BiCommentDetail size={20} />
+            </button>
+            <div className="text-xs font-bold">댓글</div>
+          </div>
+
+          <div className="flex items-center">
+            <button className="p-4 rounded-lg" onClick={shareDoc}>
+              <BiSolidDownload size={20} />
+            </button>
+            <div className="text-xs font-bold">다운</div>
+          </div>
+          <div className="flex items-center">
+            <button className="p-4 rounded-lg" onClick={getToken}>
+              <GiToken size={20} />
+            </button>
+            <div className="text-xs font-bold">토큰</div>
+          </div>
+          <div className="flex items-center">
+            <button
+              className="p-4 rounded-lg"
+              onClick={() =>
+                wordCheck({ word: edit.current?.innerText ?? '' }).then(
+                  (data) => {
+                    setWordList(data);
+                    setIsOpenWord(true);
+                  },
+                )
+              }
+            >
+              <AiOutlineFileSearch size={20} />
+            </button>
+            <div className="text-xs font-bold">검사</div>
+          </div>
           {isOpen && !editor?.editable && (
             <Comment
               spaceUUID={spaceUUID}
@@ -374,7 +409,10 @@ export default function Editor() {
           )}
         </div>
       </div>
-      <Word />
+
+      {isOpenWord && (
+        <WordModal wordList={wordList} setIsOpenWord={setIsOpenWord} />
+      )}
     </>
   );
 }
