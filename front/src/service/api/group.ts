@@ -1,5 +1,5 @@
 import { characterType, groupType, subGroupType } from '@/model/charactor';
-import { del, get, patch, post, put } from './http';
+import { del, get, patch, post } from './http';
 
 const transformSubGroupAndCharacter = (data: any) => {
   const groupName: string = data.groupName;
@@ -7,7 +7,7 @@ const transformSubGroupAndCharacter = (data: any) => {
     (childGroup: groupType) => ({
       groupUUID: childGroup.groupUUID,
       groupName: childGroup.groupName,
-      deleted: childGroup.deleted
+      deleted: childGroup.deleted,
     }),
   );
   const childCharacter: characterType[] = data.childCharacters.map(
@@ -16,7 +16,7 @@ const transformSubGroupAndCharacter = (data: any) => {
       characterName: childCharacter.characterName,
       characterImage: childCharacter.characterImage,
       characterInformation: childCharacter.information,
-      deleted: childCharacter.deleted
+      deleted: childCharacter.deleted,
     }),
   );
 
@@ -48,8 +48,13 @@ export const postGroup = async (body: groupType) => {
   return data;
 };
 
-export const patchGroup = async (req: { groupUUID: string, newName: string }) => {
-  const data = await patch(`/group?groupUUID=${req.groupUUID}&newName=${req.newName}`);
+export const patchGroup = async (req: {
+  groupUUID: string;
+  newName: string;
+}) => {
+  const data = await patch(
+    `/group?groupUUID=${req.groupUUID}&newName=${req.newName}`,
+  );
   return data;
 };
 
@@ -60,5 +65,17 @@ export const deleteGroup = async (uuid: string) => {
 
 export const getGroupTop = async () => {
   const data = await get(`/group/top`);
+  return data;
+};
+
+export const patchGroupNodePosition = async (req: {
+  workspaceUUID: string;
+  groupUUID: string;
+  x: number;
+  y: number;
+}) => {
+  const data = await patch(
+    `/group/node?workspaceUUID=${req.workspaceUUID}&groupUUID=${req.groupUUID}&x=${req.x}&y=${req.y}`,
+  );
   return data;
 };

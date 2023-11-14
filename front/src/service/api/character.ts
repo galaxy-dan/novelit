@@ -1,11 +1,11 @@
-import { EdgeType, NodeType, characterType, poop } from '@/model/charactor';
+import { EdgeType, NodeType, characterType } from '@/model/charactor';
 import { del, get, patch, post, put } from './http';
-import { String } from 'aws-sdk/clients/cloudwatchevents';
 
-const transformDiagramData = (characterData: any, groupData: any) => {
+const transformDiagramData = (characterData: any) => {
   let nodeDatas: NodeType[] = [];
+  let edgeDatas: EdgeType[] = [];
 
-  characterData.forEach((dat: any) =>
+  characterData.Relations.forEach((dat: any) => {
     nodeDatas.push({
       data: {
         id: dat.characterUUID,
@@ -18,11 +18,24 @@ const transformDiagramData = (characterData: any, groupData: any) => {
           backgroundFit: 'cover cover',
         },
       }),
-    }),
-  );
+      ...(dat.characterNode && {
+        position: {
+          x: dat.characterNode.x,
+          y: dat.characterNode.y,
+        },
+      }),
+    });
 
-  let edgeDatas: EdgeType[] = [];
-  characterData.forEach((dat: any) => {
+    if (dat.groupUUID) {
+      edgeDatas.push({
+        data: {
+          source: dat.groupUUID,
+          target: dat.characterUUID,
+          type: 'group',
+        },
+      });
+    }
+
     dat.relations.forEach((element: any) => {
       if (element.targetUUID) {
         edgeDatas.push({
@@ -37,25 +50,32 @@ const transformDiagramData = (characterData: any, groupData: any) => {
     });
   });
 
-  groupData.allGroupsAndCharacters.forEach((dat: any) => {
+  characterData.Groups.forEach((dat: any) => {
     nodeDatas.push({
       data: {
         id: dat.groupUUID,
         label: dat.groupName,
         type: 'group',
       },
+      ...(dat.groupNode && {
+        position: {
+          x: dat.groupNode.x,
+          y: dat.groupNode.y,
+        },
+      }),
     });
-    Object.keys(dat.childGroups).forEach((target) => {
+    if (dat.parentGroupUUID) {
       edgeDatas.push({
-        data: { source: dat.groupUUID, target: target, type: 'group' },
+        data: {
+          source: dat.parentGroupUUID,
+          target: dat.groupUUID,
+          type: 'group',
+        },
       });
-    });
-    Object.keys(dat.childCharacters).forEach((target) => {
-      edgeDatas.push({
-        data: { source: dat.groupUUID, target: target, type: 'group' },
-      });
-    });
+    }
   });
+
+  characterData.Relations.forEach((dat: any) => {});
 
   return {
     nodes: nodeDatas,
@@ -64,7 +84,6 @@ const transformDiagramData = (characterData: any, groupData: any) => {
 };
 
 const transformCharacterDirectory = (data: any) => {
-
   const result: any[] = [];
   const skip: boolean[] = new Array(data.allGroupsAndCharacters.length).fill(
     false,
@@ -91,11 +110,9 @@ const transformCharacterDirectory = (data: any) => {
       }
       Object.keys(curData.childGroups).forEach((key2) => {
         let newData = goDeep(key2, curData.childGroups[key2]);
-        console.log(newData);
         if (newData !== null) {
           child.push(newData);
-        } else { 
-          console.log("null 제외"+ key2);
+        } else {
         }
       });
 
@@ -120,11 +137,9 @@ const transformCharacterDirectory = (data: any) => {
     Object.keys(groups.childGroups).forEach((key) => {
       // 초기 자식에 goDeep(key 추가)
       let newData = goDeep(key, groups.childGroups[key]);
-      console.log(newData);
       if (newData !== null) {
         childrenData.push(newData);
-      } else { 
-        
+      } else {
       }
       //childrenData.push(goDeep(key, groups.childGroups[key]));
     });
@@ -198,11 +213,10 @@ export const deleteCharacter = async (uuid: string) => {
 };
 
 export const getRelationDiagramInformation = async (workspace: string) => {
-  const characterData = await get(`/character/diagram`);
-  const groupData = await get(
-    `/group/character/all?workspaceUUID=${workspace}`,
+  const characterData = await get(
+    `/character/diagram?workspaceUUID=${workspace}`,
   );
-  return transformDiagramData(characterData, groupData);
+  return transformDiagramData(characterData);
 };
 
 export const getCharacterDirectory = async (workspace: string) => {
@@ -219,4 +233,16 @@ export const patchCharacterName = async (req: {
   const newData = { ...data, characterName: req.name };
   const response = await patch(`/character?characterUUID=${req.uuid}`, newData);
   return response;
+};
+
+export const patchCharacterNodePosition = async (req: {
+  workspaceUUID: string;
+  characterUUID: string;
+  x: number;
+  y: number;
+}) => {
+  const data = await patch(
+    `/character/node?workspaceUUID=${req.workspaceUUID}&characterUUID=${req.characterUUID}&x=${req.x}&y=${req.y}`,
+  );
+  return data;
 };
