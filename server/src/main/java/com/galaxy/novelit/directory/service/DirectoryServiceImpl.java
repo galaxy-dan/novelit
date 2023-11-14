@@ -65,7 +65,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 		directoryRepository.save(directory);
 
 		//상위 디렉토리 children으로 추가
-		parent.getChildren().add(directory);
+		parent.getChildren().add(directoryUUID);
 		directoryRepository.save(parent);
 
 
@@ -94,13 +94,21 @@ public class DirectoryServiceImpl implements DirectoryService{
 		}
 
 		//자식 디렉토리와 파일 따로 분류
-		List<Directory> children = directory.getChildren();
-		List<DirectorySimpleElementDTO> directories = children.stream()
-			.filter(child -> child.isDirectory() && !child.isDeleted())
+		List<String> childrenUUIDs = directory.getChildren();
+		List<Directory> children = directoryRepository.findAllByUuidInAndDeleted(childrenUUIDs, false);
+		List<Directory> sortedChildren = childrenUUIDs.stream()
+			.map(uuid -> children.stream()
+				.filter(child -> uuid.equals(child.getUuid()))
+				.findFirst()
+				.orElse(null))
+			.toList();
+
+		List<DirectorySimpleElementDTO> directories = sortedChildren.stream()
+			.filter(Directory::isDirectory)
 			.map(child -> new DirectorySimpleElementDTO(child.getUuid(), child.getName()))
 			.toList();
-		List<DirectorySimpleElementDTO> files = children.stream()
-			.filter(child -> !child.isDirectory() && !child.isDeleted())
+		List<DirectorySimpleElementDTO> files = sortedChildren.stream()
+			.filter(child -> !child.isDirectory())
 			.map(child -> new DirectorySimpleElementDTO(child.getUuid(), child.getName()))
 			.toList();
 		return new DirectoryResDTO(directories, files);
@@ -138,20 +146,16 @@ public class DirectoryServiceImpl implements DirectoryService{
 		if(directory.isDirectory()) {
 
 			//bfs로 하위 디렉토리 완전 탐색
-			Queue<Directory> queue = new ArrayDeque<>();
-			queue.add(directory);
+			Queue<String> queue = new ArrayDeque<>();
+			queue.add(directoryUUID);
 
 			while (!queue.isEmpty()) {
-				Directory cur = queue.poll();
-				List<Directory> children = cur.getChildren();
+				String cur = queue.poll();
+				List<Directory> children = directoryRepository.findAllByParentUUIDAndDeleted(cur, false);
 				for (Directory child : children) {
-					//이미 삭제된 애들은 무시
-					if (child.isDeleted()) {
-						continue;
-					}
 					deletedDirectories.add(child.getUuid());
 					if (child.isDirectory()) {
-						queue.add(child);
+						queue.add(child.getUuid());
 					}
 				}
 			}

@@ -1,5 +1,12 @@
 package com.galaxy.novelit.workspace.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
 import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
@@ -11,17 +18,12 @@ import com.galaxy.novelit.workspace.dto.WorkSpaceDTO;
 import com.galaxy.novelit.workspace.dto.request.WorkSpaceTreeChangeReqDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceElementDTO;
 import com.galaxy.novelit.workspace.dto.response.WorkSpaceInfoResDTO;
+import com.galaxy.novelit.workspace.dto.response.WorkSpaceResDTO;
 import com.galaxy.novelit.workspace.mapper.WorkspaceMapper;
 import com.galaxy.novelit.workspace.repository.WorkspaceRepository;
-import jakarta.persistence.EntityManager;
 
-import com.galaxy.novelit.workspace.dto.response.WorkSpaceResDTO;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -92,9 +94,8 @@ public class WorkSpaceImpl implements WorkspaceService{
         Workspace workspace = workspaceRepository.findByWorkspaceUUID(workSpaceUUID).orElseThrow(
             NoSuchWorkspaceException::new);
 
-        List<WorkSpaceElementDTO> directories = directoryRepository.findByUuidAndDeleted(workSpaceUUID,
-                false).getChildren().stream()
-            .filter(d->!d.isDeleted())
+        List<WorkSpaceElementDTO> directories = directoryRepository.findAllByParentUUIDAndDeleted(workSpaceUUID,
+                false).stream()
             .map(workspaceMapper::toElementDto)
             .toList();
 
@@ -141,8 +142,8 @@ public class WorkSpaceImpl implements WorkspaceService{
         checkDirectoryException(lastParent, userUUID, workspaceUUID);
 
         //이전 부모 children에서 삭제
-        List<Directory> lastChildren = lastParent.getChildren();
-        lastChildren.remove(directory);
+        List<String> lastChildren = lastParent.getChildren();
+        lastChildren.remove(directoryUUID);
         lastParent.updateChildren(lastChildren);
         directoryRepository.save(lastParent);
 
@@ -151,18 +152,18 @@ public class WorkSpaceImpl implements WorkspaceService{
             parent = lastParent;
         }
         String nextUUID = dto.getNextUUID();
-        List<Directory> children = parent.getChildren();
+        List<String> children = parent.getChildren();
         if(nextUUID == null){
-            children.add(directory);
+            children.add(directoryUUID);
         }else{
             int index = 0;
-            for (Directory d : children) {
-                if(!d.isDeleted() && d.getUuid().equals(nextUUID)){
+            for (String d : children) {
+                if(d.equals(nextUUID)){
                     break;
                 }
                 index++;
             }
-            children.add(index, directory);
+            children.add(index, directoryUUID);
         }
         parent.updateChildren(children);
         directoryRepository.save(parent);

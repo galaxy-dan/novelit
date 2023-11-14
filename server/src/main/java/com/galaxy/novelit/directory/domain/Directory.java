@@ -3,7 +3,6 @@ package com.galaxy.novelit.directory.domain;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -26,8 +25,7 @@ public class Directory {
 	private boolean directory;
 	@Field(name = "parent_uuid")
 	private String parentUUID;
-	@DBRef(lazy = true)
-	private List<Directory> children;
+	private List<String> children;
 	private String content;
 	@Field(name = "workspace_uuid")
 	private String workspaceUUID;
@@ -44,7 +42,7 @@ public class Directory {
 	public void updateContent(String content){
 		this.content = content;
 	}
-	public void updateChildren(List<Directory> children){
+	public void updateChildren(List<String> children){
 		this.children = children;
 	}
 	public void updateParentUUID(String parentUUID){

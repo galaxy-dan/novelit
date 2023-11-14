@@ -13,10 +13,12 @@ import com.galaxy.novelit.workspace.dto.response.WorkSpaceElementDTO;
 @Component
 @Mapper(componentModel = "spring")
 public interface WorkspaceMapper {
+
     Workspace toEntity(WorkSpaceDTO workSpaceDTO);
     WorkSpaceDTO toDto(Workspace workspace);
     default WorkSpaceElementDTO toElementDto(Directory directory){
-        List<Directory> dirList = directory.getChildren();
+        List<String> dirList = directory.getChildren();
+
         List<WorkSpaceElementDTO> dtoList = dirList == null ? null : dirList.stream()
             .filter(d->!d.isDeleted()).map(this::toElementDto).toList();
         return new WorkSpaceElementDTO(directory.getUuid(), directory.getName(), directory.isDirectory(), dtoList);
