@@ -13,10 +13,10 @@ export default function Home() {
         </div>
         <KaKaoLogin />
       </div>
-      <div className="flex gap-2 justify-center items-center fixed bottom-24 left-16 font-bold text-lg">
+      {/* <div className="flex gap-2 justify-center items-center fixed bottom-24 left-16 font-bold text-lg">
         <AiOutlineSearch />
         <p className="text-xl">이용가이드</p>
-      </div>
+      </div> */}
     </>
   );
 }

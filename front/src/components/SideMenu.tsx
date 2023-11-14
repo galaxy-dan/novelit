@@ -4,7 +4,6 @@ import { NodeRendererProps, Tree, TreeApi } from 'react-arborist';
 
 import { MdOutlineStickyNote2 } from 'react-icons/md';
 import { IoExtensionPuzzle } from 'react-icons/io5';
-import People from '../../public/images/people.svg';
 import Image from 'next/image';
 import { BiSolidHome } from 'react-icons/bi';
 import { FiChevronsLeft } from 'react-icons/fi';
@@ -31,6 +30,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Link from 'next/link';
 import { useDidMountEffect } from '@/hooks/useDidMountEffect';
+import { useRecoilState } from 'recoil';
+import { menuOpenState } from '@/store/menu';
+import SideMenuMoveButton from './SideMenuMoveButton';
 
 const temp = {
   name: 'root',
@@ -87,7 +89,9 @@ const temp2 = [
 
 export default function SideMenu() {
   const [data, setData] = useState<any>(temp);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const [isOpen, setIsOpen] = useRecoilState<boolean>(menuOpenState);
+
   const treeRef = useRef<any>(null);
   const [term, setTerm] = useState<string>('');
   const queryClient = useQueryClient();
@@ -110,7 +114,7 @@ export default function SideMenu() {
     <>
       {!isOpen ? (
         <button
-          className="fixed top-2 left-2"
+          className="fixed top-5 left-5"
           onClick={() => setIsOpen((prev) => !prev)}
         >
           <AiOutlineMenu size={25} />
@@ -130,17 +134,7 @@ export default function SideMenu() {
               </button>
             </div>
             <div className="flex h-full">
-              <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2 h-full">
-                <Link href={`/novel/${slug}`}>
-                  <MdOutlineStickyNote2 size={20} />
-                </Link>
-                <Link href={`/plot/${slug}`}>
-                  <IoExtensionPuzzle size={20} />
-                </Link>
-                <Link href={`/character/${slug}`}>
-                  <Image alt="people" src={People} width={20} />
-                </Link>
-              </div>
+              <SideMenuMoveButton slug={slug} />
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
                   <div className="font-bold text-base flex items-center gap-2">
@@ -193,6 +187,7 @@ export default function SideMenu() {
                     {Node}
                   </Tree>
                 )}
+                S
               </div>
             </div>
           </div>

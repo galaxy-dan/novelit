@@ -60,7 +60,7 @@ export default function MainPage() {
   const delMutate = useMutation({
     mutationFn: deleteWorkspace,
     onSuccess: () => {
-      console.log('삭제');
+      // console.log('삭제');
       toast('삭제 성공');
       queryClient.invalidateQueries(['user']);
     },
@@ -78,7 +78,7 @@ export default function MainPage() {
     <>
       <div className="flex">
         <div className="w-[200px] min-h-screen flex items-end justify-center">
-          <div className="flex flex-col gap-4 justify-center items-start font-bold text-lg mb-6">
+          {/* <div className="flex flex-col gap-4 justify-center items-start font-bold text-lg mb-6">
             <div className="flex items-center gap-2">
               <AiOutlineSearch size={25} />
               <p className="text-xl">이용가이드</p>
@@ -91,7 +91,7 @@ export default function MainPage() {
               <IoPersonCircleOutline size={25} />
               <p className="text-xl">마이페이지</p>
             </div>
-          </div>
+          </div> */}
         </div>
         {/* <div className="flex justify-center flex-grow"> */}
         <div className="flex flex-grow flex-col text-2xl font-extrabold gap-14 mt-10">
