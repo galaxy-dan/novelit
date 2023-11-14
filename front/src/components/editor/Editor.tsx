@@ -254,7 +254,7 @@ export default function Editor() {
   const editableMutate = useMutation({
     mutationFn: patchEditable,
     onSuccess: () => {
-      toast('토글 성공');
+      // toast('토글 성공');
       setIsOpen(false);
       queryClient.invalidateQueries(['editor', searchParams.slug?.[1]]);
     },
