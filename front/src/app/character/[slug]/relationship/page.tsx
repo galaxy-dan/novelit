@@ -1,13 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineLoading3Quarters, AiOutlineCheck } from 'react-icons/ai';
 import CytoscapeComponent from 'react-cytoscapejs';
 import { Core, NodeSingular, EdgeSingular } from 'cytoscape';
 import Image from 'next/image';
-import { UseQueryResult, useQuery } from '@tanstack/react-query';
+import { UseQueryResult, useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { getRelationDiagramInformation } from '@/service/api/character';
+import {
+  getRelationDiagramInformation,
+  patchCharacterNodePosition,
+} from '@/service/api/character';
+import { patchGroupNodePosition } from '@/service/api/group';
+
 type NodeType = {
   data: {
     id: string;
@@ -54,14 +59,19 @@ export default function RelationshipDiagram({ params }: Props) {
   const { data: graphData }: UseQueryResult<graphType> = useQuery({
     queryKey: ['graph', params.slug],
     queryFn: () => getRelationDiagramInformation(params.slug),
-    onSuccess: (data) => {
-      setRenderGraph(true);
-    },
     onError: () => {
       router.push(`/character/${params.slug}`);
     },
     staleTime: 0,
     refetchOnWindowFocus: true,
+  });
+
+  const moveCharacterMutate = useMutation({
+    mutationFn: patchCharacterNodePosition,
+  });
+
+  const moveGroupMutate = useMutation({
+    mutationFn: patchGroupNodePosition,
   });
 
   const layout = {
@@ -94,9 +104,9 @@ export default function RelationshipDiagram({ params }: Props) {
         label: 'data(label)',
         'overlay-padding': '6px',
         'text-outline-color': '#4a56a6',
-        'text-outline-width': '2px',
+        'text-outline-width': '3px',
         color: 'white',
-        fontSize: 20,
+        fontSize: 22,
         'background-color': '#d6d627',
       },
     },
@@ -246,10 +256,24 @@ export default function RelationshipDiagram({ params }: Props) {
           y: originalPositions[i].y || 0,
         });
       } else {
-        // 여기서 position 저장안 된 놈 저장하기
-        // 이건 굳이 새로 받을 필요없음
+        if (ele.data().type === 'group') {
+          moveGroupMutate.mutate({
+            workspaceUUID: params.slug,
+            groupUUID: ele.data().id,
+            x: Math.round(ele.position('x')),
+            y: Math.round(ele.position('y')),
+          });
+        } else {
+          moveCharacterMutate.mutate({
+            workspaceUUID: params.slug,
+            characterUUID: ele.data().id,
+            x: Math.round(ele.position('x')),
+            y: Math.round(ele.position('y')),
+          });
+        }
       }
     });
+    cy.resize();
   };
 
   const handleDragFree = (event: any, cy: Core) => {
@@ -262,6 +286,22 @@ export default function RelationshipDiagram({ params }: Props) {
     prevNode = { id: event.target.data().id, count: 0 };
     cy.$(':selected').unselect();
     cy.elements().style({ opacity: 1 });
+
+    if (event.target.data().type === 'group') {
+      moveGroupMutate.mutate({
+        workspaceUUID: params.slug,
+        groupUUID: event.target.data().id,
+        x: event.target.position('x'),
+        y: event.target.position('y'),
+      });
+    } else {
+      moveCharacterMutate.mutate({
+        workspaceUUID: params.slug,
+        characterUUID: event.target.data().id,
+        x: event.target.position('x'),
+        y: event.target.position('y'),
+      });
+    }
   };
 
   const handleNodeClicked = (event: any, cy: Core) => {
@@ -341,63 +381,94 @@ export default function RelationshipDiagram({ params }: Props) {
     }
   };
 
+  const [cy, setCy] = useState<Core>();
+
+  useEffect(() => {
+    if (cy) {
+      cy.on('layoutstop', async () => {
+        await setNodesPosition(cy);
+        await setRenderGraph(true);
+        await setShowGraph(true);
+        cy.fit();
+      });
+
+      cy.on('select', 'node', (e) => handleNodeSelect(e, cy));
+
+      cy.on('unselect', 'node', () => handleNodeUnselect(cy));
+      cy.on('select', 'edge', (e) => handleEdgeSelect(e, cy));
+      cy.on('unselect', 'edge', () => handleEdgeUnselect(cy));
+      cy.on('free', 'node', (e) => handleNodeClicked(e, cy));
+      cy.on('dragfreeon', 'node', (e) => handleDragFree(e, cy));
+    }
+  }, [cy]);
+
+  useEffect(() => {
+    if (cy) {
+      let renderCount = 0;
+      const fitGraph = () => {
+        renderCount++;
+        console.log(renderCount);
+        if (renderCount < 10) {
+          console.log('fit해요~');
+          cy.fit(cy.nodes(), 40);
+        } else {
+          cy.off('render', fitGraph);
+        }
+      };
+
+      cy.on('render', fitGraph);
+    }
+  }, [cy]);
+
   return (
-    <div className="mx-80 my-20">
-      <div className="flex items-end justify-between">
-        <div className="flex items-end">
-          <p className="text-4xl font-extrabold mr-4">관계도</p>
-        </div>
-        <div className="flex items-center">
-          <p className="text-2xl font-extrabold mr-2">저장중</p>
-          <AiOutlineLoading3Quarters className="animate-spin text-xl " />
-          <AiOutlineCheck className="text-2xl" />
-        </div>
-      </div>
-
-      <div>
-        <div
-          className={`rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]`}
-        >
-          <div className={`h-full w-full relative ${showGraph && 'hidden'}`}>
-            <Image
-              src="/images/loadingImg.gif"
-              alt="로딩이미지"
-              width={1000}
-              height={1000}
-              className={`h-[30vh] w-[30vh] absolute mx-auto my-auto top-0 left-0 right-0 bottom-0`}
-              loading="eager"
-              priority={true}
-            />
+    <div className="select-none w-fit absolute left-[260px]">
+      <div className="w-[60rem] mx-auto ml-10 pt-10">
+        <div className="flex items-end justify-between">
+          <div className="flex items-end">
+            <p className="text-4xl font-extrabold mr-4">관계도</p>
           </div>
-          {renderGraph && (
-            <CytoscapeComponent
-              elements={CytoscapeComponent.normalizeElements(
-                graphData || { nodes: [], edges: [] },
-              )}
-              zoomingEnabled={true}
-              maxZoom={1.5}
-              minZoom={0.3}
-              autounselectify={false}
-              boxSelectionEnabled={true}
-              wheelSensitivity={0.1}
-              layout={layout}
-              stylesheet={styleSheet}
-              className={`${!showGraph && 'invisible'}  w-full h-[80vh]`}
-              cy={(cy: Core) => {
-                cy.on('layoutstop', () => {
-                  setNodesPosition(cy);
-                  setShowGraph(true);
-                });
+          <div className="flex items-center">
+            <p className="text-2xl font-extrabold mr-2">저장중</p>
+            <AiOutlineLoading3Quarters className="animate-spin text-xl " />
+            <AiOutlineCheck className="text-2xl" />
+          </div>
+        </div>
 
-                cy.on('select', 'node', (e) => handleNodeSelect(e, cy));
-                cy.on('unselect', 'node', () => handleNodeUnselect(cy));
-                cy.on('select', 'edge', (e) => handleEdgeSelect(e, cy));
-                cy.on('unselect', 'edge', () => handleEdgeUnselect(cy));
-                cy.on('free', 'node', (e) => handleNodeClicked(e, cy));
-                cy.on('dragfreeon', 'node', (e) => handleDragFree(e, cy));
-              }}
-            />
-          )}
+        <div>
+          <div
+            className={`rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]`}
+          >
+            <div className={`h-full w-full relative ${showGraph && 'hidden'}`}>
+              <Image
+                src="/images/loadingImg.gif"
+                alt="로딩이미지"
+                width={1000}
+                height={1000}
+                className={`h-[30vh] w-[30vh] absolute mx-auto my-auto top-0 left-0 right-0 bottom-0`}
+                loading="eager"
+                priority={true}
+              />
+            </div>
+            {
+              <CytoscapeComponent
+                elements={CytoscapeComponent.normalizeElements(
+                  graphData || { nodes: [], edges: [] },
+                )}
+                zoomingEnabled={true}
+                maxZoom={1.5}
+                minZoom={0.3}
+                autounselectify={false}
+                boxSelectionEnabled={true}
+                wheelSensitivity={0.1}
+                layout={layout}
+                stylesheet={styleSheet}
+                className={`${!showGraph && 'invisible'}  w-full h-[80vh]`}
+                cy={(cyInstance: Core) => {
+                  setCy(cyInstance);
+                }}
+              />
+            }
+          </div>
         </div>
       </div>
     </div>
