@@ -10,8 +10,10 @@ import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
+import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.DeletedElementException;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import com.galaxy.novelit.workspace.domain.Workspace;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -241,6 +243,13 @@ public class GroupServiceImpl implements GroupService {
         }
         if (group.isDeleted()) {
             throw new DeletedElementException("삭제된 그룹 입니다.");
+        }
+    }
+    public void checkAuthorizationException(Object entity, String userUUID) {
+        if ((entity.getClass() == CharacterEntity.class && !((CharacterEntity) entity).getUserUUID().equals(userUUID))
+            || (entity.getClass() == GroupEntity.class && !((GroupEntity) entity).getUserUUID().equals(userUUID))
+            || (entity.getClass() == Workspace.class && !((Workspace) entity).getUserUUID().equals(userUUID))) {
+            throw new AccessRefusedException();
         }
     }
 
