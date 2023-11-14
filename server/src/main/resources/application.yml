@@ -136,6 +136,7 @@ spring:
         order_inserts: true
         jdbc:
           batch_size: 100
+    open-in-view: false
 
 
 server:
