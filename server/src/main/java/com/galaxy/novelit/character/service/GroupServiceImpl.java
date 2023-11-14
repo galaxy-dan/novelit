@@ -8,6 +8,8 @@ import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
+import com.galaxy.novelit.common.exception.DeletedElementException;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,10 +30,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public GroupDtoRes getGroupInfo(String groupUUID, String userUUID) {
-        GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
-        List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUID(groupUUID);
-        List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUID(groupUUID);
+    public GroupDtoRes getGroupInfo(String groupUUID, String userUUID, String workspaceUUID) {
+        GroupEntity group = groupRepository.findByGroupUUIDAndWorkspaceUUID(groupUUID, workspaceUUID);
+        checkGroupException(group);
+
+        List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUIDAndDeletedIsFalse(groupUUID);
+        List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUIDAndDeletedIsFalse(groupUUID);
 
         GroupDtoRes dto = new GroupDtoRes();
         dto.setWorkspaceUUID(group.getWorkspaceUUID());
@@ -64,17 +68,17 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     @Override
     public void createGroup(GroupCreateDtoReq dto, String userUUID) {
-        String groupUUID = UUID.randomUUID().toString();
-        String parentGroupUUID = dto.getParentGroupUUID();
-        GroupEntity parentGroup = groupRepository.findByGroupUUID(parentGroupUUID);
-        GroupEntity newGroup;
+        // UUID 프론트에서 받아서 사용
+//        String groupUUID = UUID.randomUUID().toString();
 
-        // dto에 parentGroupUUID가 잘못된 값이 들어왔을 때, null 값으로 처리
-        if (parentGroup == null) {
+        GroupEntity newGroup;
+        String parentGroupUUID = dto.getParentGroupUUID();
+
+        if (parentGroupUUID == null) {
             newGroup = GroupEntity.builder()
                 .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
-                .groupUUID(groupUUID)
+                .groupUUID(dto.getGroupUUID())
                 .groupName(dto.getGroupName())
                 .parentGroupUUID(null)
                 .childGroups(new ArrayList<>())
@@ -84,10 +88,13 @@ public class GroupServiceImpl implements GroupService {
             groupRepository.save(newGroup);
         }
         else {
+            GroupEntity parentGroup = groupRepository.findByGroupUUID(parentGroupUUID);
+            checkGroupException(parentGroup);
+
             newGroup = GroupEntity.builder()
                 .userUUID(userUUID)
                 .workspaceUUID(dto.getWorkspaceUUID())
-                .groupUUID(groupUUID)
+                .groupUUID(dto.getGroupUUID())
                 .groupName(dto.getGroupName())
                 .parentGroupUUID(parentGroupUUID)
                 .childGroups(new ArrayList<>())
@@ -97,15 +104,23 @@ public class GroupServiceImpl implements GroupService {
             groupRepository.save(newGroup);
 
             // 부모 그룹의 childGroups 리스트에 자식 추가
-            parentGroup.addChildGroup(groupRepository.findByGroupUUID(groupUUID));
+            parentGroup.addChildGroup(groupRepository.findByGroupUUID(dto.getGroupUUID()));
             groupRepository.save(parentGroup);
         }
     }
 
     @Transactional
     @Override
-    public void deleteGroup(String groupUUID, String userUUID) {
+    public void deleteGroup(String groupUUID, String userUUID, String workspaceUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+
+        if (group == null) {
+            throw new NoSuchElementFoundException("유효하지 않은 그룹 UUID 입니다.");
+        }
+        if (group.isDeleted()) {
+            throw new DeletedElementException("이미 삭제된 그룹 입니다.");
+        }
+
         group.deleteGroup();
         groupRepository.save(group);
 
@@ -120,8 +135,10 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void updateGroupName(String groupUUID, String newName, String userUUID) {
+    public void updateGroupName(String groupUUID, String newName, String userUUID, String workspaceUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+        checkGroupException(group);
+
         group.updateGroupName(newName);
         groupRepository.save(group);
     }
@@ -183,8 +200,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional
     @Override
-    public void moveGroupNode(String groupUUID, Double x, Double y, String userUUID) {
+    public void moveGroupNode(String groupUUID, Double x, Double y, String userUUID, String workspaceUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+        checkGroupException(group);
 
         if (group.getGroupNode() == null) {
             Map<String, Double> groupNode = new HashMap<>();
@@ -195,6 +213,15 @@ public class GroupServiceImpl implements GroupService {
         group.moveGroupNode(x, y);
 
         groupRepository.save(group);
+    }
+
+    public void checkGroupException(GroupEntity group) {
+        if (group == null) {
+            throw new NoSuchElementFoundException("유효하지 않은 그룹 UUID 입니다.");
+        }
+        if (group.isDeleted()) {
+            throw new DeletedElementException("삭제된 그룹 입니다.");
+        }
     }
 
 }

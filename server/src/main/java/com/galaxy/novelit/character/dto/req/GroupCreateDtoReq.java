@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class GroupCreateDtoReq {
     private String workspaceUUID;
+    private String groupUUID;
     private String groupName;
     private String parentGroupUUID;
 }

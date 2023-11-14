@@ -1,5 +1,6 @@
 package com.galaxy.novelit.common.exception.advice;
 
+import com.galaxy.novelit.common.exception.DeletedElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -71,5 +72,10 @@ public class ExceptionAdvice {
 	@ExceptionHandler(NotLoggedInException.class)
 	public ResponseEntity<ExceptionResDTO> NotLoggedInException(NotLoggedInException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(DeletedElementException.class)
+	public ResponseEntity<ExceptionResDTO> DeletedElementException(DeletedElementException e) {
+		return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new ExceptionResDTO(e.getMessage()));
 	}
 }
