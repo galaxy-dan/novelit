@@ -28,7 +28,8 @@ export default function page({ params }: Props) {
   const [fetched, setFetched] = useState<boolean>(false);
   const { data: groupData }: UseQueryResult<groupItemType> = useQuery({
     queryKey: ['group', params.group],
-    queryFn: () => getSubGroupAndCharacter(params.group),
+    queryFn: () =>
+      getSubGroupAndCharacter({ workspace: params.slug, uuid: params.group }),
     onSuccess: (data) => {
       setGroupNameInput(data.groupName || '');
     },

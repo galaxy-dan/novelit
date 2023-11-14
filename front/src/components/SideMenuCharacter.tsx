@@ -272,6 +272,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                     // 캐릭터 수정
                     if (node.isLeaf) {
                       patchCharacterMutate.mutate({
+                        workspace: slug,
                         name: e.currentTarget.value,
                         uuid: node.data.id,
                       });

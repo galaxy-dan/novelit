@@ -57,7 +57,8 @@ export default function page({ params }: Props) {
 
   const { data: characterData }: UseQueryResult<characterType> = useQuery({
     queryKey: ['character', params.characterUUID],
-    queryFn: () => getCharacter(params.characterUUID),
+    queryFn: () =>
+      getCharacter({ workspace: params.slug, uuid: params.characterUUID }),
     onSuccess: (data) => {
       setImageInput(data?.characterImage || '');
       setImageUrl(data?.characterImage || '');
@@ -88,6 +89,7 @@ export default function page({ params }: Props) {
     mutationKey: ['otherCharacter', otherCharacterName],
     mutationFn: () =>
       patchCharacter({
+        workspace: params.slug,
         params: params.characterUUID,
         body: {
           ...character,
@@ -107,7 +109,8 @@ export default function page({ params }: Props) {
   });
 
   const deleteCharacterMutation = useMutation({
-    mutationFn: () => deleteCharacter(params.characterUUID),
+    mutationFn: () =>
+      deleteCharacter({ workspace: params.slug, uuid: params.characterUUID }),
     onSuccess: () => {
       if (groupUUID) {
         router.push(`/character/${params.slug}/${groupUUID}`);

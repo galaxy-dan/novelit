@@ -1,5 +1,6 @@
 import { EdgeType, NodeType, characterType } from '@/model/charactor';
 import { del, get, patch, post, put } from './http';
+import { v4 as uuidv4 } from 'uuid';
 
 const transformDiagramData = (characterData: any) => {
   let nodeDatas: NodeType[] = [];
@@ -168,10 +169,10 @@ const transformCharacterDirectory = (data: any) => {
   return { name: '', children: result };
 };
 
-export const getCharacterByName = async (worksapce: string, name: string) => {
+export const getCharacterByName = async (workspace: string, name: string) => {
   if (name !== '') {
     const data = await get(
-      `/character/search?workspaceUUID=${worksapce}&characterName=${name}`,
+      `/character/search?workspaceUUID=${workspace}&characterName=${name}`,
     );
     return data;
   } else {
@@ -179,8 +180,13 @@ export const getCharacterByName = async (worksapce: string, name: string) => {
   }
 };
 
-export const getCharacter = async (uuid: string) => {
-  const data = await get(`/character?characterUUID=${uuid}`);
+export const getCharacter = async (req: {
+  workspace: string;
+  uuid: string;
+}) => {
+  const data = await get(
+    `/character?workspace=${req.workspace}&characterUUID=${req.uuid}`,
+  );
   return data;
 };
 
@@ -189,7 +195,9 @@ export const postCharacter = async (req: {
   group: string | null;
   name: string;
 }) => {
+  const uuid = uuidv4();
   const data = await post(`/character`, {
+    characterUUID: uuid,
     workspaceUUID: req.workspace,
     groupUUID: req.group,
     characterName: req.name,
@@ -202,13 +210,22 @@ export const postCharacter = async (req: {
 export const patchCharacter = async (req: {
   params: string;
   body: characterType;
+  workspace: string;
 }) => {
-  const data = await patch(`/character?characterUUID=${req.params}`, req.body);
+  const data = await patch(
+    `/character?workspaceUUID=${req.workspace}&characterUUID=${req.params}`,
+    req.body,
+  );
   return data;
 };
 
-export const deleteCharacter = async (uuid: string) => {
-  const data = await del(`/character?characterUUID=${uuid}`);
+export const deleteCharacter = async (req: {
+  workspace: string;
+  uuid: string;
+}) => {
+  const data = await del(
+    `/character?workspaceUUID=${req.workspace}&characterUUID=${req.uuid}`,
+  );
   return data;
 };
 
@@ -228,10 +245,16 @@ export const getCharacterDirectory = async (workspace: string) => {
 export const patchCharacterName = async (req: {
   name: string;
   uuid: string;
+  workspace: string;
 }) => {
-  const data = await get(`/character?characterUUID=${req.uuid}`);
+  const data = await get(
+    `/character?workspaceUUID=${req.workspace}&characterUUID=${req.uuid}`,
+  );
   const newData = { ...data, characterName: req.name };
-  const response = await patch(`/character?characterUUID=${req.uuid}`, newData);
+  const response = await patch(
+    `/character?workspaceUUID=${req.workspace}&characterUUID=${req.uuid}`,
+    newData,
+  );
   return response;
 };
 
