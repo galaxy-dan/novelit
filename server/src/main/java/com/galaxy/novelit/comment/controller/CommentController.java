@@ -38,9 +38,6 @@ public class CommentController {
         notificationService.send(commentAddRequestDto.getCommentNickname()
             , commentAddRequestDto.getDirectoryUUID(), publisherUUID);
 
-        /*notificationService.alertComment(commentAddRequestDto.getCommentNickname()
-            , commentAddRequestDto.getDirectoryUUID(), publisherUUID);*/
-
         return ResponseEntity.ok().build();
     }
 

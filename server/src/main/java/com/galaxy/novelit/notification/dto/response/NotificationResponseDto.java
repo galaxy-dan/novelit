@@ -26,7 +26,7 @@ public class NotificationResponseDto {
 
         return NotificationResponseDto.builder()
             .type("alertComment")
-            .subscriberUUID(id) // 받는사람 UUID
+            .subscriberUUID(id)
             .notificationUUID(notiUUID)
             .notificationContent(commentNickname + " 님이 댓글을 남겼습니다.")
             .build();
