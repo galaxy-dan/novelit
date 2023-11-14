@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class FileResDTO {
 	private String title;
 	private String content;
+	private boolean editable;
 }

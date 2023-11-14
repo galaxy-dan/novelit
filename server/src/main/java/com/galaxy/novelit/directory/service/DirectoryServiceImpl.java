@@ -58,7 +58,7 @@ public class DirectoryServiceImpl implements DirectoryService{
 		if(isDirectory){
 			builder.children(new ArrayList<>());
 		}else{
-			builder.content("");
+			builder.content("").editable(true);
 		}
 		Directory directory = builder.build();
 
@@ -112,12 +112,15 @@ public class DirectoryServiceImpl implements DirectoryService{
 	public FileResDTO getFile(String directoryUUID, String userUUID) {
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
 		//예외 처리
+		if(directoryUUID.equals(userUUID)){
+			userUUID = directory.getUserUUID();
+		}
 		checkDirectoryException(directory, userUUID);
 		if(directory.isDirectory()){
 			throw new WrongDirectoryTypeException();
 		}
 
-		return new FileResDTO(directory.getName(), directory.getContent());
+		return new FileResDTO(directory.getName(), directory.getContent(), directory.isEditable());
 	}
 
 	@Transactional
@@ -169,10 +172,17 @@ public class DirectoryServiceImpl implements DirectoryService{
 		Directory directory = directoryRepository.findByUuidAndDeleted(directoryUUID, false);
 
 		//예외 처리
+		if(directoryUUID.equals(userUUID)){
+			userUUID = directory.getUserUUID();
+		}
 		checkDirectoryException(directory, userUUID);
 		if(directory.isDirectory()){
 			throw new WrongDirectoryTypeException();
 		}
+
+		// if(!directory.isEditable()){
+		// 	throw new EditRefusedException();
+		// }
 
 		directory.updateContent(dto.getContent());
 		directoryRepository.save(directory);

@@ -32,7 +32,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation "org.springframework.boot:spring-boot-starter-actuator"
 
@@ -67,6 +67,9 @@ dependencies {
 
 	// mariadb
 	implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
+
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {

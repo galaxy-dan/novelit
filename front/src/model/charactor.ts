@@ -25,6 +25,7 @@ export type informationType = {
   [key: string]: string;
 };
 export type relationshipType = {
-  uuid: string;
+  uuid?: string|null;
+  name: string;
   description: string;
 };

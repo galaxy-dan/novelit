@@ -1,19 +1,14 @@
 package com.galaxy.novelit.comment.service;
 
-import com.galaxy.novelit.comment.domain.CommentInfo;
 import com.galaxy.novelit.comment.domain.Comment;
+import com.galaxy.novelit.comment.domain.CommentInfo;
 import com.galaxy.novelit.comment.dto.CommentInfoDto;
 import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentDeleteRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentUpdateRequestDto;
-import com.galaxy.novelit.comment.repository.CommentInfoRepository;
 import com.galaxy.novelit.comment.repository.CommentRepository;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
-import com.galaxy.novelit.common.exception.NonUniqueException;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,25 +21,25 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     @Override
-    public void addComment(CommentAddRequestDto commentAddRequestDto) {
-        // spaceUUID get
+    public void addComment(CommentAddRequestDto commentAddRequestDto, String userUUID) {
         Comment comment = commentRepository.findCommentBySpaceUUID(
             commentAddRequestDto.getSpaceUUID());
 
         // 새롭게 들어갈때
         if (comment == null) {
-            commentRepository.save(Comment.create(commentAddRequestDto));
+            commentRepository.save(Comment.create(commentAddRequestDto, userUUID));
         }
         // 이미 있으면
         else {
             // list에 넣어주기
             List<CommentInfo> commentInfoList = comment.getCommentInfoList();
-            commentInfoList.add(CommentInfo.create(commentAddRequestDto));
+            commentInfoList.add(CommentInfo.create(commentAddRequestDto, userUUID));
 
             comment.updateCommentInfoList(commentInfoList);
             // save
             commentRepository.save(comment);
         }
+
     }
 
     @Override
@@ -57,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public void updateComment(CommentUpdateRequestDto commentUpdateRequestDto) {
+    public void updateComment(CommentUpdateRequestDto commentUpdateRequestDto, String userUUID) {
         // 코멘트 서치
         Comment comment = commentRepository.findCommentBySpaceUUID(
             commentUpdateRequestDto.getSpaceUUID());
@@ -68,26 +63,17 @@ public class CommentServiceImpl implements CommentService {
 
         List<CommentInfo> commentInfoList = comment.getCommentInfoList();
 
+        // 유저 닉네임
         // 세부 코멘트 서치
         for (CommentInfo info :commentInfoList) {
-            // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
-            if (info.getCommentUUID().equals(commentUpdateRequestDto.getCommentUUID())) {
-                if (info.getCommentUUID().equals(commentUpdateRequestDto.getCommentUUID())) {
-                    // 내용 업데이트
-                    info.updateCommentContent(commentUpdateRequestDto.getCommentContent());
-                    comment.updateCommentInfoList(commentInfoList);
-                    commentRepository.save(comment);
-                    return;
-                }
-                // 편집자인 경우 : 아이디 비번 둘다 확인
-                if (info.getCommentNickname().equals(commentUpdateRequestDto.getCommentNickname()) &&
-                     info.getCommentPassword().equals(commentUpdateRequestDto.getCommentPassword())) {
-                    // 내용 업데이트
-                    info.updateCommentContent(commentUpdateRequestDto.getCommentContent());
-                    comment.updateCommentInfoList(commentInfoList);
-                    commentRepository.save(comment);
-                    return;
-                }
+            // 코멘트 UUID && userUUID 확인
+            if (info.getCommentUUID().equals(commentUpdateRequestDto.getCommentUUID())
+                && info.getUserUUID().equals(userUUID)) {
+                // 내용 업데이트
+                info.updateCommentContent(commentUpdateRequestDto.getCommentContent());
+                comment.updateCommentInfoList(commentInfoList);
+                commentRepository.save(comment);
+                return;
             }
         }
 
@@ -95,7 +81,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(CommentDeleteRequestDto commentDeleteRequestDto) {
+    public void deleteComment(CommentDeleteRequestDto commentDeleteRequestDto, String userUUID) {
         // 코멘트 서치
         Comment comment = commentRepository.findCommentBySpaceUUID(
             commentDeleteRequestDto.getSpaceUUID());
@@ -109,23 +95,12 @@ public class CommentServiceImpl implements CommentService {
         // 세부 코멘트 서치
         for (CommentInfo info :commentInfoList) {
             // 소설가인 경우 : 로그인한 사람이랑 같음. 비밀번호없음
-            if (info.getCommentUUID().equals(commentDeleteRequestDto.getCommentUUID())) {
-                if (info.getCommentUUID().equals(commentDeleteRequestDto.getCommentUUID())) {
-                    // 삭제
-                    commentInfoList.remove(info);
-                    comment.updateCommentInfoList(commentInfoList);
-                    commentRepository.save(comment);
-                    return;
-                }
-                // 편집자인 경우 : 아이디 비번 둘다 확인
-                if (info.getCommentNickname().equals(commentDeleteRequestDto.getCommentNickname()) &&
-                    info.getCommentPassword().equals(commentDeleteRequestDto.getCommentPassword())) {
-                    // 내용 업데이트
-                    commentInfoList.remove(info);
-                    comment.updateCommentInfoList(commentInfoList);
-                    commentRepository.save(comment);
-                    return;
-                }
+            if (info.getCommentUUID().equals(commentDeleteRequestDto.getCommentUUID())
+                && info.getUserUUID().equals(userUUID)) {
+                commentInfoList.remove(info);
+                comment.updateCommentInfoList(commentInfoList);
+                commentRepository.save(comment);
+                return;
             }
         }
 
