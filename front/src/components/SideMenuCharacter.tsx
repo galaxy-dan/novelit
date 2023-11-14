@@ -17,14 +17,9 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {
-  deleteDirectory,
-  patchDirectory,
-  postDirectory,
-} from '@/service/api/novel';
 import { getWorkspace } from '@/service/api/workspace';
-import { Directory, Novel } from '@/model/workspace';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Novel } from '@/model/workspace';
+import { useParams, useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { AiOutlineMenu } from 'react-icons/ai';
 import Link from 'next/link';
@@ -73,16 +68,19 @@ export default function SideMenuCharacter() {
           <AiOutlineMenu size={25} />
         </button>
       ) : (
-        <div className="min-h-screen z-50 fixe left-0 top-0 bg-violet-50 w-[260px] font-melody">
+        <div className="min-h-screen h-full z-50 fixe left-0 top-0 bg-violet-50 w-[260px] font-melody">
           <div className="h-full">
-            <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
-              <div className="flex gap-2">
-                <button onClick={() => router.push('/main')}>
+            <div className="flex justify-between items-center pt-4 px-4 border-b-2 border-gray-300">
+              <div className="flex gap-2 items-end">
+                <button className="pb-4" onClick={() => router.push('/main')}>
                   <BiSolidHome size={30} />
                 </button>
-                <div className="font-bold text-xl">{workspace?.title}</div>
+                <p className="font-bold text-xl pb-3">{workspace?.title}</p>
               </div>
-              <button onClick={() => setIsOpen((prev) => !prev)}>
+              <button
+                className=" pb-3"
+                onClick={() => setIsOpen((prev) => !prev)}
+              >
                 <FiChevronsLeft size={20} />
               </button>
             </div>
@@ -104,20 +102,26 @@ export default function SideMenuCharacter() {
                     <div>👨‍👩‍👦</div>
                     <div className="pb-1">캐릭터작성</div>
                   </div>
-                  <div>
+                  <div className="flex items-center">
                     <button
                       onClick={() => {
                         treeRef.current.createLeaf(treeRef.current.root.id);
                       }}
                     >
-                      <AiFillFileAdd size={25} />
+                      <AiFillFileAdd
+                        size={19.5}
+                        className="hover:text-gray-600 hover:bg-gray-300"
+                      />
                     </button>
                     <button
                       onClick={() => {
                         treeRef.current.createInternal(treeRef.current.root.id);
                       }}
                     >
-                      <AiFillFolderAdd size={25} />
+                      <AiFillFolderAdd
+                        size={25}
+                        className="hover:text-gray-600 hover:bg-gray-300"
+                      />
                     </button>
                   </div>
                 </div>
@@ -135,11 +139,10 @@ export default function SideMenuCharacter() {
                     openByDefault={false}
                     width={200}
                     // height={1000}
-                    indent={24}
-                    rowHeight={36}
-                    paddingTop={30}
+                    indent={14}
+                    rowHeight={30}
+                    paddingTop={15}
                     paddingBottom={10}
-                    padding={25 /* sets both */}
                     className="scrollbar-hide"
                     searchTerm={term}
                     searchMatch={(node, term) =>
@@ -169,9 +172,9 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
 
   const postCharacterMutate = useMutation({
     mutationFn: postCharacter,
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       queryClient.invalidateQueries(['group']);
+      queryClient.invalidateQueries(['characterDirectory']);
     },
   });
 
@@ -179,6 +182,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     mutationFn: postGroup,
     onSuccess: () => {
       queryClient.invalidateQueries(['group']);
+      queryClient.invalidateQueries(['characterDirectory']);
     },
   });
 
@@ -187,6 +191,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     onSuccess: () => {
       queryClient.invalidateQueries(['group']);
       queryClient.invalidateQueries(['character']);
+      queryClient.invalidateQueries(['characterDirectory']);
     },
   });
 
@@ -194,6 +199,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     mutationFn: patchGroup,
     onSuccess: () => {
       queryClient.invalidateQueries(['group']);
+      queryClient.invalidateQueries(['characterDirectory']);
     },
   });
 
@@ -201,6 +207,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     mutationFn: deleteCharacter,
     onSuccess: () => {
       queryClient.invalidateQueries(['group']);
+      queryClient.invalidateQueries(['characterDirectory']);
     },
   });
 
@@ -208,21 +215,22 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
     mutationFn: deleteGroup,
     onSuccess: () => {
       queryClient.invalidateQueries(['group']);
+      queryClient.invalidateQueries(['characterDirectory']);
     },
   });
 
   return (
     <>
       <div
-        className={`flex justify-between items-center text-violet-50 hover:text-black hover:bg-slate-50 ${
+        className={`flex justify-between items-start text-violet-50 hover:text-black hover:bg-slate-50 ${
           node.isSelected ? 'bg-slate-50' : 'bg-violet-50'
-        }`}
+        } select-none py-0`}
         onClick={() => {
           node.toggle();
         }}
         onDoubleClick={() => {
           if (node.isLeaf) {
-            //router.push(`/character/${slug}/characterInfo/${node.id}`);
+            router.push(`/character/${slug}/characterInfo/${node.id}`);
           }
         }}
       >
@@ -230,6 +238,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
           {node.isEditing ? (
             <input
               type="text"
+              className="select-none"
               defaultValue={node.data.name}
               onFocus={(e) => e.currentTarget.select()}
               onBlur={() => node.reset()}
@@ -240,7 +249,6 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                     node.parent?.id === '__REACT_ARBORIST_INTERNAL_ROOT__'
                       ? null
                       : node.parent?.id;
-                  console.log("부모 uuid는?: "+ parentUUID);
                   if (node.id.includes('simple')) {
                     // 캐릭터 생성
                     if (node.isLeaf) {
@@ -282,9 +290,11 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
               autoFocus
             />
           ) : (
-            <div style={style} className="text-sm font-bold">
-              {node.isLeaf ? '📖' : node.isOpen ? '📂' : '📁'}
-              {node.data.name}
+            <div className="flex">
+              <div style={style} className="text-sm font-bold">
+                {node.isLeaf ? '📖' : node.isOpen ? '📂' : '📁'}
+              </div>
+              <div className="text-sm font-bold">{node.data.name}</div>
             </div>
           )}
         </div>
@@ -297,7 +307,6 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
             <button
               onClick={() => {
                 tree.delete(node.id);
-                console.log("삭제 uuid "+node.data.id);
                 if (node.isLeaf) {
                   deleteCharacterMutate.mutate(node.data.id);
                 } else {
