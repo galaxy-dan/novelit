@@ -58,8 +58,7 @@ export default function page({ params }: Props) {
       router.push(`/plot/${params.slug}`);
     },
     enabled: !isFetched,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    staleTime: 0
   });
 
   const putCharacterMutation = useMutation({

@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import SideMenu from './SideMenu';
 import SideMenuPlot from './SideMenuPlot';
+import SideMenuCharacter from './SideMenuCharacter';
 
 export default function Side() {
   const path = usePathname();
@@ -13,7 +14,7 @@ export default function Side() {
     <>
       {(pathname === 'novel' || pathname === 'editor') && <SideMenu />}
       {pathname === 'plot' && <SideMenuPlot />}
-      {pathname === 'character' && <>character</>}
+      {pathname === 'character' && <SideMenuCharacter/>}
     </>
   );
 }

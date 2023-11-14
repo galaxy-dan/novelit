@@ -11,7 +11,6 @@ export default function PlotCard({ plot , workspace}: Props) {
   return (
     <div className="flex border-2 rounded-md w-[24rem] h-40 px-3 items-center shadow-lg mt-8 cursor-pointer"
       onClick={()=>{
-        console.log(`/plot/${workspace}/${plot.plotUuid}`);
         router.push(`/plot/${workspace}/${plot.plotUuid}`);
       }}
     >
