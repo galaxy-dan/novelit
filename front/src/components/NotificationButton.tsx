@@ -10,8 +10,7 @@ import { usePathname } from 'next/navigation';
 import { useContext, useState } from 'react';
 
 export default function NotificationButton() {
-  const pathname = usePathname();
-  if (pathname === '/') return;
+
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   // const { user } = useContext(AuthContext);
@@ -30,7 +29,7 @@ export default function NotificationButton() {
   });
 
   return (
-    <div className="fixed top-5 right-5 flex w-full justify-end">
+    <div className="flex w-full justify-end">
       <div className="relative">
         <button
           onClick={toggleDropdown}
