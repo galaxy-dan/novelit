@@ -7,6 +7,7 @@ import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.notification.dto.response.NotificationResponseDto;
 import com.galaxy.novelit.notification.redis.dto.request.AlarmRedisRequestDto;
+import com.galaxy.novelit.notification.redis.dto.response.SseConnection;
 import com.galaxy.novelit.notification.redis.service.AlarmRedisService;
 import com.galaxy.novelit.notification.repository.EmitterRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,7 +42,10 @@ public class NotificationServiceImpl implements NotificationService{
         emitter.onTimeout(() -> emitterRepository.deleteAllStartByWithId(id));
         emitter.onError((e) -> emitterRepository.deleteAllStartByWithId(id));
 
-        sendToClient(emitter, id, "Connection");
+        sendToClient(emitter, id, SseConnection.builder()
+            .type("Connection")
+            .content("최초연결")
+            .build());
 
         if (!lastEventId.isEmpty()) {
             Map<String, SseEmitter> events = emitterRepository.findAllStartById(subscriberUUID);
