@@ -30,47 +30,32 @@ public class CharacterController {
     private final String tempUser = "temp";
 
     @GetMapping
-    public ResponseEntity<Object> getCharacterInfo(@RequestParam String characterUUID, Authentication authentication) {
-        try {
-//            CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, authentication.getName());
-            CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, tempUser);
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<Object> getCharacterInfo(@RequestParam String workspaceUUID, @RequestParam String characterUUID, Authentication authentication) {
+//        CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, authentication.getName(), String workspaceUUID);
+        CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, tempUser, workspaceUUID);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
     public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto, Authentication authentication) {
-        try {
-//            characterService.createCharacter(dto, authentication.getName());
-            characterService.createCharacter(dto, tempUser);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+//        characterService.createCharacter(dto, authentication.getName());
+        characterService.createCharacter(dto, tempUser);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping
-    public ResponseEntity<Object> updateCharacter(@RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto, Authentication authentication) {
-        try {
-//            characterService.updateCharacter(characterUUID, dto, authentication.getName());
-            characterService.updateCharacter(characterUUID, dto, tempUser);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<Object> updateCharacter(@RequestParam String workspaceUUID, @RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto, Authentication authentication) {
+//        characterService.updateCharacter(characterUUID, dto, authentication.getName(), workspaceUUID);
+        characterService.updateCharacter(characterUUID, dto, tempUser, workspaceUUID);
+        return ResponseEntity.ok().build();
+
     }
 
     @DeleteMapping
-    public  ResponseEntity<Object> deleteCharacter(@RequestParam String characterUUID, Authentication authentication) {
-        try {
-//            characterService.deleteCharacter(characterUUID, authentication.getName());
-            characterService.deleteCharacter(characterUUID, tempUser);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public  ResponseEntity<Object> deleteCharacter(@RequestParam String workspaceUUID, @RequestParam String characterUUID, Authentication authentication) {
+//        characterService.deleteCharacter(characterUUID, authentication.getName(), workspaceUUID);
+        characterService.deleteCharacter(characterUUID, tempUser, workspaceUUID);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/search")
@@ -81,37 +66,26 @@ public class CharacterController {
     }
 
     @GetMapping("/diagram")
-    public ResponseEntity<Object> getRelationships() {
-        try {
-            List<RelationDtoRes> dto = characterService.getRelationships();
+    public ResponseEntity<Object> getRelationships(@RequestParam String workspaceUUID, Authentication authentication) {
+//        List<RelationDtoRes> dto = characterService.getRelationships(authentication.getName(), workspaceUUID);
+        List<RelationDtoRes> dto = characterService.getRelationships(tempUser, workspaceUUID);
 
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/move")
-    public ResponseEntity<Object> moveCharacter(@RequestParam String characterUUID, @RequestParam String groupUUID, Authentication authentication) {
-        try {
-//            characterService.moveCharacter(characterUUID, groupUUID, authentication.getName());
-            characterService.moveCharacter(characterUUID, groupUUID, tempUser);
+    public ResponseEntity<Object> moveCharacter(@RequestParam String workspaceUUID, @RequestParam String characterUUID, @RequestParam String groupUUID, Authentication authentication) {
+//        characterService.moveCharacter(characterUUID, groupUUID, authentication.getName(), workspaceUUID);
+        characterService.moveCharacter(characterUUID, groupUUID, tempUser, workspaceUUID);
 
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/node")
-    public ResponseEntity<Object> moveCharacterNode(@RequestParam String characterUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
-        try {
-//            characterService.moveCharacterNode(characterUUID, x, y, authentication.getName());
-            characterService.moveCharacterNode(characterUUID, x, y, tempUser);
+    public ResponseEntity<Object> moveCharacterNode(@RequestParam String workspaceUUID, @RequestParam String characterUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
+//        characterService.moveCharacterNode(characterUUID, x, y, authentication.getName(), workspaceUUID);
+        characterService.moveCharacterNode(characterUUID, x, y, tempUser, workspaceUUID);
 
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        return ResponseEntity.ok().build();
     }
 }
