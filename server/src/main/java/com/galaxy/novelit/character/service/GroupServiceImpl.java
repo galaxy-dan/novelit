@@ -172,6 +172,7 @@ public class GroupServiceImpl implements GroupService {
                 .groupUUID(group.getGroupUUID())
                 .groupName(group.getGroupName())
                 .groupNode(group.getGroupNode())
+                .parentGroupUUID(group.getParentGroupUUID())
                 .build();
 
             dtoList.add(dto);
