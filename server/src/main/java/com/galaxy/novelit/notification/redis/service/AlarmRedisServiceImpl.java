@@ -42,17 +42,19 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
     public List<AlarmGetResponseDto> getAllList(String subUUID) {
         List<AlarmGetResponseDto> list = new ArrayList<>();
 
-        List<AlarmRedis> all = (List<AlarmRedis>) alarmRedisRepository.findAll();
+        List<AlarmRedis> all = alarmRedisRepository.findAllByNoti_SubUUID(subUUID)
+            .orElseThrow(() -> new RuntimeException());
+
 
         //log.info("d : {}" , all.get(0).getNoti().getSubUUID());
 
-        for (AlarmRedis alarmRedis : all) {
+        /*for (AlarmRedis alarmRedis : all) {
             if (alarmRedis.getNoti().getSubUUID().equals(subUUID)) {
                 list.add(AlarmGetResponseDto.domainToGetResDto(alarmRedis));
                 //og.info(alarmRedis.getNoti().getSubUUID());
             }
-        }
+        }*/
 
-        return list;
+        return AlarmGetResponseDto.domainListToGetResDtoList(all);
     }
 }
