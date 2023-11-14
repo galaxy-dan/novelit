@@ -1,9 +1,19 @@
 'use client';
-import CharacterCard from '@/components/character/CharacterCard';
-import SubGroupCard from '@/components/character/SubGroupCard';
-import { characterType, groupType, subGroupType } from '@/model/charactor';
-import React, { useEffect, useRef, useState } from 'react';
-import { BsFillPersonFill, BsSearch } from 'react-icons/bs';
+import CharacterCardGroup from '@/components/character/CharacterCardGroup';
+import CharacterHomeTitle from '@/components/character/CharacterHomeTitle';
+import CharacterNameSearch from '@/components/character/CharacterNameSearch';
+import CharacterUpperGroup from '@/components/character/CharacterUpperGroup';
+import GroupCardGroup from '@/components/character/GroupCardGroup';
+import GroupName from '@/components/character/GroupName';
+import { groupItemType } from '@/model/charactor';
+import { getSubGroupAndCharacter } from '@/service/api/group';
+import {
+  UseQueryResult,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 type Props = {
   params: {
@@ -13,167 +23,47 @@ type Props = {
 };
 
 export default function page({ params }: Props) {
-  const [subGroups, setSubgroups] = useState<subGroupType[]>([
-    { id: 'subgroup1', name: '서브그룹 1' },
-    { id: 'subgroup2', name: '서브그룹 2' },
-  ]);
-  const [characters, setCharacters] = useState<characterType[]>([
-    {
-      characterUUID: 'character1',
-      characterName: '배트맨',
-      characterImage:
-        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '나이',
-          content: '24',
-        },
-      ],
-      relationship: [],
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [fetched, setFetched] = useState<boolean>(false);
+  const { data: groupData }: UseQueryResult<groupItemType> = useQuery({
+    queryKey: ['group', params.group],
+    queryFn: () => getSubGroupAndCharacter(params.group),
+    onSuccess: (data) => {
+      setGroupNameInput(data.groupName || '');
     },
-    {
-      characterUUID: 'character2',
-      characterName: '배트맨',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-      ],
-      relationship: [],
+    onError: () => {
+      router.push(`/character/${params.slug}`);
     },
-    {
-      characterUUID: 'character3',
-      characterName: '배트맨',
-      characterImage:
-        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-      ],
-      relationship: [],
-    },
-    {
-      characterUUID: 'character4',
-      characterName: '배트맨',
-      characterImage:
-        'https://images.unsplash.com/photo-1697541283989-bbefb5982de9?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzfHx8ZW58MHx8fHx8',
-      description: '',
-      information: [
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-        {
-          characterUUID: '',
-          title: '',
-          content: '',
-        },
-      ],
-      relationship: [],
-    },
-  ]);
-
-  const [group, setGroup] = useState<groupType>({
-    groupUUID: 'group1',
-    groupName: '그룹 1',
+    staleTime: 0,
   });
 
-  const [width, setWidth] = useState(100);
-  const characterNameRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (characterNameRef !== null && characterNameRef.current !== null) {
-      if (characterNameRef.current.offsetWidth > 100) {
-        setWidth(characterNameRef.current.offsetWidth + 5);
-      } else {
-        setWidth(100);
-      }
-    }
-  }, [group.groupName]);
+  const [groupNameInput, setGroupNameInput] = useState<string>('');
 
   return (
     <div className="ml-10 my-20 select-none">
       {/* 제목 */}
-      <div className="flex items-end text-5xl">
-        <BsFillPersonFill className="mr-2" />
-        <p className="text-3xl font-extrabold">캐릭터 설정</p>
-      </div>
+      <CharacterUpperGroup
+        parentUUID={groupData?.parentGroupUUID}
+        slug={params.slug}
+      />
+      <CharacterHomeTitle slug={params.slug} />
       {/* 검색 창 */}
-      <div className="flex items-center bg-neutral-200 rounded-md w-fit px-2 py-1 mt-14 text-2xl">
-        <label htmlFor="hm">
-          <BsSearch />
-        </label>
-        <input
-          id="hm"
-          type="text"
-          className="bg-neutral-200 rounded-md ml-2 outline-none truncate font-extrabold text-xl"
-        />
-      </div>
+      <CharacterNameSearch slug={params.slug} />
       {/* 캐릭터 카드 전체 모음 */}
       <div className="mt-6">
         {/* 캐릭터 카드 그룹 */}
-        <div>
-          <span
-            ref={characterNameRef}
-            className="invisible opacity-0 absolute text-4xl font-extrabold"
-          >
-            {group.groupName}
-          </span>
-          <input
-            className="text-4xl font-extrabold max-w-[30rem] truncate"
-            style={{ width }}
-            type="text"
-            onChange={(e) => {
-              setGroup((prev) => ({ ...prev, groupName: e.target.value }));
-            }}
-            value={group.groupName}
-          />
-        </div>
+        <GroupName
+          groupUUID={params.group}
+          groupName={groupNameInput}
+          setGroupName={setGroupNameInput}
+        />
 
-        <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
-          {subGroups?.map((subGroup, i) => (
-            <SubGroupCard subGroup={subGroup} slug={params.slug} />
-          ))}
-        </div>
-        <div className="grid b:grid-cols-1 c:grid-cols-2 d:grid-cols-3 e:grid-cols-4 f:grid-cols-5 grid-flow-row gap-4 ">
-          {characters?.map((character, i) => (
-            <CharacterCard character={character} slug={params.slug}/>
-          ))}
-        </div>
+        <GroupCardGroup slug={params.slug} groups={groupData?.groups || []} />
+        <CharacterCardGroup
+          slug={params.slug}
+          characters={groupData?.characters || []}
+        />
       </div>
     </div>
   );
