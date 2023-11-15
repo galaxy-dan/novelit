@@ -419,7 +419,7 @@ export default function RelationshipDiagram({ params }: Props) {
   }, [cy]);
 
   return (
-    <div className="select-none w-fit absolute left-[260px]">
+    <div className="select-none w-fit absolute left-[260px]  h-screen overflow-y-scroll scrollbar-hide">
       <div className="w-[60rem] mx-auto ml-10 pt-10">
         <div className="flex items-end justify-between">
           <div className="flex items-end">

@@ -15,7 +15,7 @@ export default function SideMenuMoveButton({ slug }: Props) {
   const pathname = path.split('/')[1];
 
   return (
-    <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2 h-full">
+    <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2">
       <Link href={`/novel/${slug}`}>
         {pathname === 'novel' || pathname === 'editor' ? (
           <MdStickyNote2 size={20} />
