@@ -1,7 +1,6 @@
 package com.galaxy.novelit.notification.repository;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +24,7 @@ public class EmitterRepository {
     }
 
     public SseEmitter get (String id) {
-        for (Entry<String, SseEmitter> entry : emitters.entrySet()) {
-            if (entry.getKey().equals(id)) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        return emitters.get(id);
     }
 
     public Map<String, SseEmitter> findAllEmittersStartWithId(String id) {

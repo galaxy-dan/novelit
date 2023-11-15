@@ -34,10 +34,9 @@ public class CommentController {
         Authentication authentication){
         String publisherUUID = authentication.getName();
 
-        log.info("addComment : {}", publisherUUID);
         commentService.addComment(commentAddRequestDto, publisherUUID);
 
-        notificationService.send(commentAddRequestDto.getCommentNickname()
+        notificationService.notify(commentAddRequestDto.getCommentNickname()
             , commentAddRequestDto.getDirectoryUUID(), publisherUUID);
 
         return ResponseEntity.ok().build();
