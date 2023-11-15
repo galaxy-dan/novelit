@@ -273,11 +273,11 @@ public class CharacterServiceImpl implements CharacterService {
     public void deleteCharacter(String characterUUID, String userUUID, String workspaceUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
 
-        // 단어장에서 단어 삭제
-        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
-                workspaceUUID, character.getCharacterName());
-        System.out.println("단어 삭제 UUID: " + we.getWordUUID());
-        wordsService.deleteWord(we.getWordUUID());
+//        // 단어장에서 단어 삭제
+//        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//                workspaceUUID, character.getCharacterName());
+//        System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+//        wordsService.deleteWord(we.getWordUUID());
 
         if (character == null) {
             throw new NoSuchElementFoundException("유효하지 않은 캐릭터 UUID 입니다.");

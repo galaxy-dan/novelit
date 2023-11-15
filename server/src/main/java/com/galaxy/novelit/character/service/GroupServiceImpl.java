@@ -138,11 +138,11 @@ public class GroupServiceImpl implements GroupService {
             throw new DeletedElementException("이미 삭제된 그룹 입니다.");
         }
 
-        // 단어장에서 단어 삭제
-        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
-            workspaceUUID, group.getGroupName());
-        System.out.println("단어 삭제 UUID: " + we.getWordUUID());
-        wordsService.deleteWord(we.getWordUUID());
+//        // 단어장에서 단어 삭제
+//        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//            workspaceUUID, group.getGroupName());
+//        System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+//        wordsService.deleteWord(we.getWordUUID());
 
         group.deleteGroup();
         groupRepository.save(group);
@@ -159,11 +159,11 @@ public class GroupServiceImpl implements GroupService {
         List<CharacterEntity> childCharacters = group.getChildCharacters();
         for (CharacterEntity childCharacter : childCharacters) {
 
-            // 단어장에서 단어 삭제
-            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
-                workspaceUUID, childCharacter.getCharacterName());
-            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
-            wordsService.deleteWord(we.getWordUUID());
+//            // 단어장에서 단어 삭제
+//            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//                workspaceUUID, childCharacter.getCharacterName());
+//            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+//            wordsService.deleteWord(we.getWordUUID());
 
             childCharacter.deleteCharacter();
             characterRepository.save(childCharacter);
@@ -173,10 +173,10 @@ public class GroupServiceImpl implements GroupService {
         // 그룹에 속한 자식 그룹들 삭제 재귀
         List<GroupEntity> childGroups = group.getChildGroups();
         for (GroupEntity childGroup : childGroups) {
-            // 단어장에서 단어 삭제
-            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
-                workspaceUUID, childGroup.getGroupName());
-            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+//            // 단어장에서 단어 삭제
+//            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//                workspaceUUID, childGroup.getGroupName());
+//            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
             deleteGroup(childGroup.getGroupUUID(), userUUID, workspaceUUID);
         }
 
