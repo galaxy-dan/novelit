@@ -1,6 +1,7 @@
 package com.galaxy.novelit.notification.repository;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,22 @@ public class EmitterRepository {
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
 
-    public SseEmitter save(String subscriberUUID, SseEmitter sseEmitter) {
-        emitters.put(subscriberUUID, sseEmitter);
+    public SseEmitter save(String id, SseEmitter sseEmitter) {
+        emitters.put(id, sseEmitter);
         return sseEmitter;
     }
 
     public void saveEventCache(String id, Object object) {
         eventCache.put(id, object);
+    }
+
+    public SseEmitter get (String id) {
+        for (Entry<String, SseEmitter> entry : emitters.entrySet()) {
+            if (entry.getKey().equals(id)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     public Map<String, SseEmitter> findAllEmittersStartWithId(String id) {
@@ -39,7 +49,7 @@ public class EmitterRepository {
     public void deleteById(String emitterId) {
         emitters.remove(emitterId);
     }
-    
+
     /*public void deleteAllStartByWithId(String id) {
         emitters.forEach((key, emitter) -> {
             if (key.startsWith(id)) emitters.remove(key);

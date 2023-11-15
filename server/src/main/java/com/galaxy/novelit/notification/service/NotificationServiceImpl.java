@@ -89,8 +89,22 @@ public class NotificationServiceImpl implements NotificationService{
         NotificationResponseDto notificationResponseDto = NotificationResponseDto.createAlarmComment(
             commentNickname, id);
 
+        /*sendToClient(new SseEmitter(DEFAULT_TIMEOUT), id, notificationResponseDto);
+
+        // 알림 레디스에 저장
+        alarmRedisService.save(AlarmRedisRequestDto.builder()
+            .pubUUID(publisherUUID)
+            .pubName(commentNickname)
+            .subUUID(id)
+            .directoryName(directoryName)
+            .build());*/
+
         // subscriberUUID로 시작하는 emitter 찾기
         Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(id);
+
+        if (sseEmitters == null){
+            throw new RuntimeException();
+        }
 
         sseEmitters.forEach(
             (key, emitter) -> {
