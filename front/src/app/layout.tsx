@@ -47,7 +47,9 @@ export default function RootLayout({
               <ToastContainer pauseOnFocusLoss={false} />
               <TopMenu />
               <Side />
-              <main className="flex-grow">{children}</main>
+              <main className="flex-grow h-screen overflow-y-scroll scrollbar-hide">
+                {children}
+              </main>
             </AuthContextProvider>
           </RecoilProvider>
         </QueryProvider>
