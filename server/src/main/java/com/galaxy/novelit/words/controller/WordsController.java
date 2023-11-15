@@ -3,6 +3,7 @@ package com.galaxy.novelit.words.controller;
 import com.galaxy.novelit.directory.dto.request.DirectoryNameEditReqDTO;
 import com.galaxy.novelit.words.dto.req.WordsCreateReqDTO;
 import com.galaxy.novelit.words.dto.req.WordsUpdateReqDTO;
+import com.galaxy.novelit.words.dto.res.WordsDtoRes;
 import com.galaxy.novelit.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +26,21 @@ public class WordsController {
     private final WordsService wordsService;
     private final String tempUser = "temp";
 
+    @GetMapping
+    public ResponseEntity<Object> getWords(@RequestParam String workspaceUUID) {
+        try {
+            WordsDtoRes dto = wordsService.getWords(workspaceUUID);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Object> createWord(@RequestBody WordsCreateReqDTO dto) {
         try {
-            wordsService.createWord(dto, tempUser);
+            // TODO: 2023-11-15 나중에 이 호출을 쓸때가 있을때 uuid 넣도록 수정해야함 
+            wordsService.createWord(dto, "",tempUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

@@ -4,8 +4,11 @@ import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import com.galaxy.novelit.words.dto.req.WordsCreateReqDTO;
 import com.galaxy.novelit.words.dto.req.WordsUpdateReqDTO;
 import com.galaxy.novelit.words.dto.res.WordsDtoRes;
+import com.galaxy.novelit.words.dto.res.WordsDtoRes.WordInfo;
 import com.galaxy.novelit.words.entity.WordsEntity;
 import com.galaxy.novelit.words.repository.WordsRepository;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,21 +25,32 @@ public class WordsServiceImpl implements WordsService {
     @Override
     public WordsDtoRes getWords(String workspaceUUID) {
         WordsDtoRes dto = new WordsDtoRes();
+        List<WordsEntity> wordList = wordsRepository.findAllByWorkspaceUUID(workspaceUUID);
+        List<WordInfo> wordInfoList = new ArrayList<>();
+
+        for (WordsEntity word : wordList) {
+            WordInfo wordInfo = new WordInfo();
+            wordInfo.setWordUUID(word.getWordUUID());
+            wordInfo.setWord(word.getWord());
+            wordInfo.setCharacter(word.isCharacter());
+
+            wordInfoList.add(wordInfo);
+        }
 
         dto.setWorkspaceUUID(workspaceUUID);
-        dto.setWordInfo(null);
+        dto.setWordInfo(wordInfoList);
 
         return dto;
     }
 
     @Override
     @Transactional
-    public void createWord(WordsCreateReqDTO dto, String userUUID) {
+    public void createWord(WordsCreateReqDTO dto, String uuid, String userUUID) {
         String wordUUID = UUID.randomUUID().toString();
         WordsEntity word = WordsEntity.builder()
             .userUUID(userUUID)
             .workspaceUUID(dto.getWorkspaceUUID())
-            .wordUUID(wordUUID)
+            .wordUUID(uuid)
             .word(dto.getWord())
             .build();
 

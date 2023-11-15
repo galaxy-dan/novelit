@@ -31,19 +31,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupController {
     private final GroupService groupService;
     private final CharacterService characterService;
-    private final String tempUser = "temp";
+//    private final String tempUser = "temp";
 
     @GetMapping
     public ResponseEntity<Object> getGroupInfo(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
 //        GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName(), workspaceUUID);
-        GroupDtoRes dto = groupService.getGroupInfo(groupUUID, tempUser, workspaceUUID);
+        GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName(), workspaceUUID);
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/characters")
     public ResponseEntity<Object> getSimpleCharactersInfo(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
 //        List<CharacterSimpleDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName(), workspaceUUID);
-        List<CharacterThumbnailDtoRes> dto = characterService.getCharacters(groupUUID, tempUser, workspaceUUID);
+        List<CharacterThumbnailDtoRes> dto = characterService.getCharacters(groupUUID, authentication.getName(), workspaceUUID);
         return ResponseEntity.ok().body(dto);
     }
 
@@ -52,8 +52,8 @@ public class GroupController {
 //        List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(authentication.getName());
 //        List<CharacterSimpleDtoRes> characterDto = characterService.getTopCharacter(authentication.getName());
 
-        List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(workspaceUUID, tempUser);
-        List<CharacterThumbnailDtoRes> characterDto = characterService.getTopCharacter(workspaceUUID, tempUser);
+        List<GroupSimpleDtoRes> groupDto = groupService.getTopGroup(workspaceUUID, authentication.getName());
+        List<CharacterThumbnailDtoRes> characterDto = characterService.getTopCharacter(workspaceUUID, authentication.getName());
 
         Map<String, Object> response = new HashMap<>();
         response.put("groups", groupDto);
@@ -66,29 +66,29 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto, Authentication authentication) {
 //        groupService.createGroup(dto, authentication.getName());
-        groupService.createGroup(dto, tempUser);
+        groupService.createGroup(dto, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping
     public ResponseEntity<Object> updateGroupName(@RequestParam String workspaceUUID, @RequestParam String groupUUID, @RequestParam String newName, Authentication authentication) {
 //        groupService.updateGroupName(groupUUID, newName, authentication.getName(), workspaceUUID);
-        groupService.updateGroupName(groupUUID, newName, tempUser, workspaceUUID);
+        groupService.updateGroupName(groupUUID, newName, authentication.getName(), workspaceUUID);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Object> deleteGroup(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
 //        groupService.deleteGroup(groupUUID, authentication.getName(),workspaceUUID);
-        groupService.deleteGroup(groupUUID, tempUser,workspaceUUID);
+        groupService.deleteGroup(groupUUID, authentication.getName(),workspaceUUID);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/character/all")
     public ResponseEntity<Object> getGroupAndCharatcter(@RequestParam String workspaceUUID, Authentication authentication) {
 //        List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, authentication.getName());
-        List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, tempUser);
-        List<CharacterSimpleDtoRes> noGroupDto = characterService.getNoGroupCharacters(workspaceUUID, tempUser);
+        List<AllGroupsCharactersDtoRes> dto = groupService.getAllGroupsAndCharacters(workspaceUUID, authentication.getName());
+        List<CharacterSimpleDtoRes> noGroupDto = characterService.getNoGroupCharacters(workspaceUUID, authentication.getName());
 
         Map<String, Object> response = new HashMap<>();
         response.put("allGroupsAndCharacters", dto);
@@ -100,7 +100,7 @@ public class GroupController {
     @PatchMapping("/node")
     public ResponseEntity<Object> moveGroupNode(@RequestParam String workspaceUUID, @RequestParam String groupUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
 //        groupService.moveGroupNode(groupUUID, x, y, authentication.getName(), workspaceUUID);
-        groupService.moveGroupNode(groupUUID, x, y, tempUser, workspaceUUID);
+        groupService.moveGroupNode(groupUUID, x, y, authentication.getName(), workspaceUUID);
 
         return ResponseEntity.ok().build();
     }

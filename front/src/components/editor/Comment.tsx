@@ -80,7 +80,7 @@ export default function Comment({
     mutationFn: postComment,
     onSuccess: () => {
       queryClient.invalidateQueries(['comment', spaceUUID]);
-
+      reset();
       // 글도 최신화
       patchMutate.mutate({
         uuid: directoryUUID,
