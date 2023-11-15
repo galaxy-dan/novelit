@@ -100,6 +100,7 @@ export default function page({ params }: Props) {
     onSuccess: () => {
       setLoadingState(3);
       queryClient.invalidateQueries(['group']);
+      queryClient.invalidateQueries(['characterDirectory']);
     },
     onError: () => {
       setLoadingState(4);

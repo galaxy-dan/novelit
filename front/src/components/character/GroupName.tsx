@@ -24,7 +24,10 @@ export default function GroupName({
         workspace: slug,
       }),
     onError: () => queryClient.refetchQueries(['group', groupUUID]),
-    onSuccess: () => queryClient.refetchQueries(['group']),
+    onSuccess: () => {
+      queryClient.refetchQueries(['group']);
+      queryClient.refetchQueries(['characterDirectory']);
+    },
   });
 
   const [width, setWidth] = useState(100);
