@@ -102,7 +102,7 @@ export default function SideMenuPlot() {
                 <FiChevronsLeft size={20} />
               </button>
             </div>
-            <div className="flex h-full">
+            <div className="flex h-full bg-violet-50">
               <SideMenuMoveButton slug={slug} />
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
@@ -133,7 +133,7 @@ export default function SideMenuPlot() {
                     data={plotDirectories.children}
                     openByDefault={false}
                     width={200}
-                    // height={1000}
+                    height={600}
                     indent={18}
                     rowHeight={33}
                     paddingTop={15}

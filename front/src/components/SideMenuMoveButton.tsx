@@ -37,6 +37,9 @@ export default function SideMenuMoveButton({ slug }: Props) {
           <Image alt="people" src={PeopleWhite} width={20} />
         )}
       </Link>
+      <Link href={`/character/${slug}/relationship`}>
+        <Image alt="people" src={People} width={20} />
+      </Link>
     </div>
   );
 }
