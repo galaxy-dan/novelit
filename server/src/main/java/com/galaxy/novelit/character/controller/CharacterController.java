@@ -4,15 +4,10 @@ import com.galaxy.novelit.character.dto.req.CharacterCreateDtoReq;
 import com.galaxy.novelit.character.dto.req.CharacterUpdateDtoReq;
 import com.galaxy.novelit.character.dto.res.CharacterDtoRes;
 import com.galaxy.novelit.character.dto.res.CharacterSearchInfoResDTO;
-import com.galaxy.novelit.character.dto.res.GroupSimpleWithNodeDtoRes;
 import com.galaxy.novelit.character.dto.res.RelationDtoRes;
-import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.service.CharacterService;
-import com.galaxy.novelit.character.service.GroupService;
 import com.galaxy.novelit.words.service.WordsService;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CharacterController {
     private final CharacterService characterService;
-    private final GroupService groupService;
     private final WordsService wordsService;
 //    private final String tempUser = "temp";
 
@@ -78,11 +72,7 @@ public class CharacterController {
         List<RelationDtoRes> dtoRelations = characterService.getRelationships(authentication.getName(), workspaceUUID);
         List<GroupSimpleWithNodeDtoRes> dtoGroups = groupService.getAllGroupsWithNode(workspaceUUID, authentication.getName());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("Relations", dtoRelations);
-        response.put("Groups", dtoGroups);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/move")

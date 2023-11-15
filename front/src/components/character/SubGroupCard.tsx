@@ -1,5 +1,4 @@
 import { subGroupType } from '@/model/charactor';
-import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 type Props = {
@@ -8,17 +7,16 @@ type Props = {
 };
 export default function SubGroupCard({ subGroup, slug }: Props) {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   return (
     <div
-      className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8 cursor-pointer hover:bg-neutral-200"
+      className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8 cursor-pointer"
       onClick={() => {
-        router.push(`/character/${slug}/${subGroup.groupUUID}`);
+        router.push(`/character/${slug}/${subGroup.id}`);
       }}
     >
       <div className="ml-4 w-36 my-auto">
-        <p className="font-extrabold text-2xl">{subGroup.groupName}</p>
+        <p className="font-extrabold text-2xl">{subGroup.name}</p>
       </div>
     </div>
   );

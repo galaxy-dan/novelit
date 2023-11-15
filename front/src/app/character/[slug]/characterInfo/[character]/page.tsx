@@ -15,22 +15,20 @@ import styles from '@/service/cssStyle/scrollbar.module.css';
 import {
   deleteCharacter,
   getCharacter,
-  getCharacterByName,
-  patchCharacter,
+  putCharacter,
 } from '@/service/api/character';
 import {
+  UseMutationResult,
   UseQueryResult,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { GiCancel } from 'react-icons/gi';
-import CharacterUpperGroup from '@/components/character/CharacterUpperGroup';
 
 type Props = {
   params: {
-    characterUUID: string;
+    character: string;
     slug: string;
   };
 };
@@ -56,61 +54,38 @@ export default function page({ params }: Props) {
   const [isNameChanged, setIsNameChanged] = useState<boolean>(false);
 
   const { data: characterData }: UseQueryResult<characterType> = useQuery({
-    queryKey: ['character', params.characterUUID],
-    queryFn: () =>
-      getCharacter({ workspace: params.slug, uuid: params.characterUUID }),
+    queryKey: ['character', params.character],
+    queryFn: () => getCharacter(params.character),
     onSuccess: (data) => {
       setImageInput(data?.characterImage || '');
       setImageUrl(data?.characterImage || '');
       setNameInput(data?.characterName || '');
       setInformationInput(data?.information || []);
-      setRelationInput(data?.relations || []);
+      setRelationInput(data?.relationship || []);
       setdescriptionInput(data?.description || '');
       setGroupUUID(data?.groupUUID || null);
     },
     onError: () => {
       router.push(`/character/${params.slug}`);
     },
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    enabled: !isFetched,
   });
 
-  const [otherCharacterNameInput, setOtherCharacterNameInput] =
-    useState<string>('');
-  const [otherCharacterName, setOtherCharacterName] = useState<string>('');
-
-  const { data: otherCharacterData }: UseQueryResult<characterType[]> =
-    useQuery({
-      queryKey: ['otherCharacter', otherCharacterName],
-      queryFn: () => getCharacterByName(params.slug, otherCharacterName),
-    });
-
   const putCharacterMutation = useMutation({
-    mutationKey: ['otherCharacter', otherCharacterName],
-    mutationFn: () =>
-      patchCharacter({
-        workspace: params.slug,
-        params: params.characterUUID,
-        body: {
-          ...character,
-          groupUUID: groupUUID,
-        },
-      }),
+    mutationFn: () => putCharacter(params.character, character),
     onSuccess: () => {
-      setLoadingState(3);
-      queryClient.invalidateQueries(['group']);
+      setState(3);
     },
     onError: () => {
-      setLoadingState(4);
+      setState(4);
     },
     onMutate: () => {
-      setLoadingState(2);
+      setState(2);
     },
   });
 
   const deleteCharacterMutation = useMutation({
-    mutationFn: () =>
-      deleteCharacter({ workspace: params.slug, uuid: params.characterUUID }),
+    mutationFn: () => deleteCharacter(params.character),
     onSuccess: () => {
       if (groupUUID) {
         router.push(`/character/${params.slug}/${groupUUID}`);
@@ -119,7 +94,7 @@ export default function page({ params }: Props) {
       }
     },
     onError: () => {
-      setLoadingState(4);
+      setState(4);
     },
   });
 
@@ -129,7 +104,7 @@ export default function page({ params }: Props) {
     characterImage: '',
     description: '',
     information: [],
-    relations: [],
+    relationship: [],
   });
 
   const ref = useRef<characterType | null>(null);
@@ -156,54 +131,24 @@ export default function page({ params }: Props) {
 
   const [groupUUID, setGroupUUID] = useState<string | null>('');
 
-  const [relationCharacterSearchInput, setRelationCharacterSearchInput] =
-    useState<number>(-1);
-  const [loadingState, setLoadingState] = useState<number>(0);
+  const [searchInput, setSearchInput] = useState<number>(-1);
+  const [state, setState] = useState<number>(0);
 
-  const updateCharacter = () => {
+  const hello = () => {
     setCharacter((prev) => ({
       ...prev,
       characterName: nameInput,
       description: descriptionInput,
       characterImage: characterImageInput,
-      relations: relationshipInput || [],
+      relationship: relationshipInput,
       information: informationInput,
     }));
   };
-  const [filteredRelationCharacterData, setFilteredRelationCharacterData] =
-    useState<characterType[]>([]);
 
   useEffect(() => {
-    setFilteredRelationCharacterData(
-      otherCharacterData?.filter(
-        (obj) =>
-          !relationshipInput
-            ?.map((obj) => obj.targetUUID)
-            .includes(obj.characterUUID) &&
-          obj.characterUUID !== params.characterUUID,
-      ) || [],
-    );
-  }, [otherCharacterData, otherCharacterName, relationCharacterSearchInput]);
-
-  useEffect(() => {
-    const debounce = setTimeout(
-      () => {
-        return setOtherCharacterName(otherCharacterNameInput);
-      },
-      isFetched ? 500 : 0,
-    );
-    return () => {
-      clearTimeout(debounce);
-    };
-  }, [otherCharacterNameInput]);
-
-  useEffect(() => {
-    const debounce = setTimeout(
-      () => {
-        return updateCharacter();
-      },
-      isFetched ? 1000 : 0,
-    );
+    const debounce = setTimeout(() => {
+      return hello();
+    }, 1300);
     return () => {
       clearTimeout(debounce);
     };
@@ -221,6 +166,7 @@ export default function page({ params }: Props) {
       JSON.stringify(ref.current) !== JSON.stringify(character)
     ) {
       if (isFetched) {
+        console.log(character);
         putCharacterMutation.mutate();
         if (isNameChanged) {
           queryClient.invalidateQueries(['characterDirectory']);
@@ -230,7 +176,7 @@ export default function page({ params }: Props) {
         setIsFetched(true);
       }
     } else {
-      setLoadingState(0);
+      setState(0);
     }
     ref.current = JSON.parse(JSON.stringify(character));
   }, [character]);
@@ -251,23 +197,17 @@ export default function page({ params }: Props) {
   };
 
   useEffect(() => {
-    if (loadingState === 1 || loadingState === 2) {
+    if (state === 1 || state === 2) {
       enablePrevent();
     } else {
       disablePrevent();
     }
-  }, [loadingState]);
+  }, [state]);
 
   return (
-    <div
-      className="select-none w-full"
-      onClick={() => {
-        setRelationCharacterSearchInput(-1);
-      }}
-    >
-      <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 py-20 ">
+    <div className="select-none w-full" onClick={() => setSearchInput(-1)}>
+      <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 my-20 ">
         {/* 상단 타이틀 메뉴 + 로딩 상태 */}
-        <CharacterUpperGroup parentUUID={groupUUID || ''} slug={params.slug} />
         <div className="flex items-end justify-between">
           <div className="flex items-center">
             <div>
@@ -283,7 +223,7 @@ export default function page({ params }: Props) {
                 type="text"
                 onChange={(e) => {
                   setNameInput(e.target.value);
-                  setLoadingState(1);
+                  setState(1);
                 }}
                 value={nameInput || ''}
               />
@@ -297,7 +237,7 @@ export default function page({ params }: Props) {
             />
           </div>
 
-          <UploadState state={loadingState} />
+          <UploadState state={state} />
         </div>
         {/* 캐릭터 이미지 및 설명 */}
         <div className="flex h-64 mt-6">
@@ -305,29 +245,19 @@ export default function page({ params }: Props) {
             {characterImageUrl !== '' &&
             characterImageUrl !== undefined &&
             characterImageUrl !== null ? (
-              <>
-                <Image
-                  src={characterImageUrl}
-                  alt="캐릭터 상세 이미지"
-                  priority={true}
-                  className="object-cover w-full h-full cursor-pointer"
-                  height={1000}
-                  width={1000}
-                  onClick={() => {
-                    imgRef?.current?.click();
-                  }}
-                  loader={loaderProp}
-                  unoptimized={true}
-                />
-                <GiCancel
-                  className="absolute top-0 right-0 w-10 h-10 cursor-pointer text-red-600 hover:text-red-800 font-extrabold z-10"
-                  onClick={() => {
-                    setImageUrl(null);
-                    setImageInput(null);
-                    setLoadingState(1);
-                  }}
-                ></GiCancel>
-              </>
+              <Image
+                src={characterImageUrl}
+                alt="캐릭터 상세 이미지"
+                priority={true}
+                className="object-cover w-full h-full cursor-pointer"
+                height={1000}
+                width={1000}
+                onClick={() => {
+                  imgRef?.current?.click();
+                }}
+                loader={loaderProp}
+                unoptimized={true}
+              />
             ) : (
               <Image
                 src="/images/default_character.png"
@@ -375,7 +305,7 @@ export default function page({ params }: Props) {
                   }
                 }
 
-                setLoadingState(1);
+                setState(1);
               }}
             />
           </div>
@@ -386,7 +316,7 @@ export default function page({ params }: Props) {
                 className={`${styles.scroll} resize-none outline-none font-bold text-lg w-full h-full`}
                 value={descriptionInput || ''}
                 onChange={(e) => {
-                  setLoadingState(1);
+                  setState(1);
                   if (e.target.value.length < 1000) {
                     setdescriptionInput(e.target.value);
                   } else {
@@ -403,84 +333,77 @@ export default function page({ params }: Props) {
           <p className="text-xl font-extrabold">기본 정보</p>
           <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
             <tbody>
-              {informationInput !== null &&
-                informationInput !== undefined &&
-                informationInput.length >= 1 &&
-                Object.entries(informationInput[0]).map(([key, value], i) => {
-                  return (
-                    <tr className="h-16  relative" key={i}>
-                      <td
-                        className={`${i === 0 && 'rounded-tl-xl'} ${
-                          i === informationInput.length - 1 && 'rounded-bl-xl'
-                        } border border-gray-300 w-1/5 px-2 py-1 text-center`}
-                      >
+              {informationInput?.map((info, i) => {
+                let objkey: string = '';
+                let objvalue: string = '';
+
+                Object.entries(info).forEach(([key, value]) => {
+                  objkey = key;
+                  objvalue = value;
+                });
+
+                return (
+                  <tr className="h-16  relative" key={i}>
+                    <td
+                      className={`${i === 0 && 'rounded-tl-xl'} ${
+                        i === informationInput.length - 1 && 'rounded-bl-xl'
+                      } border border-gray-300 w-1/5 px-2 py-1 text-center`}
+                    >
+                      <input
+                        type="text"
+                        className="w-full resize-none outline-none truncate my-auto text-center font-bold"
+                        value={objkey}
+                        onChange={(e) => {
+                          setState(1);
+                          var newItem = [...informationInput];
+                          let str: string = e.target.value;
+                          newItem[i] = { [str]: objvalue };
+                          setInformationInput(newItem);
+                        }}
+                      />
+                    </td>
+                    <td
+                      className={`${i === 0 && 'rounded-tr-xl'} ${
+                        i === informationInput.length - 1 && 'rounded-br-xl'
+                      } border h-full border-gray-300 w-4/5 px-2 pt-1`}
+                    >
+                      <div className="flex">
                         <input
                           type="text"
                           className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                          value={key.split('@;!')[0]}
+                          value={objvalue}
                           onChange={(e) => {
-                            setLoadingState(1);
-
+                            setState(1);
                             var newItem = [...informationInput];
-                            let str: string =
-                              e.target.value + '@;!' + key.split('@;!')[1];
-                            let newObj: informationType[] = [{}];
-                            Object.keys(newItem[0]).forEach((ckey) => {
-                              if (ckey === key) {
-                                newObj[0][str] = newItem[0][key];
-                              } else {
-                                newObj[0][ckey] = newItem[0][ckey];
-                              }
-                            });
-                            setInformationInput(newObj);
+                            newItem[i][objkey] = e.target.value;
+                            setInformationInput(newItem);
                           }}
                         />
-                      </td>
-                      <td
-                        className={`${i === 0 && 'rounded-tr-xl'} ${
-                          i === informationInput.length - 1 && 'rounded-br-xl'
-                        } border h-full border-gray-300 w-4/5 px-2 pt-1`}
-                      >
-                        <div className="flex">
-                          <input
-                            type="text"
-                            className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                            value={value}
-                            onChange={(e) => {
-                              setLoadingState(1);
-                              var newItem = [...informationInput];
-                              newItem[0][key] = e.target.value;
-                              setInformationInput(newItem);
-                            }}
-                          />
-                          <FaMinus
-                            className="my-auto cursor-pointer h-10"
-                            onClick={() => {
-                              setLoadingState(1);
-                              let tmpInfo: informationType[] = [
-                                ...informationInput,
-                              ];
-                              delete tmpInfo[0][key];
-                              setInformationInput(tmpInfo);
-                            }}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        <FaMinus
+                          className="my-auto cursor-pointer h-10"
+                          onClick={() => {
+                            setState(1);
+                            let tmpInfo = [...informationInput];
+                            let tmp = tmpInfo.splice(i, 1);
+                            setInformationInput(tmpInfo);
+                          }}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           <button
             className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
             onClick={() => {
-              let uuid = '@;!' + self.crypto.randomUUID();
-              if (informationInput) {
-                let newInfo = [...informationInput];
-                newInfo[0][uuid] = '';
-                setInformationInput(newInfo);
-                setLoadingState(1);
-              }
+              let newInfo: informationType[] = [
+                ...(informationInput || []),
+                { '': '' },
+              ];
+              setInformationInput(newInfo);
+              setState(1);
             }}
           >
             <HiPlus className="text-white mx-auto font-bold" />
@@ -501,97 +424,45 @@ export default function page({ params }: Props) {
                   >
                     <input
                       type="text"
-                      className={`${
-                        (!relationshipInput[i].targetUUID ||
-                          relationshipInput[i].targetUUID === '') &&
-                        'text-neutral-400'
-                      } w-full resize-none outline-none truncate my-auto text-center font-bold`}
-                      value={relationshipInput[i].targetName}
+                      className="w-full resize-none outline-none truncate my-auto text-center font-bold"
+                      value={relationshipInput[i].name}
                       onChange={(e) => {
-                        setLoadingState(1);
+                        setState(1);
                         var newItem = [...relationshipInput];
-                        newItem[i].targetName = e.target.value;
-                        newItem[i].targetUUID = null;
-                        if (e.target.value.length > 0) {
-                          setRelationCharacterSearchInput(i);
-                        } else {
-                          setRelationCharacterSearchInput(-1);
-                        }
+                        newItem[i].name = e.target.value;
+                        newItem[i].uuid = null;
                         setRelationInput(newItem);
-                        setOtherCharacterNameInput(e.target.value);
-                      }}
-                      onClick={(e) => {
-                        if (
-                          relationshipInput[i].targetName !==
-                          otherCharacterNameInput
-                        ) {
-                          setFilteredRelationCharacterData([]);
-                        }
-
-                        if (
-                          !relationshipInput[i].targetUUID &&
-                          relationshipInput[i].targetName.length > 0
-                        ) {
-                          setRelationCharacterSearchInput(i);
-                          setOtherCharacterName(
-                            relationshipInput[i].targetName,
-                          );
-                          e.stopPropagation();
-                        }
+                        setSearchInput(i);
+                        //UUID null로 초기화
                       }}
                     />
                     <div
                       className={`${styles.scroll} ${
-                        relationCharacterSearchInput !== i && 'hidden'
-                      } absolute w-1/5 border max-h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
+                        searchInput !== i && 'hidden'
+                      } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
                     >
-                      {filteredRelationCharacterData.length === 0 && (
-                        <div className="px-2 py-2 hover:bg-gray-200">
-                          검색 결과가 없습니다!
-                        </div>
-                      )}
-                      {filteredRelationCharacterData.map(
-                        (otherCharacter, j) => (
-                          <div
-                            className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
-                            onClick={() => {
-                              setLoadingState(1);
-                              var newItem = [...relationshipInput];
-                              newItem[i].targetUUID =
-                                otherCharacter.characterUUID;
-                              newItem[i].targetName =
-                                otherCharacter.characterName || '';
-                              setRelationInput(newItem);
-                              setRelationCharacterSearchInput(-1);
-                              setFilteredRelationCharacterData([]);
-                            }}
-                            key={otherCharacter.characterUUID}
-                          >
-                            {!otherCharacter.characterImage ? (
-                              <Image
-                                src="/images/default_character.png"
-                                alt="관계 캐릭터 이미지 없음"
-                                priority={true}
-                                className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                                height={1000}
-                                width={1000}
-                              />
-                            ) : (
-                              <Image
-                                src={otherCharacter.characterImage || ''}
-                                alt="관계 캐릭터 이미지"
-                                priority={true}
-                                className="object-contain w-1/6 cursor-pointer mr-1 items-center"
-                                height={1000}
-                                width={1000}
-                              />
-                            )}
-                            <p className="truncate">
-                              {otherCharacter.characterName}
-                            </p>
-                          </div>
-                        ),
-                      )}
+                      <div
+                        className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => {
+                          setState(1);
+                          var newItem = [...relationshipInput];
+                          newItem[i].uuid = 'uuid';
+                          newItem[i].name = '이름이름이름이름';
+                          setRelationInput(newItem);
+                          setSearchInput(-1);
+                          //UUID
+                        }}
+                      >
+                        <Image
+                          src="/characterImages/default_character.png"
+                          alt="관계 캐릭터 이미지"
+                          priority={true}
+                          className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                          height={1000}
+                          width={1000}
+                        />
+                        <p className="truncate">이름이름이름이름이름이름</p>
+                      </div>
                     </div>
                   </td>
                   <td
@@ -603,18 +474,120 @@ export default function page({ params }: Props) {
                       <input
                         type="text"
                         className="w-full resize-none outline-none truncate my-auto text-center font-bold"
-                        value={relationshipInput[i].content}
+                        value={relationshipInput[i].description}
                         onChange={(e) => {
-                          setLoadingState(1);
+                          setState(1);
                           var newItem = [...relationshipInput];
-                          newItem[i].content = e.target.value;
+                          newItem[i].description = e.target.value;
                           setRelationInput(newItem);
                         }}
                       />
                       <FaMinus
                         className="my-auto cursor-pointer h-10"
                         onClick={() => {
-                          setLoadingState(1);
+                          setState(1);
+                          let tmpRelation = [...relationshipInput];
+                          let tmp = tmpRelation.splice(i, 1);
+                          setRelationInput(tmpRelation);
+                        }}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button
+            className="bg-black w-32 h-4 pt-0 rounded-b-3xl mx-auto block"
+            onClick={() => {
+              let newInfo: informationType[] = [
+                ...(informationInput || []),
+                { '': '' },
+              ];
+              setInformationInput(newInfo);
+              setState(1);
+            }}
+          >
+            <HiPlus className="text-white mx-auto font-bold" />
+          </button>
+        </div>
+
+        {/* 관계 */}
+        <div className="mt-8">
+          <p className="text-xl font-extrabold">관계</p>
+          <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
+            <tbody>
+              {relationshipInput?.map((info, i) => (
+                <tr className="h-16 relative" key={i}>
+                  <td
+                    className={`${i === 0 && 'rounded-tl-xl'} ${
+                      i === relationshipInput.length - 1 && 'rounded-bl-xl'
+                    } border border-gray-300 w-1/5 px-2 py-1 text-center`}
+                  >
+                    <input
+                      type="text"
+                      className="w-full resize-none outline-none truncate my-auto text-center font-bold"
+                      value={relationshipInput[i].name}
+                      onChange={(e) => {
+                        setState(1);
+                        var newItem = [...relationshipInput];
+                        newItem[i].name = e.target.value;
+                        newItem[i].uuid = null;
+                        setRelationInput(newItem);
+                        setSearchInput(i);
+                        //UUID null로 초기화
+                      }}
+                    />
+                    <div
+                      className={`${styles.scroll} ${
+                        searchInput !== i && 'hidden'
+                      } absolute w-1/5 border h-32 overflow-y-scroll border-gray-400 left-0 top-16 divide-y divide-gray-400 bg-white z-10`}
+                    >
+                      <div
+                        className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => {
+                          setState(1);
+                          var newItem = [...relationshipInput];
+                          newItem[i].uuid = 'uuid';
+                          newItem[i].name = '이름이름이름이름';
+                          setRelationInput(newItem);
+                          setSearchInput(-1);
+                          //UUID
+                        }}
+                      >
+                        <Image
+                          src="/characterImages/default_character.png"
+                          alt="관계 캐릭터 이미지"
+                          priority={true}
+                          className="object-contain w-1/6 cursor-pointer mr-1 items-center"
+                          height={1000}
+                          width={1000}
+                        />
+                        <p className="truncate">이름이름이름이름이름이름</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    className={`${i === 0 && 'rounded-tr-xl'} ${
+                      i === relationshipInput.length - 1 && 'rounded-br-xl'
+                    } border h-full border-gray-300 w-4/5 px-2 pt-1`}
+                  >
+                    <div className="flex">
+                      <input
+                        type="text"
+                        className="w-full resize-none outline-none truncate my-auto text-center font-bold"
+                        value={relationshipInput[i].description}
+                        onChange={(e) => {
+                          setState(1);
+                          var newItem = [...relationshipInput];
+                          newItem[i].description = e.target.value;
+                          setRelationInput(newItem);
+                        }}
+                      />
+                      <FaMinus
+                        className="my-auto cursor-pointer h-10"
+                        onClick={() => {
+                          setState(1);
                           let tmpRelation = [...relationshipInput];
                           let tmp = tmpRelation.splice(i, 1);
                           setRelationInput(tmpRelation);
@@ -631,10 +604,10 @@ export default function page({ params }: Props) {
             onClick={() => {
               let newRelation: relationshipType[] = [
                 ...(relationshipInput || []),
-                { targetUUID: null, targetName: '', content: '' },
+                { uuid: '', name: '', description: '' },
               ];
               setRelationInput(newRelation);
-              setLoadingState(1);
+              setState(1);
             }}
           >
             <HiPlus className="text-white mx-auto font-bold" />

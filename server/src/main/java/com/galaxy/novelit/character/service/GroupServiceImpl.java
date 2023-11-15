@@ -4,7 +4,6 @@ import com.galaxy.novelit.character.dto.req.GroupCreateDtoReq;
 import com.galaxy.novelit.character.dto.res.AllGroupsCharactersDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupDtoRes;
 import com.galaxy.novelit.character.dto.res.GroupSimpleDtoRes;
-import com.galaxy.novelit.character.dto.res.GroupSimpleWithNodeDtoRes;
 import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
@@ -64,7 +63,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(readOnly = true)
     @Override
     public List<GroupSimpleDtoRes> getTopGroup(String workspaceUUID, String userUUID) {
-        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNullAndDeletedIsFalse(workspaceUUID);
+        List<GroupEntity> groups = groupRepository.findAllByWorkspaceUUIDAndParentGroupUUIDIsNull(workspaceUUID);
         List<GroupSimpleDtoRes> dto = new ArrayList<>();
 
         for (GroupEntity group : groups) {
@@ -200,16 +199,14 @@ public class GroupServiceImpl implements GroupService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<GroupSimpleWithNodeDtoRes> getAllGroupsWithNode(String workspaceUUID, String userUUID) {
+    public List<GroupSimpleDtoRes> getAllGroups(String workspaceUUID, String userUUID) {
         List<GroupEntity> allGroups = groupRepository.findAllByWorkspaceUUIDAndDeletedIsFalse(workspaceUUID);
-        List<GroupSimpleWithNodeDtoRes> dtoList = new ArrayList<>();
+        List<GroupSimpleDtoRes> dtoList = new ArrayList<>();
 
         for (GroupEntity group : allGroups) {
-            GroupSimpleWithNodeDtoRes dto = GroupSimpleWithNodeDtoRes.builder()
+            GroupSimpleDtoRes dto = GroupSimpleDtoRes.builder()
                 .groupUUID(group.getGroupUUID())
                 .groupName(group.getGroupName())
-                .groupNode(group.getGroupNode())
-                .parentGroupUUID(group.getParentGroupUUID())
                 .build();
 
             dtoList.add(dto);
