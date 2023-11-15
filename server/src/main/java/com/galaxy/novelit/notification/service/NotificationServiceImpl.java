@@ -16,14 +16,13 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService{
-    private static final Long DEFAULT_TIMEOUT = 120L * 60 * 1000; // 2시간 지속
+    private static final Long DEFAULT_TIMEOUT = 60L * 60 * 1000; // 2시간 지속
 
     private final EmitterRepository emitterRepository;
     private final DirectoryRepository directoryRepository;
@@ -32,20 +31,14 @@ public class NotificationServiceImpl implements NotificationService{
 
     public SseEmitter subscribe(String lastEventId, String subscriberUUID, HttpServletResponse response)
     {
-        String id = subscriberUUID;
-        //String id = subscriberUUID + "_" + System.currentTimeMillis();
+        //String id = subscriberUUID;
+        String id = subscriberUUID + "_" + System.currentTimeMillis();
 
         // subscriberUUID
-        SseEmitter emitter = emitterRepository.save(id, new SseEmitter(DEFAULT_TIMEOUT));
-        //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
-        response.setHeader("X-Accel-Buffering", "no");
+        SseEmitter emitter = createEmitter(id);
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(id));
-        emitter.onTimeout(() -> emitterRepository.deleteById(id));
-        emitter.onError((e) -> emitterRepository.deleteById(id));
-
-        sendToClient(emitter, id, SseConnection.builder()
-            .type("Connection")
+        sendToClient(emitter, id, "Connection" ,SseConnection.builder()
+            .type("alertComment")
             .content("최초연결")
             .build());
 
@@ -53,18 +46,30 @@ public class NotificationServiceImpl implements NotificationService{
             Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(id);
             events.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                .forEach(entry -> sendToClient(emitter, entry.getKey(), entry.getValue()));
+                .forEach(entry -> sendToClient(emitter, entry.getKey(),"alertComment" , entry.getValue()));
         }
+
         return emitter;
     }
 
+    private SseEmitter createEmitter(String id) {
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        emitterRepository.save(id, emitter);
+
+        emitter.onCompletion(() -> emitterRepository.deleteById(id));
+        emitter.onTimeout(() -> emitterRepository.deleteById(id));
+
+        return emitter;
+    }
+
+
     // 처음 구독
-    private void sendToClient(SseEmitter emitter, String id, Object data)
+    private void sendToClient(SseEmitter emitter, String id, String name, Object data)
     {
         try{
             emitter.send(SseEmitter.event()
                 .id(id)
-                .name("alertComment")
+                .name(name)
                 .data(data));
         } catch (IOException exception)
         {
@@ -74,55 +79,37 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    @Transactional
     // 알림 보낼 로직에 send 메서드 호출하면 됨
-    public void send(String commentNickname, String directoryUUID, String publisherUUID) {
+    public void notify(String commentNickname, String directoryUUID, String publisherUUID) {
         // 파일 찾기
         Directory directory = directoryRepository.findDirectoryByUuid(
                 directoryUUID)
             .orElseThrow(() -> new NoSuchElementFoundException("작품이 없습니다!"));
 
         // 유저UUID, 파일 이름찾기
-        String id = directory.getUserUUID();
+        String subscriberUUID = directory.getUserUUID();
         String directoryName = directory.getName();
 
         // 알림 responseDto 만들기
         NotificationResponseDto notificationResponseDto = NotificationResponseDto.createAlarmComment(
-            commentNickname, id);
+            commentNickname, subscriberUUID);
 
-        log.info("Send subscriberUUID : {}", id);
 
-        /*sendToClient(new SseEmitter(DEFAULT_TIMEOUT), id, notificationResponseDto);
+        Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(subscriberUUID);
 
-        // 알림 레디스에 저장
-        alarmRedisService.save(AlarmRedisRequestDto.builder()
-            .pubUUID(publisherUUID)
-            .pubName(commentNickname)
-            .subUUID(id)
-            .directoryName(directoryName)
-            .build());*/
-
-        // subscriberUUID로 시작하는 emitter 찾기
-        Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(id);
-
-        if (sseEmitters == null){
-            throw new RuntimeException();
-        }
 
         sseEmitters.forEach(
             (key, emitter) -> {
                 // 데이터 캐시 저장 (유실된 데이터 처리 위함)
                 emitterRepository.saveEventCache(key, notificationResponseDto);
 
-                log.info("NotificationServiceImpl key : {}",key);
-
-                sendToClient(emitter, key, notificationResponseDto);
+                sendToClient(emitter, key, "alertComment", notificationResponseDto);
 
                 // 알림 레디스에 저장
                 alarmRedisService.save(AlarmRedisRequestDto.builder()
                     .pubUUID(publisherUUID)
                     .pubName(commentNickname)
-                    .subUUID(id)
+                    .subUUID(subscriberUUID)
                     .directoryName(directoryName)
                     .build());
             }
