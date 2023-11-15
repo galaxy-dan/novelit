@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -150,7 +151,7 @@ public class CharacterServiceImpl implements CharacterService {
         // 단어장에 캐릭터 이름 저장
         WordsCreateReqDTO wordsCreateReqDTO = new WordsCreateReqDTO(dto.getWorkspaceUUID(), dto.getCharacterName());
 
-        wordsService.createWord(wordsCreateReqDTO, userUUID);
+        wordsService.createWord(wordsCreateReqDTO, dto.getCharacterUUID(), userUUID);
 
 
         String groupUUID = dto.getGroupUUID();
@@ -207,9 +208,9 @@ public class CharacterServiceImpl implements CharacterService {
         checkCharacterException(character);
 
         // 단어장 단어 업데이트
-        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID, workspaceUUID, character.getCharacterName());
-        System.out.println("단어 수정 UUID: " + we.getWordUUID());
-        wordsService.updateWord(we.getWordUUID(), dto.getCharacterName());
+        Optional<WordsEntity> we = wordsRepository.findByWordUUID(characterUUID);
+//        System.out.println("단어 수정 UUID: " + we.getWordUUID());
+        wordsService.updateWord(we.get().getWordUUID(), dto.getCharacterName());
 
         RelationEntity relation = relationRepository.findByCharacterUUID(characterUUID);
         RelationEntity newRelation;

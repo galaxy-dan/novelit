@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +87,7 @@ public class GroupServiceImpl implements GroupService {
         // 단어장에 캐릭터 이름 저장
         WordsCreateReqDTO wordsCreateReqDTO = new WordsCreateReqDTO(dto.getWorkspaceUUID(), dto.getGroupName());
 
-        wordsService.createWord(wordsCreateReqDTO, userUUID);
+        wordsService.createWord(wordsCreateReqDTO, dto.getGroupUUID(),userUUID);
 
         GroupEntity newGroup;
         String parentGroupUUID = dto.getParentGroupUUID();
@@ -189,9 +190,9 @@ public class GroupServiceImpl implements GroupService {
         checkGroupException(group);
 
         // 단어장 단어 업데이트
-        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID, workspaceUUID, group.getGroupName());
-        System.out.println("단어 수정 UUID: " + we.getWordUUID());
-        wordsService.updateWord(we.getWordUUID(), newName);
+        Optional<WordsEntity> we = wordsRepository.findByWordUUID(groupUUID);
+//        System.out.println("단어 수정 UUID: " + we.get());
+        wordsService.updateWord(we.get().getWordUUID(), newName);
 
         group.updateGroupName(newName);
         groupRepository.save(group);

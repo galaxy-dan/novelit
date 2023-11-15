@@ -39,7 +39,8 @@ public class WordsController {
     @PostMapping
     public ResponseEntity<Object> createWord(@RequestBody WordsCreateReqDTO dto) {
         try {
-            wordsService.createWord(dto, tempUser);
+            // TODO: 2023-11-15 나중에 이 호출을 쓸때가 있을때 uuid 넣도록 수정해야함 
+            wordsService.createWord(dto, "",tempUser);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

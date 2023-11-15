@@ -45,12 +45,12 @@ public class WordsServiceImpl implements WordsService {
 
     @Override
     @Transactional
-    public void createWord(WordsCreateReqDTO dto, String userUUID) {
+    public void createWord(WordsCreateReqDTO dto, String uuid, String userUUID) {
         String wordUUID = UUID.randomUUID().toString();
         WordsEntity word = WordsEntity.builder()
             .userUUID(userUUID)
             .workspaceUUID(dto.getWorkspaceUUID())
-            .wordUUID(wordUUID)
+            .wordUUID(uuid)
             .word(dto.getWord())
             .build();
 
