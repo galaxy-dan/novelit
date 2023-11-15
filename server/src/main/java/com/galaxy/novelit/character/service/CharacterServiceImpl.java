@@ -207,7 +207,7 @@ public class CharacterServiceImpl implements CharacterService {
         checkCharacterException(character);
 
         // 단어장 단어 업데이트
-        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID, workspaceUUID, dto.getCharacterName());
+        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID, workspaceUUID, character.getCharacterName());
         System.out.println("단어 수정 UUID: " + we.getWordUUID());
         wordsService.updateWord(we.getWordUUID(), dto.getCharacterName());
 
