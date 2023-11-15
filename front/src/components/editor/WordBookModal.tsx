@@ -70,6 +70,7 @@ export default function WordBookModal({
     mutationFn: postWord,
     onSuccess: () => {
       queryClient.invalidateQueries(['word', workspaceUUID]);
+      reset();
     },
   });
 
