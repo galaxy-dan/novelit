@@ -10,5 +10,8 @@ import org.springframework.stereotype.Repository;
 public interface WordsRepository extends JpaRepository<WordsEntity,Long> {
     Optional<WordsEntity> findByWordUUID(String wordUUID);
     void deleteByWordUUID(String wordUUID);
+
+    WordsEntity findByUserUUIDAndWorkspaceUUIDAndWord(String userUUID, String workspaceUUID, String characterName);
+
     List<WordsEntity> findAllByWorkspaceUUID(String workspaceUUID);
 }
