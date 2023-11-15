@@ -276,6 +276,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                       patchGroupMutate.mutate({
                         groupUUID: node.data.id,
                         newName: e.currentTarget.value,
+                        workspace: slug
                       });
                     }
                   }
@@ -301,7 +302,6 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
             </button>
             <button
               onClick={() => {
-                tree.delete(node.id);
                 if (node.isLeaf) {
                   deleteCharacterMutate.mutate(node.data.id);
                   tree.delete(node.id);
@@ -309,6 +309,7 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                   deleteGroupMutate.mutate(node.data.id);
                   tree.delete(node.id);
                 }
+                tree.delete(node.id);
               }}
               title="Delete"
             >
