@@ -39,9 +39,9 @@ public class NotificationServiceImpl implements NotificationService{
         //nginx리버스 프록시에서 버퍼링 기능으로 인한 오동작 방지
         response.setHeader("X-Accel-Buffering", "no");
 
-        emitter.onCompletion(() -> emitterRepository.deleteAllStartByWithId(id));
-        emitter.onTimeout(() -> emitterRepository.deleteAllStartByWithId(id));
-        emitter.onError((e) -> emitterRepository.deleteAllStartByWithId(id));
+        emitter.onCompletion(() -> emitterRepository.deleteById(id));
+        emitter.onTimeout(() -> emitterRepository.deleteById(id));
+        emitter.onError((e) -> emitterRepository.deleteById(id));
 
         sendToClient(emitter, id, SseConnection.builder()
             .type("Connection")
@@ -49,7 +49,7 @@ public class NotificationServiceImpl implements NotificationService{
             .build());
 
         if (!lastEventId.isEmpty()) {
-            Map<String, SseEmitter> events = emitterRepository.findAllStartById(subscriberUUID);
+            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(id);
             events.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
                 .forEach(entry -> sendToClient(emitter, entry.getKey(), entry.getValue()));
@@ -67,7 +67,7 @@ public class NotificationServiceImpl implements NotificationService{
                 .data(data));
         } catch (IOException exception)
         {
-            emitterRepository.deleteAllStartByWithId(id);
+            emitterRepository.deleteById(id);
             emitter.completeWithError(exception);
         }
     }
@@ -90,12 +90,14 @@ public class NotificationServiceImpl implements NotificationService{
             commentNickname, id);
 
         // subscriberUUID로 시작하는 emitter 찾기
-        Map<String,SseEmitter> sseEmitters = emitterRepository.findAllStartById(id);
+        Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(id);
 
         sseEmitters.forEach(
             (key, emitter) -> {
                 // 데이터 캐시 저장 (유실된 데이터 처리 위함)
                 emitterRepository.saveEventCache(key, notificationResponseDto);
+
+                log.info("NotificationServiceImpl key : {}",key);
 
                 sendToClient(emitter, key, notificationResponseDto);
 
