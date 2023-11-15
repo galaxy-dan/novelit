@@ -47,7 +47,7 @@ export default function GroupName({
   const [inputText, setInputText] = useState<string>('');
 
   return (
-    <div>
+    <div className='mt-10'>
       <span
         ref={characterNameRef}
         className="invisible opacity-0 absolute text-4xl font-extrabold"

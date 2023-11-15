@@ -120,16 +120,19 @@ export default function SideMenu() {
           <AiOutlineMenu size={25} />
         </button>
       ) : (
-        <div className="min-h-screen z-50 fixe left-0 top-0 bg-violet-50 w-[260px] font-melody">
+        <div className="min-h-screen z-50 left-0 top-0 bg-violet-50 w-[260px] font-melody">
           <div className="h-full">
-            <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
-              <div className="flex gap-2">
-                <button onClick={() => router.push('/main')}>
+            <div className="flex justify-between items-center pt-4 px-4  border-b-2 border-gray-300">
+              <div className="flex gap-2 items-end">
+                <button className="pb-4" onClick={() => router.push('/main')}>
                   <BiSolidHome size={30} />
                 </button>
-                <div className="font-bold text-xl">{workspace?.title}</div>
+                <div className="font-bold text-xl pb-3">{workspace?.title}</div>
               </div>
-              <button onClick={() => setIsOpen((prev) => !prev)}>
+              <button
+                className="pb-3"
+                onClick={() => setIsOpen((prev) => !prev)}
+              >
                 <FiChevronsLeft size={20} />
               </button>
             </div>
@@ -141,14 +144,14 @@ export default function SideMenu() {
                     <div>📔</div>
                     <div className="pb-1">소설작성</div>
                   </div>
-                  <div>
+                  <div className="flex items-center">
                     <button
                       onClick={() => {
                         // console.log(treeRef.current.root.id);
                         treeRef.current.createLeaf(treeRef.current.root.id);
                       }}
                     >
-                      <AiFillFileAdd size={25} />
+                      <AiFillFileAdd size={19.5} />
                     </button>
                     <button
                       onClick={() => {
@@ -173,11 +176,10 @@ export default function SideMenu() {
                     openByDefault={false}
                     width={200}
                     // height={1000}
-                    indent={24}
-                    rowHeight={36}
-                    paddingTop={30}
+                    indent={14}
+                    rowHeight={30}
+                    paddingTop={15}
                     paddingBottom={10}
-                    padding={25 /* sets both */}
                     className="scrollbar-hide"
                     searchTerm={term}
                     searchMatch={(node, term) =>
