@@ -1,13 +1,11 @@
 package com.galaxy.novelit.notification.service;
 
-import com.galaxy.novelit.author.domain.User;
 import com.galaxy.novelit.author.repository.UserRepository;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.notification.dto.response.NotificationResponseDto;
 import com.galaxy.novelit.notification.redis.dto.request.AlarmRedisRequestDto;
-import com.galaxy.novelit.notification.redis.dto.response.SseConnection;
 import com.galaxy.novelit.notification.redis.service.AlarmRedisService;
 import com.galaxy.novelit.notification.repository.EmitterRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService{
-    private static final Long DEFAULT_TIMEOUT = 60L * 60 * 1000; // 2시간 지속
+    private static final Long DEFAULT_TIMEOUT = 60L * 60 * 1000; // 1시간 지속
 
     private final EmitterRepository emitterRepository;
     private final DirectoryRepository directoryRepository;
@@ -37,7 +35,7 @@ public class NotificationServiceImpl implements NotificationService{
         // subscriberUUID
         SseEmitter emitter = createEmitter(id);
 
-        sendToClient(emitter, id, "alertComment" ,SseConnection.builder()
+        sendToClient(emitter, id, "alertComment" ,NotificationResponseDto.builder()
             .type("Connection")
             .content("최초연결")
             .build());
@@ -91,8 +89,7 @@ public class NotificationServiceImpl implements NotificationService{
         String directoryName = directory.getName();
 
         // 알림 responseDto 만들기
-        NotificationResponseDto notificationResponseDto = NotificationResponseDto.createAlarmComment(
-            commentNickname, subscriberUUID);
+        NotificationResponseDto notificationResponseDto = NotificationResponseDto.createAlarmComment(commentNickname);
 
 
         Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(subscriberUUID);
@@ -114,17 +111,5 @@ public class NotificationServiceImpl implements NotificationService{
                     .build());
             }
         );
-    }
-
-    //redis pub시 pub UUID와 notiResDto을 합쳐서 보낸다.
-    // @param String pubUUID
-    // @Body NotiResDto notiResDto
-    private String getRedisPubMessage(String pubUUID, NotificationResponseDto notificationResponseDto) {
-        return pubUUID + "->" + notificationResponseDto.getSubscriberUUID();
-    }
-
-    private User getUserByUserUUIDOrException(String userUUID) {
-        User user = userRepository.findByUserUUID(userUUID);
-        return user;
     }
 }
