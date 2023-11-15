@@ -136,7 +136,7 @@ export default function SideMenu() {
                 <FiChevronsLeft size={20} />
               </button>
             </div>
-            <div className="flex h-full">
+            <div className="flex h-full bg-violet-50">
               <SideMenuMoveButton slug={slug} />
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
@@ -175,12 +175,12 @@ export default function SideMenu() {
                     initialData={workspace.directories}
                     openByDefault={false}
                     width={200}
-                    // height={1000}
+                    height={600}
                     indent={14}
                     rowHeight={30}
                     paddingTop={15}
                     paddingBottom={10}
-                    className="scrollbar-hide"
+                    className="scrollbar-hide h-full"
                     searchTerm={term}
                     searchMatch={(node, term) =>
                       node.data.name.toLowerCase().includes(term.toLowerCase())
@@ -189,7 +189,6 @@ export default function SideMenu() {
                     {Node}
                   </Tree>
                 )}
-                S
               </div>
             </div>
           </div>
@@ -276,9 +275,15 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
               type="text"
               defaultValue={node.data.name}
               onFocus={(e) => e.currentTarget.select()}
-              onBlur={() => node.reset()}
+              onBlur={() => {
+                node.reset();
+                tree.delete(node.id);
+              }}
               onKeyDown={(e) => {
-                if (e.key === 'Escape') node.reset();
+                if (e.key === 'Escape') {
+                  node.reset();
+                  tree.delete(node.id);
+                }
                 if (e.key === 'Enter') {
                   if (node.id.includes('simple')) {
                     // 생성
