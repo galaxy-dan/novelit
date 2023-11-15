@@ -388,12 +388,13 @@ export default function Editor() {
             <button
               className="p-4 rounded-lg"
               onClick={() =>
-                wordCheck({ word: edit.current?.innerText ?? '' }).then(
-                  (data) => {
-                    setWordList(data);
-                    setIsOpenWord(true);
-                  },
-                )
+                wordCheck({
+                  word: edit.current?.innerText ?? '',
+                  workspaceUUID: searchParams.slug?.[0],
+                }).then((data) => {
+                  setWordList(data);
+                  setIsOpenWord(true);
+                })
               }
             >
               <AiOutlineFileSearch size={20} />
@@ -411,7 +412,13 @@ export default function Editor() {
       </div>
 
       {isOpenWord && (
-        <WordModal wordList={wordList} setIsOpenWord={setIsOpenWord} />
+        <WordModal
+          wordList={wordList}
+          setIsOpenWord={setIsOpenWord}
+          word={edit.current?.innerText ?? ''}
+          workspaceUUID={searchParams.slug?.[0]}
+          setWordList={setWordList}
+        />
       )}
     </>
   );
