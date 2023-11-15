@@ -32,9 +32,13 @@ import {
   postCharacter,
 } from '@/service/api/character';
 import { deleteGroup, patchGroup, postGroup } from '@/service/api/group';
+import { useRecoilState } from 'recoil';
+import { menuOpenState } from '@/store/menu';
+import SideMenuMoveButton from './SideMenuMoveButton';
 
 export default function SideMenuCharacter() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useRecoilState<boolean>(menuOpenState);
+
   const treeRef = useRef<any>(null);
   const [term, setTerm] = useState<string>('');
   const queryClient = useQueryClient();
@@ -62,13 +66,13 @@ export default function SideMenuCharacter() {
     <>
       {!isOpen ? (
         <button
-          className="fixed top-2 left-2"
+          className="fixed top-5 left-5"
           onClick={() => setIsOpen((prev) => !prev)}
         >
           <AiOutlineMenu size={25} />
         </button>
       ) : (
-        <div className="min-h-screen h-full z-50 fixe left-0 top-0 bg-violet-50 w-[260px] font-melody">
+        <div className="min-h-screen z-50 left-0 top-0 bg-violet-50 w-[260px] font-melody">
           <div className="h-full">
             <div className="flex justify-between items-center pt-4 px-4 border-b-2 border-gray-300">
               <div className="flex gap-2 items-end">
@@ -85,17 +89,7 @@ export default function SideMenuCharacter() {
               </button>
             </div>
             <div className="flex h-full">
-              <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2 h-full">
-                <Link href={`/novel/${slug}`}>
-                  <MdOutlineStickyNote2 size={20} />
-                </Link>
-                <Link href={`/plot/${slug}`}>
-                  <IoExtensionPuzzle size={20} />
-                </Link>
-                <Link href={`/character/${slug}`}>
-                  <Image alt="people" src={People} width={20} />
-                </Link>
-              </div>
+              <SideMenuMoveButton slug={slug} />
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
                   <div className="font-bold text-base flex items-center gap-2">
@@ -270,7 +264,6 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                         groupUUID: uuid,
                       });
                     }
-                    
                   } else {
                     // 캐릭터 수정
                     if (node.isLeaf) {

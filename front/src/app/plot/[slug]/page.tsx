@@ -49,6 +49,7 @@ export default function page({ params }: Props) {
           onChange={(e) => {
             setInput(e.target.value);
           }}
+          placeholder='이름으로 검색'
         />
       </div>
       <div className=" grid gap-4 a1:grid-cols-1 b2:grid-cols-1 c2:grid-cols-2 d2:grid-cols-3 e2:grid-cols-4 f2:grid-cols-5 ">
