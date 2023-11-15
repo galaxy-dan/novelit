@@ -158,6 +158,13 @@ public class GroupServiceImpl implements GroupService {
         // 그룹에 속한 자식 캐릭터 삭제
         List<CharacterEntity> childCharacters = group.getChildCharacters();
         for (CharacterEntity childCharacter : childCharacters) {
+
+            // 단어장에서 단어 삭제
+            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+                workspaceUUID, childCharacter.getCharacterName());
+            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+            wordsService.deleteWord(we.getWordUUID());
+
             childCharacter.deleteCharacter();
             characterRepository.save(childCharacter);
             relationRepository.deleteByCharacterUUID(childCharacter.getCharacterUUID());
@@ -166,6 +173,10 @@ public class GroupServiceImpl implements GroupService {
         // 그룹에 속한 자식 그룹들 삭제 재귀
         List<GroupEntity> childGroups = group.getChildGroups();
         for (GroupEntity childGroup : childGroups) {
+            // 단어장에서 단어 삭제
+            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+                workspaceUUID, childGroup.getGroupName());
+            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
             deleteGroup(childGroup.getGroupUUID(), userUUID, workspaceUUID);
         }
 
