@@ -37,8 +37,8 @@ public class NotificationServiceImpl implements NotificationService{
         // subscriberUUID
         SseEmitter emitter = createEmitter(id);
 
-        sendToClient(emitter, id, "Connection" ,SseConnection.builder()
-            .type("alertComment")
+        sendToClient(emitter, id, "alertComment" ,SseConnection.builder()
+            .type("Connection")
             .content("최초연결")
             .build());
 
