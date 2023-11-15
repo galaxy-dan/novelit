@@ -15,11 +15,12 @@ export const getJwtPayload = (token: string) => {
   return result;
 };
 
-export async function wordCheck(req: { word: string }) {
+export async function wordCheck(req: { word: string; workspaceUUID: string }) {
   const response = await fetch('/bpi/word', {
     method: 'POST',
     body: JSON.stringify(req),
     headers: {
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       'Content-Type': 'application/json',
     },
   });

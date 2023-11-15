@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class RelationEntity {
     @Id
     private String id;
+    @Field(name = "workspace_uuid")
+    private String workspaceUUID;
     @Field(name = "character_uuid")
     private String characterUUID;
     @Field(name = "character_name")

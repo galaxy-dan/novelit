@@ -18,10 +18,20 @@ import com.galaxy.novelit.character.entity.RelationEntity.Relation;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
 import com.galaxy.novelit.character.repository.RelationRepository;
+import com.galaxy.novelit.common.exception.AccessRefusedException;
+import com.galaxy.novelit.common.exception.DeletedElementException;
+import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import com.galaxy.novelit.words.dto.req.WordsCreateReqDTO;
+import com.galaxy.novelit.words.entity.WordsEntity;
+import com.galaxy.novelit.words.repository.WordsRepository;
+import com.galaxy.novelit.words.service.WordsService;
+import com.galaxy.novelit.workspace.domain.Workspace;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,39 +44,40 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CharacterServiceImpl implements CharacterService {
 
+    private final WordsService wordsService;
+
     private final CharacterRepository characterRepository;
     private final GroupRepository groupRepository;
     private final RelationRepository relationRepository;
+    private final WordsRepository wordsRepository;
 
 
     @Transactional(readOnly = true)
     @Override
-    public CharacterDtoRes getCharacterInfo(String characterUUID, String userUUID) {
-        CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+    public CharacterDtoRes getCharacterInfo(String characterUUID, String userUUID, String workspaceUUID) {
+        CharacterEntity character = characterRepository.findByCharacterUUIDAndWorkspaceUUID(characterUUID, workspaceUUID);
 
-        CharacterDtoRes dto = new CharacterDtoRes();
-        dto.setGroupUUID(character.getGroupUUID());
-        dto.setCharacterName(character.getCharacterName());
-        dto.setCharacterUUID(character.getCharacterUUID());
-        dto.setInformation(character.getInformation());
-        dto.setDescription(character.getDescription());
-        dto.setRelations(character.getRelationship().getRelations());
-        dto.setDeleted(character.isDeleted());
-        dto.setCharacterImage(character.getCharacterImage());
+        checkCharacterException(character);
 
-//        Map<String, Double> xy = new HashMap<>();
-//        xy.put("x", character.getCharacterNode().get("x"));
-//        xy.put("y", character.getCharacterNode().get("y"));
-//        dto.setCharacterNode(xy);
-//        dto.setCharacterNode(character.getCharacterNode());
-        return dto;
+        return CharacterDtoRes.builder()
+            .workspaceUUID(character.getWorkspaceUUID())
+            .groupUUID(character.getGroupUUID())
+            .characterUUID(character.getCharacterUUID())
+            .characterName(character.getCharacterName())
+            .description(character.getDescription())
+            .information(character.getInformation())
+            .relations(character.getRelationship().getRelations())
+            .characterImage(character.getCharacterImage())
+            .build();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<CharacterThumbnailDtoRes> getCharacters(String groupUUID, String userUUID) {
-        List<CharacterEntity> characters = characterRepository.findAllByGroupUUID(groupUUID);
-//            .orElseThrow(() -> new NoSuchElementFoundException("없는 그룹입니디."));
+    public List<CharacterThumbnailDtoRes> getCharacters(String groupUUID, String userUUID, String workspaceUUID) {
+        GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+        checkGroupException(group);
+
+        List<CharacterEntity> characters = characterRepository.findAllByGroupUUIDAndDeletedIsFalse(groupUUID);
 
         List<CharacterThumbnailDtoRes> characterThumbnailInfoList = new ArrayList<>();
 
@@ -98,7 +109,7 @@ public class CharacterServiceImpl implements CharacterService {
     @Transactional(readOnly = true)
     @Override
     public List<CharacterThumbnailDtoRes> getTopCharacter(String workspaceUUID, String userUUID) {
-        List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
+        List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNullAndDeletedIsFalse(workspaceUUID);
         List<CharacterThumbnailDtoRes> dto = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
@@ -117,7 +128,7 @@ public class CharacterServiceImpl implements CharacterService {
     @Transactional(readOnly = true)
     @Override
     public List<CharacterSimpleDtoRes> getNoGroupCharacters(String workspaceUUID, String userUUID) {
-        List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNull(workspaceUUID);
+        List<CharacterEntity> characters = characterRepository.findAllByWorkspaceUUIDAndGroupUUIDIsNullAndDeletedIsFalse(workspaceUUID);
         List<CharacterSimpleDtoRes> dto = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
@@ -134,16 +145,29 @@ public class CharacterServiceImpl implements CharacterService {
     @Transactional
     @Override
     public void createCharacter(CharacterCreateDtoReq dto, String userUUID) {
-        String characterUUID = UUID.randomUUID().toString();
+        // UUID 프론트에서 받아오는 값으로 대체
+//        String characterUUID = UUID.randomUUID().toString();
+
+        // 단어장에 캐릭터 이름 저장
+        WordsCreateReqDTO wordsCreateReqDTO = new WordsCreateReqDTO(dto.getWorkspaceUUID(), dto.getCharacterName());
+
+        wordsService.createWord(wordsCreateReqDTO, dto.getCharacterUUID(), userUUID);
+
 
         String groupUUID = dto.getGroupUUID();
-        // 그룹이 조회되지 않을 때 그룹UUID를 null로 변경
-        if (groupRepository.findByGroupUUID(groupUUID) == null) {
-            groupUUID = null;
+        GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
+        if (groupUUID != null) {
+            checkGroupException(group);
         }
 
+        // 그룹이 조회되지 않을 때 그룹UUID를 null로 변경
+//        if (groupRepository.findByGroupUUID(groupUUID) == null) {
+//            groupUUID = null;
+//        }
+
         RelationEntity newRelation = RelationEntity.builder()
-            .characterUUID(characterUUID)
+            .workspaceUUID(dto.getWorkspaceUUID())
+            .characterUUID(dto.getCharacterUUID())
             .characterName(dto.getCharacterName())
             .relations(dto.getRelations())
             .build();
@@ -154,10 +178,9 @@ public class CharacterServiceImpl implements CharacterService {
             .userUUID(userUUID)
             .workspaceUUID(dto.getWorkspaceUUID())
             .groupUUID(groupUUID)
-            .characterUUID(characterUUID)
+            .characterUUID(dto.getCharacterUUID())
             .characterName(dto.getCharacterName())
             .description(dto.getDescription())
-
             .relationship(newRelation)
             .characterImage(dto.getCharacterImage());
 
@@ -171,24 +194,31 @@ public class CharacterServiceImpl implements CharacterService {
 
         // 소속 그룹의 엔티티에 추가
         if (groupUUID != null) {
-            GroupEntity parentGroup = groupRepository.findByGroupUUID(groupUUID);
-            CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
-            parentGroup.addChildCharacter(character);
+            CharacterEntity character = characterRepository.findByCharacterUUID(dto.getCharacterUUID());
+            group.addChildCharacter(character);
 
-            groupRepository.save(parentGroup);
+            groupRepository.save(group);
         }
     }
 
     @Transactional
     @Override
-    public void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID) {
+    public void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID, String workspaceUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+        checkCharacterException(character);
+
+        // 단어장 단어 업데이트
+        Optional<WordsEntity> we = wordsRepository.findByWordUUID(characterUUID);
+//        System.out.println("단어 수정 UUID: " + we.getWordUUID());
+        wordsService.updateWord(we.get().getWordUUID(), dto.getCharacterName());
+
         RelationEntity relation = relationRepository.findByCharacterUUID(characterUUID);
         RelationEntity newRelation;
         CharacterEntityBuilder newCharacter;
 
         newRelation = RelationEntity.builder()
             .id(relation.getId())
+            .workspaceUUID(relation.getWorkspaceUUID())
             .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
             .relations(dto.getRelations())
@@ -220,10 +250,15 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public void moveCharacter(String characterUUID, String groupUUID, String userUUID) {
+    public void moveCharacter(String characterUUID, String groupUUID, String userUUID, String workspaceUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+        checkCharacterException(character);
+
         GroupEntity parentGroup = groupRepository.findByGroupUUID(character.getGroupUUID());
+
         GroupEntity newParentGroup = groupRepository.findByGroupUUID(groupUUID);
+        checkGroupException(newParentGroup);
+
         parentGroup.removeChildCharacter(character);
         newParentGroup.addChildCharacter(character);
         character.moveCharacter(groupUUID);
@@ -236,24 +271,40 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public void deleteCharacter(String characterUUID, String userUUID) {
+    public void deleteCharacter(String characterUUID, String userUUID, String workspaceUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
-        GroupEntity parentGroup = groupRepository.findByGroupUUID(character.getGroupUUID());
+
+//        // 단어장에서 단어 삭제
+//        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//                workspaceUUID, character.getCharacterName());
+//        System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+//        wordsService.deleteWord(we.getWordUUID());
+
+        if (character == null) {
+            throw new NoSuchElementFoundException("유효하지 않은 캐릭터 UUID 입니다.");
+        }
+        if (character.isDeleted()) {
+            throw new DeletedElementException("이미 삭제된 캐릭터 입니다.");
+        }
 
         character.deleteCharacter();
-        parentGroup.addChildCharacter(character);
-
         characterRepository.save(character);
         relationRepository.deleteByCharacterUUID(characterUUID);
-        groupRepository.save(parentGroup);
+
+        // 부모 그룹의 자식캐릭터 필드 수정
+        GroupEntity parentGroup = groupRepository.findByGroupUUID(character.getGroupUUID());
+        if (parentGroup != null) {
+            parentGroup.removeChildCharacter(character);
+            groupRepository.save(parentGroup);
+        }
     }
 
     @Transactional
     @Override
     public List<CharacterSearchInfoResDTO> searchCharacter(String workspaceUUID, String characterName) {
         List<CharacterEntity> characters = characterRepository
-                .findAllByWorkspaceUUIDAndCharacterNameLike(workspaceUUID, characterName);
-        System.out.println(characters.size());
+                .findAllByWorkspaceUUIDAndDeletedIsFalseAndCharacterNameLike(workspaceUUID, characterName);
+//        System.out.println(characters.size());
         List<CharacterSearchInfoResDTO> characterInfoList = new ArrayList<>();
 
         for (CharacterEntity character : characters) {
@@ -290,8 +341,8 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<RelationDtoRes> getRelationships() {
-        List<RelationEntity> allRelation = relationRepository.findAll();
+    public List<RelationDtoRes> getRelationships(String userUUID, String workspaceUUID) {
+        List<RelationEntity> allRelation = relationRepository.findAllByWorkspaceUUID(workspaceUUID);
         List<RelationDtoRes> allDto = new ArrayList<>();
 
         for (RelationEntity relation : allRelation) {
@@ -300,6 +351,10 @@ public class CharacterServiceImpl implements CharacterService {
             String characterUUID = relation.getCharacterUUID();
             String characterName = relation.getCharacterName();
             CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+            if (character == null) {
+                continue;
+            }
+
             String characterImage = character.getCharacterImage();
             Map<String, Double> characterNode = null;
             if (character.getCharacterNode() != null) {
@@ -391,8 +446,9 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Transactional
     @Override
-    public void moveCharacterNode(String characterUUID, Double x, Double y, String userUUID) {
+    public void moveCharacterNode(String characterUUID, Double x, Double y, String userUUID, String workspaceUUID) {
         CharacterEntity character = characterRepository.findByCharacterUUID(characterUUID);
+        checkCharacterException(character);
 
         if (character.getCharacterNode() == null) {
             Map<String, Double> characterNode = new HashMap<>();
@@ -405,5 +461,31 @@ public class CharacterServiceImpl implements CharacterService {
         characterRepository.save(character);
     }
 
-
+    public void checkCharacterException(CharacterEntity character) {
+        if (character == null) {
+            throw new NoSuchElementFoundException("유효하지 않은 캐릭터 UUID 입니다.");
+        }
+        if (character.isDeleted()) {
+            throw new DeletedElementException("삭제된 캐릭터 입니다.");
+        }
+    }
+    public void checkGroupException(GroupEntity group) {
+        if (group == null) {
+            throw new NoSuchElementFoundException("유효하지 않은 그룹 UUID 입니다.");
+        }
+        if (group.isDeleted()) {
+            throw new DeletedElementException("삭제된 그룹 입니다.");
+        }
+    }
+    public void checkAuthorizationException(Object entity, String userUUID) {
+        if (entity.getClass() == CharacterEntity.class && !((CharacterEntity) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
+        }
+        if (entity.getClass() == GroupEntity.class && !((GroupEntity) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
+        }
+        if (entity.getClass() == Workspace.class && !((Workspace) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
+        }
+    }
 }

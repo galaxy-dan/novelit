@@ -4,7 +4,7 @@ import com.galaxy.novelit.alarm.dto.SseEventName;
 import com.galaxy.novelit.alarm.repository.SseRepository;
 import com.galaxy.novelit.alarm.repository.SseRepositoryKeyRule;
 import com.galaxy.novelit.author.repository.UserRepository;
-import com.galaxy.novelit.notification.dto.response.SseConnection;
+import com.galaxy.novelit.notification.dto.response.NotificationResponseDto;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class AlarmService {
             sse.send(SseEmitter.event()
                 .name(CONNECTED)
                 .id(getEventId(username, now, SseEventName.ALARM_LIST))
-                .data(SseConnection.builder()
+                .data(NotificationResponseDto.builder()
                     .type("connection")
                     .content("최초 연결")
                     .build()));

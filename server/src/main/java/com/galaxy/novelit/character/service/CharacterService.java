@@ -10,17 +10,17 @@ import com.galaxy.novelit.character.dto.res.RelationDtoRes;
 import java.util.List;
 
 public interface CharacterService {
-    CharacterDtoRes getCharacterInfo(String characterUUID, String userUUID);
-    List<CharacterThumbnailDtoRes> getCharacters(String groupUUID, String userUUID);
+    CharacterDtoRes getCharacterInfo(String characterUUID, String userUUID, String workspaceUUID);
+    List<CharacterThumbnailDtoRes> getCharacters(String groupUUID, String userUUID, String workspaceUUID);
     List<CharacterThumbnailDtoRes> getTopCharacter(String workspaceUUID, String userUUID);
     List<CharacterSimpleDtoRes> getNoGroupCharacters(String workspaceUUID, String userUUID);
     void createCharacter(CharacterCreateDtoReq dto, String userUUID);
-    void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID);
-    void deleteCharacter(String characterUUID, String userUUID);
+    void updateCharacter(String characterUUID, CharacterUpdateDtoReq dto, String userUUID, String workspaceUUID);
+    void deleteCharacter(String characterUUID, String userUUID, String workspaceUUID);
 
     List<CharacterSearchInfoResDTO> searchCharacter(String workspaceUUID, String characterName);
-    List<RelationDtoRes> getRelationships();
-    void moveCharacter(String characterUUID, String groupUUID, String userUUID);
+    List<RelationDtoRes> getRelationships(String userUUID, String workspaceUUID);
+    void moveCharacter(String characterUUID, String groupUUID, String userUUID, String workspaceUUID);
     List<CharacterSimpleDtoRes> getAllCharacters(String workspaceUUID, String userUUID);
-    void moveCharacterNode(String characterUUID, Double x, Double y, String userUUID);
+    void moveCharacterNode(String characterUUID, Double x, Double y, String userUUID, String workspaceUUID);
 }

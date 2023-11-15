@@ -1,6 +1,5 @@
 package com.galaxy.novelit.notification.dto.response;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,21 +13,12 @@ import lombok.Setter;
 @Builder
 public class NotificationResponseDto {
     private String type;
-    private String subscriberUUID;
-    private String notificationUUID;
-    private String notificationContent;
+    private String content;
 
-
-    public static NotificationResponseDto createAlarmComment(String commentNickname, String id){
-        UUID uuid = UUID.randomUUID();
-
-        String notiUUID = uuid.toString();
-
+    public static NotificationResponseDto createAlarmComment(String commentNickname){
         return NotificationResponseDto.builder()
             .type("alertComment")
-            .subscriberUUID(id)
-            .notificationUUID(notiUUID)
-            .notificationContent(commentNickname + " 님이 댓글을 남겼습니다.")
+            .content(commentNickname + " 님이 댓글을 남겼습니다.")
             .build();
     }
 }

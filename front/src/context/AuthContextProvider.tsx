@@ -3,25 +3,33 @@
 import { useAuth } from '@/hooks/useAuth';
 import { AuthContext } from './AuthContext';
 import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 type Props = {
   children: React.ReactNode;
 };
 
 export default function AuthContextProvider({ children }: Props) {
+  const pathname = usePathname();
+  const router = useRouter();
   const { user, setUser } = useAuth();
-  const token = localStorage.getItem("accessToken");
+  let token = null;
+
   useEffect(() => {
-    // if (token && !user) {
-    //   const base64Payload = token.split('.')[1];
-    //   const payload = Buffer.from(base64Payload, 'base64');
-    //   const { userId, role } = JSON.parse(payload.toString());
-    //   setUser({
-    //     userId,
-    //     role: role === 'ROLE_CONSUMER' ? 0 : 1,
-    //   });
-    // }
-  }, [setUser, token, user]);
+    token = localStorage.getItem('refreshToken');
+    if (
+      pathname === '/' ||
+      pathname.startsWith('/login') ||
+      pathname.startsWith('/share')
+    )
+      return;
+
+    if (!token) {
+      toast('로그인 해주세요!');
+      router.push('/');
+    }
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
