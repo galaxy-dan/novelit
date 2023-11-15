@@ -39,7 +39,6 @@ public class CommentServiceImpl implements CommentService {
             // save
             commentRepository.save(comment);
         }
-
     }
 
     @Override
