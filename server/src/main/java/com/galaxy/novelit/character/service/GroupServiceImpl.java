@@ -246,9 +246,13 @@ public class GroupServiceImpl implements GroupService {
         }
     }
     public void checkAuthorizationException(Object entity, String userUUID) {
-        if ((entity.getClass() == CharacterEntity.class && !((CharacterEntity) entity).getUserUUID().equals(userUUID))
-            || (entity.getClass() == GroupEntity.class && !((GroupEntity) entity).getUserUUID().equals(userUUID))
-            || (entity.getClass() == Workspace.class && !((Workspace) entity).getUserUUID().equals(userUUID))) {
+        if (entity.getClass() == CharacterEntity.class && !((CharacterEntity) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
+        }
+        if (entity.getClass() == GroupEntity.class && !((GroupEntity) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
+        }
+        if (entity.getClass() == Workspace.class && !((Workspace) entity).getUserUUID().equals(userUUID)) {
             throw new AccessRefusedException();
         }
     }
