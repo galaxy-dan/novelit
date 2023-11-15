@@ -291,6 +291,7 @@ public class CharacterServiceImpl implements CharacterService {
         characterRepository.save(character);
         relationRepository.deleteByCharacterUUID(characterUUID);
 
+        // 부모 그룹의 자식캐릭터 필드 수정
         GroupEntity parentGroup = groupRepository.findByGroupUUID(character.getGroupUUID());
         if (parentGroup != null) {
             parentGroup.removeChildCharacter(character);

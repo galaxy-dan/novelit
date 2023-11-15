@@ -53,4 +53,13 @@ public class CharacterEntity {
         this.characterNode.replace("y", y);
     }
 
+    @Override
+    public boolean equals(Object entity) {
+        CharacterEntity character = (CharacterEntity) entity;
+        if (character.getCharacterUUID().equals(characterUUID)) {
+            return true;
+        }
+        return  super.equals(entity);
+    }
+
 }
