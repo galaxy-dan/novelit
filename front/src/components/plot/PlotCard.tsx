@@ -4,13 +4,14 @@ import React from 'react';
 import { BsJournalBookmark } from 'react-icons/bs';
 type Props = {
   plot: plotType;
-  workspace : string;
+  workspace: string;
 };
-export default function PlotCard({ plot , workspace}: Props) {
+export default function PlotCard({ plot, workspace }: Props) {
   const router = useRouter();
   return (
-    <div className="flex border-2 rounded-md w-[24rem] h-40 px-3 items-center shadow-lg mt-8 cursor-pointer"
-      onClick={()=>{
+    <div
+      className="flex border-2 rounded-md w-[24rem] h-40 px-3 items-center shadow-lg mt-8 cursor-pointer hover:bg-neutral-200"
+      onClick={() => {
         router.push(`/plot/${workspace}/${plot.plotUuid}`);
       }}
     >
@@ -19,9 +20,7 @@ export default function PlotCard({ plot , workspace}: Props) {
         <p className="font-extrabold text-2xl">{plot.plotTitle}</p>
         <div className="font-bold ">
           <div className="flex mt-1 min-w-0">
-            <p className="flex-1 line-clamp-2 text-lg">
-              {plot.story}
-            </p>
+            <p className="flex-1 line-clamp-2 text-lg">{plot.story}</p>
           </div>
         </div>
       </div>

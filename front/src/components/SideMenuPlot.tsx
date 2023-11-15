@@ -24,9 +24,13 @@ import { plotDirectory, plotType } from '@/model/plot';
 import Link from 'next/link';
 import { getWorkspace } from '@/service/api/workspace';
 import { Novel } from '@/model/workspace';
+import SideMenuMoveButton from './SideMenuMoveButton';
+import { useRecoilState } from 'recoil';
+import { menuOpenState } from '@/store/menu';
 
 export default function SideMenuPlot() {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useRecoilState<boolean>(menuOpenState);
+
   const treeRef = useRef<any>(null);
   const [term, setTerm] = useState<string>('');
   const queryClient = useQueryClient();
@@ -71,7 +75,7 @@ export default function SideMenuPlot() {
   return (
     <>
       <button
-        className="fixed top-2 left-2"
+        className="fixed top-5 left-5"
         onClick={() => {
           setIsOpen((prev) => !prev);
         }}
@@ -80,44 +84,39 @@ export default function SideMenuPlot() {
       </button>
 
       {isOpen && (
-        <div className="min-h-screen z-50 fixe left-0 top-0 bg-violet-50 w-[260px] font-melody">
-          <div>
-            <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
-              <div className="flex gap-2">
-                <button onClick={() => router.push('/main')}>
+        <div className="min-h-screen z-50 left-0 top-0 bg-violet-50 w-[260px] font-melody">
+          <div className="h-full">
+            <div className="flex justify-between items-center pt-4 px-4 border-b-2 border-gray-300">
+              <div className="flex gap-2 items-end">
+                <button className="pb-4" onClick={() => router.push('/main')}>
                   <BiSolidHome size={30} />
                 </button>
-                <div className="font-bold text-xl">{workspace?.title}</div>
+                <div className="font-bold text-xl  pb-3">
+                  {workspace?.title}
+                </div>
               </div>
-              <button onClick={() => setIsOpen((prev) => !prev)}>
+              <button
+                className=" pb-3"
+                onClick={() => setIsOpen((prev) => !prev)}
+              >
                 <FiChevronsLeft size={20} />
               </button>
             </div>
-            <div className="flex h-full">
-              <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2 h-full">
-                <Link href={`/novel/${slug}`}>
-                  <MdOutlineStickyNote2 size={20} />
-                </Link>
-                <Link href={`/plot/${slug}`}>
-                  <IoExtensionPuzzle size={20} />
-                </Link>
-                <Link href={`/character/${slug}`}>
-                  <Image alt="people" src={People} width={20} />
-                </Link>
-              </div>
+            <div className="flex h-full bg-violet-50">
+              <SideMenuMoveButton slug={slug} />
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
                   <div className="font-bold text-base flex items-center gap-2">
-                    <div>📔</div>
+                    <div>💭</div>
                     <div className="pb-1">플롯작성</div>
                   </div>
-                  <div>
+                  <div className="flex items-center">
                     <button
                       onClick={() => {
                         createMutate.mutate();
                       }}
                     >
-                      <AiFillFileAdd size={25} />
+                      <AiFillFileAdd size={19.5} />
                     </button>
                   </div>
                 </div>
@@ -134,11 +133,11 @@ export default function SideMenuPlot() {
                     data={plotDirectories.children}
                     openByDefault={false}
                     width={200}
-                    indent={24}
-                    rowHeight={36}
-                    paddingTop={30}
+                    height={600}
+                    indent={18}
+                    rowHeight={33}
+                    paddingTop={15}
                     paddingBottom={10}
-                    padding={25 /* sets both */}
                     className="scrollbar-hide"
                     searchTerm={term}
                     searchMatch={(node, term) =>

@@ -186,18 +186,24 @@ export default function page({ params }: Props) {
   }, [otherCharacterData, otherCharacterName, relationCharacterSearchInput]);
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
-      return setOtherCharacterName(otherCharacterNameInput);
-    }, 500);
+    const debounce = setTimeout(
+      () => {
+        return setOtherCharacterName(otherCharacterNameInput);
+      },
+      isFetched ? 500 : 0,
+    );
     return () => {
       clearTimeout(debounce);
     };
   }, [otherCharacterNameInput]);
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
-      return updateCharacter();
-    }, 1000);
+    const debounce = setTimeout(
+      () => {
+        return updateCharacter();
+      },
+      isFetched ? 1000 : 0,
+    );
     return () => {
       clearTimeout(debounce);
     };
@@ -259,9 +265,9 @@ export default function page({ params }: Props) {
         setRelationCharacterSearchInput(-1);
       }}
     >
-      <CharacterUpperGroup parentUUID={groupUUID || ''} slug={params.slug} />
       <div className="w-[60vw] min-w-[50rem] max-w-[100rem] ml-32 py-20 ">
         {/* 상단 타이틀 메뉴 + 로딩 상태 */}
+        <CharacterUpperGroup parentUUID={groupUUID || ''} slug={params.slug} />
         <div className="flex items-end justify-between">
           <div className="flex items-center">
             <div>

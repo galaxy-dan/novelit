@@ -14,6 +14,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { plotType } from '@/model/plot';
 import { deletePlot, getPlot, putPlot } from '@/service/api/plot';
+import { FaFolderTree } from 'react-icons/fa6';
 
 type Props = {
   params: {
@@ -41,7 +42,7 @@ export default function page({ params }: Props) {
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
   const [istitleChanged, setIstitleChanged] = useState<boolean>(false);
-  
+
   const { data: plotData }: UseQueryResult<plotType> = useQuery({
     queryKey: ['plot', params.plot],
     queryFn: () => getPlot(params.plot),
@@ -58,7 +59,7 @@ export default function page({ params }: Props) {
       router.push(`/plot/${params.slug}`);
     },
     enabled: !isFetched,
-    staleTime: 0
+    staleTime: 0,
   });
 
   const putCharacterMutation = useMutation({
@@ -240,6 +241,15 @@ export default function page({ params }: Props) {
   return (
     <div className="ml-32 my-20 w-[60vw] min-w-[50rem] max-w-[100rem]">
       {/* 상단 타이틀 메뉴 + 로딩 상태 */}
+      <div
+        className="flex items-center font-bold mb-4 ml-2 cursor-pointer"
+        onClick={() => {
+          router.push(`/plot/${params.slug}`);
+        }}
+      >
+        <FaFolderTree />
+        <p className="ml-2">상위 항목으로 이동</p>
+      </div>
       <div className="flex items-end justify-between">
         <div className="flex items-center">
           <div>
@@ -275,7 +285,7 @@ export default function page({ params }: Props) {
       {/* 캐릭터 이미지 및 설명 */}
       <div className="flex h-64 mt-6">
         <div className="flex flex-col flex-grow justify-between">
-          <p className="text-xl font-bold">캐릭터 설명</p>
+          <p className="text-xl font-bold">줄거리 작성</p>
           <div className="border-2 border-gray-300 rounded-xl h-56 p-2">
             <textarea
               className={`${styles.scroll}  resize-none outline-none font-bold text-lg w-full h-full`}
@@ -295,7 +305,7 @@ export default function page({ params }: Props) {
 
       {/* 기본 정보 */}
       <div className="mt-8">
-        <p className="text-xl font-extrabold">기본 정보</p>
+        <p className="text-xl font-extrabold">소설 구성 단계</p>
         <table className="text-xl border border-gray-300 rounded-xl border-separate border-spacing-0 w-full">
           <tbody>
             <tr className="w-full" key="발단">
