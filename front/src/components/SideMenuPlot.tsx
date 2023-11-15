@@ -21,6 +21,9 @@ import { useParams, useRouter } from 'next/navigation';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { deletePlot, getPlotDirectory, postPlot } from '@/service/api/plot';
 import { plotDirectory, plotType } from '@/model/plot';
+import Link from 'next/link';
+import { getWorkspace } from '@/service/api/workspace';
+import { Novel } from '@/model/workspace';
 
 export default function SideMenuPlot() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -34,6 +37,12 @@ export default function SideMenuPlot() {
   const slug = Array.isArray(searchParams.slug)
     ? searchParams.slug[0]
     : searchParams.slug;
+
+  const { data: workspace }: UseQueryResult<Novel> = useQuery({
+    queryKey: ['workspace', slug],
+    queryFn: () => getWorkspace({ workspaceUUID: slug }),
+    enabled: !!slug,
+  });
 
   const { data: plotDirectories }: UseQueryResult<plotDirectory> = useQuery({
     queryKey: ['plotDirectory'],
@@ -75,20 +84,26 @@ export default function SideMenuPlot() {
           <div>
             <div className="flex justify-between items-center p-4 border-b-2 border-gray-300">
               <div className="flex gap-2">
-                <button onClick={() => router.push('/')}>
+                <button onClick={() => router.push('/main')}>
                   <BiSolidHome size={30} />
                 </button>
-                <div className="font-bold text-xl">{plotDirectories?.name}</div>
+                <div className="font-bold text-xl">{workspace?.title}</div>
               </div>
               <button onClick={() => setIsOpen((prev) => !prev)}>
                 <FiChevronsLeft size={20} />
               </button>
             </div>
-            <div className="flex">
-              <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2">
-                <MdOutlineStickyNote2 size={20} />
-                <IoExtensionPuzzle size={20} />
-                <Image alt="people" src={People} width={20} />
+            <div className="flex h-full">
+              <div className="flex flex-col gap-4 border-r-2 border-gray-300 p-2 h-full">
+                <Link href={`/novel/${slug}`}>
+                  <MdOutlineStickyNote2 size={20} />
+                </Link>
+                <Link href={`/plot/${slug}`}>
+                  <IoExtensionPuzzle size={20} />
+                </Link>
+                <Link href={`/character/${slug}`}>
+                  <Image alt="people" src={People} width={20} />
+                </Link>
               </div>
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
@@ -154,7 +169,6 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
   const deleteMutate = useMutation({
     mutationFn: deletePlot,
     onSuccess: () => {
-      console.log('삭제.. 성공~~');
       queryClient.refetchQueries(['plotDirectory']);
       queryClient.refetchQueries(['plotList']);
       if (searchParams.plot === node.id) {
