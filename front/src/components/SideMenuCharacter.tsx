@@ -36,7 +36,6 @@ export default function SideMenuCharacter() {
   const [term, setTerm] = useState<string>('');
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [fetched, setFetched] = useState<boolean>(false);
   const searchParams = useParams();
 
   const slug = Array.isArray(searchParams.slug)
@@ -45,9 +44,6 @@ export default function SideMenuCharacter() {
 
   const { data: characters }: UseQueryResult<characterDirectory> = useQuery({
     queryKey: ['characterDirectory', slug],
-    onSuccess: () => {
-      setFetched(false);
-    },
     queryFn: () => getCharacterDirectory(slug),
     enabled: !!slug,
   });
@@ -118,7 +114,7 @@ export default function SideMenuCharacter() {
                   value={term}
                   onChange={(e) => setTerm(e.target.value)}
                 />
-                {characters && !fetched && (
+                {characters && (
                   <Tree
                     ref={treeRef}
                     initialData={characters?.children || []}
@@ -268,15 +264,15 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
                       patchCharacterMutate.mutate({
                         workspace: slug,
                         name: e.currentTarget.value,
-                        uuid: node.data.id,
+                        uuid: node.id,
                       });
                     }
                     // 그룹 수정
                     else {
                       patchGroupMutate.mutate({
-                        groupUUID: node.data.id,
+                        groupUUID: node.id,
                         newName: e.currentTarget.value,
-                        workspace: slug
+                        workspace: slug,
                       });
                     }
                   }
@@ -303,13 +299,15 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
             <button
               onClick={() => {
                 if (node.isLeaf) {
-                  deleteCharacterMutate.mutate(node.data.id);
+                  deleteCharacterMutate.mutate({
+                    workspace: slug,
+                    uuid: node.id,
+                  });
                   tree.delete(node.id);
                 } else {
-                  deleteGroupMutate.mutate(node.data.id);
+                  deleteGroupMutate.mutate({ workspace: slug, uuid: node.id });
                   tree.delete(node.id);
                 }
-                tree.delete(node.id);
               }}
               title="Delete"
             >
