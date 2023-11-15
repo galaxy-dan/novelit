@@ -21,6 +21,8 @@ import {
 } from 'react-icons/bi';
 import { PiTextTLight } from 'react-icons/pi';
 import { FaCheck, FaShareSquare } from 'react-icons/fa';
+import { FaBook } from 'react-icons/fa';
+
 import { MdEdit, MdEditOff } from 'react-icons/md';
 import { GiToken } from 'react-icons/gi';
 import { AiOutlineFileSearch, AiFillCaretDown } from 'react-icons/ai';
@@ -43,6 +45,7 @@ import { get } from '@/service/api/http';
 import UploadState from '../state/UploadState';
 import { getShareToken } from '@/service/api/share';
 import WordModal from './WordModal';
+import WordBookModal from './WordBookModal';
 
 export default function Editor() {
   const searchParams = useParams();
@@ -63,6 +66,8 @@ export default function Editor() {
 
   const [wordList, setWordList] = useState<Word[]>([]);
   const [isOpenWord, setIsOpenWord] = useState<boolean>(false);
+
+  const [isOpenWordbook, setIsOpenWordbook] = useState<boolean>(false);
 
   const edit = useRef<HTMLDivElement>(null);
 
@@ -387,6 +392,15 @@ export default function Editor() {
           <div className="flex items-center">
             <button
               className="p-4 rounded-lg"
+              onClick={() => setIsOpenWordbook(true)}
+            >
+              <FaBook size={20} />
+            </button>
+            <div className="text-xs font-bold">단어</div>
+          </div>
+          <div className="flex items-center">
+            <button
+              className="p-4 rounded-lg"
               onClick={() =>
                 wordCheck({
                   word: edit.current?.innerText ?? '',
@@ -418,6 +432,13 @@ export default function Editor() {
           word={edit.current?.innerText ?? ''}
           workspaceUUID={searchParams.slug?.[0]}
           setWordList={setWordList}
+        />
+      )}
+
+      {isOpenWordbook && (
+        <WordBookModal
+          workspaceUUID={searchParams.slug?.[0]}
+          setIsOpenWordbook={setIsOpenWordbook}
         />
       )}
     </>
