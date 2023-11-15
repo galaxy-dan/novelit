@@ -23,29 +23,29 @@ const config: Config = {
       },
     },
     screens: {
-      f: { min: '2040px' },
+      f: { min: '2400px' },
       // => @media (max-width: 1279px) { ... }
 
-      e: { max: '2040px' },
+      e: { max: '2400px' },
       // => @media (max-width: 1279px) { ... }
 
-      d: { max: '1750px' },
+      d: { max: '1900px' },
       // => @media (max-width: 1279px) { ... }
 
-      c: { max: '1460px' },
+      c: { max: '1420px' },
       // => @media (max-width: 1023px) { ... }
 
-      b: { max: '1170px' },
+      b: { max: '1150px' },
       // => @media (max-width: 767px) { ... }
 
-      a: { max: '880px' },
+      a: { max: '839px' },
       // => @media (max-width: 639px) { ... }
-      f2: { min: '3790px' },
-      e2: { max: '3140px' },
-      d2: { max: '2500px' },
-      c2: { max: '1765px' },
-      b2: { max: '1094px' },
-      a2: { max: '700px' },
+      f2: {min: '3840px' },
+      e2: {max: '3190px' },
+      d2: {max: '2550px' },
+      c2: {max: '1915px' },
+      b2: {max: '1134px' },
+      a2: {max: '750px' },
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],
