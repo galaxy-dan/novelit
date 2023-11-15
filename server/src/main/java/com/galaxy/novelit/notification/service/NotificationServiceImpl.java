@@ -32,7 +32,8 @@ public class NotificationServiceImpl implements NotificationService{
 
     public SseEmitter subscribe(String lastEventId, String subscriberUUID, HttpServletResponse response)
     {
-        String id = subscriberUUID + "_" + System.currentTimeMillis();
+        String id = subscriberUUID;
+        //String id = subscriberUUID + "_" + System.currentTimeMillis();
 
         // subscriberUUID
         SseEmitter emitter = emitterRepository.save(id, new SseEmitter(DEFAULT_TIMEOUT));
