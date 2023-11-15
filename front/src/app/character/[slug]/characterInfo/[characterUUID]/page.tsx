@@ -73,6 +73,7 @@ export default function page({ params }: Props) {
     },
     refetchOnWindowFocus: true,
     refetchOnMount: true,
+    staleTime: 0,
   });
 
   const [otherCharacterNameInput, setOtherCharacterNameInput] =
@@ -260,7 +261,7 @@ export default function page({ params }: Props) {
 
   return (
     <div
-      className="select-none w-full"
+      className="select-none w-full h-screen overflow-y-scroll scrollbar-hide"
       onClick={() => {
         setRelationCharacterSearchInput(-1);
       }}
