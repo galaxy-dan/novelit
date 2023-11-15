@@ -1,6 +1,9 @@
 // import { sendEmail } from "@/service/email";
 import * as yup from 'yup';
 import hanspell from 'hanspell';
+import { get } from '@/service/api/http';
+import axios from 'axios';
+import { WordInfo } from '@/model/wordbook';
 
 const bodySchema = yup.object().shape({
   from: yup.string().email().required(),
@@ -9,24 +12,39 @@ const bodySchema = yup.object().shape({
 });
 
 export async function POST(req: Request) {
-  const {word} = await req.json();
+  const { word, workspaceUUID } = await req.json();
 
-  //   if (!bodySchema.isValidSync(body)) {
-  //     return new Response(JSON.stringify({ message: "메일 전송에 실패함!" }), {
-  //       status: 400,
-  //     });
-  //   }
+  // console.log(req);
+  // const data = await req.json();
 
-  //   const { from, subject, message } = body;
+  // const word = data.word;
 
-//   const sentence = '리랜드는 얼굴 골격이 rnf은게,';
-  const end = function () {
-    // console.log('// check ends');
-  };
-//   const error = function (err: any) {
-//     console.error('// error: ' + err);
-//   };
+  // console.log(req.headers.get('Authorization'));
 
+  // const wordList = await get('/workspace/words', { workspaceUUID });
+
+  const wordbook = await axios.get(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/words`,
+    {
+      headers: {
+        Authorization: req.headers.get('Authorization'),
+        'Content-Type': 'application/json',
+      },
+      params: {
+        workspaceUUID,
+      },
+    },
+  );
+
+  // const wordCheck: any = {};
+  // wordbook.data.wordInfo.map((el: WordInfo) => {
+  //   wordCheck[el.word] = true;
+  // });
+
+  // console.log(wordCheck);
+
+  // console.log('local', localStorage.getItem('accessToken'));
+  const end = function () {};
 
   const getHanspell = (word: any) => {
     return new Promise((resolve, reject) => {
@@ -45,10 +63,21 @@ export async function POST(req: Request) {
     });
   };
 
-  const process = async () => {
+  const getResult = async () => {
     try {
-      const data = await getHanspell(word);
-      return new Response(JSON.stringify(data), {
+      const data: any = await getHanspell(word);
+      const result = [];
+
+      outer: for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < wordbook.data.wordInfo.length; j++) {
+          if (data[i].token.includes(wordbook.data.wordInfo[j].word)) {
+            continue outer;
+          }
+        }
+        result.push(data[i]);
+      }
+
+      return new Response(JSON.stringify(result), {
         status: 200,
       });
     } catch (error) {
@@ -56,5 +85,5 @@ export async function POST(req: Request) {
     }
   };
 
-  return process();
+  return getResult();
 }
