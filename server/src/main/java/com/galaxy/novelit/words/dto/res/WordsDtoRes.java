@@ -15,13 +15,13 @@ import lombok.Setter;
 @Getter
 public class WordsDtoRes {
     private String workspaceUUID;
-    private List<wordInfo> wordInfo;
+    private List<WordInfo> wordInfo;
 
     @Getter
     @Setter
-    public static class wordInfo {
+    public static class WordInfo {
         String wordUUID;
         String word;
-        String isCharacter;
+        boolean isCharacter;
     }
 }
