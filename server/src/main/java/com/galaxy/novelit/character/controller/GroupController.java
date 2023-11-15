@@ -31,12 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupController {
     private final GroupService groupService;
     private final CharacterService characterService;
-//    private final String tempUser = "temp";
+    private final String tempUser = "temp";
 
     @GetMapping
     public ResponseEntity<Object> getGroupInfo(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
-//        GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName(), workspaceUUID);
         GroupDtoRes dto = groupService.getGroupInfo(groupUUID, authentication.getName(), workspaceUUID);
+//        GroupDtoRes dto = groupService.getGroupInfo(groupUUID, tempUser, workspaceUUID);
         return ResponseEntity.ok(dto);
     }
 
@@ -65,8 +65,8 @@ public class GroupController {
 
     @PostMapping
     public ResponseEntity<Object> createGroup(@RequestBody GroupCreateDtoReq dto, Authentication authentication) {
-//        groupService.createGroup(dto, authentication.getName());
         groupService.createGroup(dto, authentication.getName());
+//        groupService.createGroup(dto, tempUser);
         return ResponseEntity.ok().build();
     }
 
@@ -79,8 +79,8 @@ public class GroupController {
 
     @DeleteMapping
     public ResponseEntity<Object> deleteGroup(@RequestParam String workspaceUUID, @RequestParam String groupUUID, Authentication authentication) {
-//        groupService.deleteGroup(groupUUID, authentication.getName(),workspaceUUID);
         groupService.deleteGroup(groupUUID, authentication.getName(),workspaceUUID);
+//        groupService.deleteGroup(groupUUID, tempUser, workspaceUUID);
         return ResponseEntity.ok().build();
     }
 
