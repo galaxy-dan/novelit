@@ -1,23 +1,11 @@
 package com.galaxy.novelit.config.redis;
 
-import static io.lettuce.core.ReadFrom.REPLICA_PREFERRED;
+import static io.lettuce.core.ReadFrom.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.galaxy.novelit.alarm.dto.SseEventName;
-import com.galaxy.novelit.alarm.service.RedisMessageSubscriber;
-import io.lettuce.core.ClientOptions;
-import io.lettuce.core.SocketOptions;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,17 +19,29 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.galaxy.novelit.alarm.dto.SseEventName;
+import com.galaxy.novelit.alarm.service.RedisMessageSubscriber;
+
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.SocketOptions;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class LettuceConnectionConfig {
 
-    @Value("${spring.redis.cluster.nodes}")
-    private String clusterNodes;
-    @Value("${spring.redis.cluster.max-redirects}")
+    @Value("${spring.data.redis.cluster.nodes}")
+    private List<String> clusterNodes;
+    @Value("${spring.data.redis.cluster.max-redirects}")
     private Integer maxRedirects;
-    @Value("${spring.redis.password}")
-    private String password;
+    // @Value("${spring.data.redis.password}")
+    // private String password;
     private final RedisMessageSubscriber redisMessageSubscriber;
 
 //    private final EntityManagerFactory entityManagerFactory;
@@ -77,12 +77,12 @@ public class LettuceConnectionConfig {
      */
     @Bean
     public RedisClusterConfiguration redisClusterConfiguration() {
-        List<String> clusterNodeList = Arrays.stream(StringUtils.split(clusterNodes, ','))
-            .map(String::trim)
-            .collect(Collectors.toList());
-        RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(clusterNodeList);
+        // List<String> clusterNodeList = Arrays.stream(StringUtils.split(clusterNodes, ','))
+        //     .map(String::trim)
+        //     .collect(Collectors.toList());
+        RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(clusterNodes);
         redisClusterConfiguration.setMaxRedirects(maxRedirects);
-        redisClusterConfiguration.setPassword(password);
+        // redisClusterConfiguration.setPassword(password);
         return redisClusterConfiguration;
     }
 
