@@ -47,16 +47,18 @@ public class GroupServiceImpl implements GroupService {
         GroupEntity group = groupRepository.findByGroupUUIDAndWorkspaceUUID(groupUUID, workspaceUUID);
         checkGroupException(group);
 
-        List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUIDAndDeletedIsFalse(groupUUID);
-        List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUIDAndDeletedIsFalse(groupUUID);
+//        List<GroupEntity> childGroups = groupRepository.findAllByParentGroupUUIDAndDeletedIsFalse(groupUUID);
+//        List<CharacterEntity> childCharacters = characterRepository.findAllByGroupUUIDAndDeletedIsFalse(groupUUID);
 
         GroupDtoRes dto = new GroupDtoRes();
         dto.setWorkspaceUUID(group.getWorkspaceUUID());
         dto.setGroupUUID(group.getGroupUUID());
         dto.setGroupName(group.getGroupName());
         dto.setParentGroupUUID(group.getParentGroupUUID());
-        dto.setChildGroups(childGroups);
-        dto.setChildCharacters(childCharacters);
+//        dto.setChildGroups(childGroups);
+//        dto.setChildCharacters(childCharacters);
+        dto.setChildGroups(group.getChildGroups());
+        dto.setChildCharacters(group.getChildCharacters());
 
         return dto;
     }
