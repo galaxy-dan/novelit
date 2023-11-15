@@ -73,6 +73,7 @@ export default function page({ params }: Props) {
     },
     refetchOnWindowFocus: true,
     refetchOnMount: true,
+    staleTime: 0,
   });
 
   const [otherCharacterNameInput, setOtherCharacterNameInput] =
