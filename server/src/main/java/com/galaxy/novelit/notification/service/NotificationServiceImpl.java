@@ -106,7 +106,7 @@ public class NotificationServiceImpl implements NotificationService{
                 alarmRedisService.save(AlarmRedisRequestDto.builder()
                     .pubUUID(publisherUUID)
                     .pubName(commentNickname)
-                    .subUUID(key)
+                    .subUUID(subscriberUUID)
                     .directoryName(directoryName)
                     .build());
             }
