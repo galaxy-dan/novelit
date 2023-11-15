@@ -27,26 +27,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class CharacterController {
     private final CharacterService characterService;
     private final WordsService wordsService;
-    private final String tempUser = "temp";
+//    private final String tempUser = "temp";
 
     @GetMapping
     public ResponseEntity<Object> getCharacterInfo(@RequestParam String workspaceUUID, @RequestParam String characterUUID, Authentication authentication) {
 //        CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, authentication.getName(), String workspaceUUID);
-        CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, tempUser, workspaceUUID);
+        CharacterDtoRes dto = characterService.getCharacterInfo(characterUUID, authentication.getName(), workspaceUUID);
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping
     public ResponseEntity<Object> createCharacter(@RequestBody CharacterCreateDtoReq dto, Authentication authentication) {
 //        characterService.createCharacter(dto, authentication.getName());
-        characterService.createCharacter(dto, tempUser);
+        characterService.createCharacter(dto, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping
     public ResponseEntity<Object> updateCharacter(@RequestParam String workspaceUUID, @RequestParam String characterUUID, @RequestBody CharacterUpdateDtoReq dto, Authentication authentication) {
 //        characterService.updateCharacter(characterUUID, dto, authentication.getName(), workspaceUUID);
-        characterService.updateCharacter(characterUUID, dto, tempUser, workspaceUUID);
+        characterService.updateCharacter(characterUUID, dto, authentication.getName(), workspaceUUID);
         return ResponseEntity.ok().build();
 
     }
@@ -54,7 +54,7 @@ public class CharacterController {
     @DeleteMapping
     public  ResponseEntity<Object> deleteCharacter(@RequestParam String workspaceUUID, @RequestParam String characterUUID, Authentication authentication) {
 //        characterService.deleteCharacter(characterUUID, authentication.getName(), workspaceUUID);
-        characterService.deleteCharacter(characterUUID, tempUser, workspaceUUID);
+        characterService.deleteCharacter(characterUUID, authentication.getName(), workspaceUUID);
         return ResponseEntity.ok().build();
     }
 
@@ -68,7 +68,9 @@ public class CharacterController {
     @GetMapping("/diagram")
     public ResponseEntity<Object> getRelationships(@RequestParam String workspaceUUID, Authentication authentication) {
 //        List<RelationDtoRes> dto = characterService.getRelationships(authentication.getName(), workspaceUUID);
-        List<RelationDtoRes> dto = characterService.getRelationships(tempUser, workspaceUUID);
+//        List<GroupSimpleWithNodeDtoRes> dtoGroups = groupService.getAllGroupsWithNode(workspaceUUID, authentication.getName());
+        List<RelationDtoRes> dtoRelations = characterService.getRelationships(authentication.getName(), workspaceUUID);
+        List<GroupSimpleWithNodeDtoRes> dtoGroups = groupService.getAllGroupsWithNode(workspaceUUID, authentication.getName());
 
         return ResponseEntity.ok(dto);
     }
@@ -76,7 +78,7 @@ public class CharacterController {
     @PatchMapping("/move")
     public ResponseEntity<Object> moveCharacter(@RequestParam String workspaceUUID, @RequestParam String characterUUID, @RequestParam String groupUUID, Authentication authentication) {
 //        characterService.moveCharacter(characterUUID, groupUUID, authentication.getName(), workspaceUUID);
-        characterService.moveCharacter(characterUUID, groupUUID, tempUser, workspaceUUID);
+        characterService.moveCharacter(characterUUID, groupUUID, authentication.getName(), workspaceUUID);
 
         return ResponseEntity.ok().build();
     }
@@ -84,7 +86,7 @@ public class CharacterController {
     @PatchMapping("/node")
     public ResponseEntity<Object> moveCharacterNode(@RequestParam String workspaceUUID, @RequestParam String characterUUID, @RequestParam Double x, @RequestParam Double y, Authentication authentication) {
 //        characterService.moveCharacterNode(characterUUID, x, y, authentication.getName(), workspaceUUID);
-        characterService.moveCharacterNode(characterUUID, x, y, tempUser, workspaceUUID);
+        characterService.moveCharacterNode(characterUUID, x, y, authentication.getName(), workspaceUUID);
 
         return ResponseEntity.ok().build();
     }

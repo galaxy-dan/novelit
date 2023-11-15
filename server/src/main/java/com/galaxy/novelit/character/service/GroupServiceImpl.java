@@ -8,13 +8,21 @@ import com.galaxy.novelit.character.entity.CharacterEntity;
 import com.galaxy.novelit.character.entity.GroupEntity;
 import com.galaxy.novelit.character.repository.CharacterRepository;
 import com.galaxy.novelit.character.repository.GroupRepository;
+import com.galaxy.novelit.character.repository.RelationRepository;
+import com.galaxy.novelit.common.exception.AccessRefusedException;
 import com.galaxy.novelit.common.exception.DeletedElementException;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import com.galaxy.novelit.words.dto.req.WordsCreateReqDTO;
+import com.galaxy.novelit.words.entity.WordsEntity;
+import com.galaxy.novelit.words.repository.WordsRepository;
+import com.galaxy.novelit.words.service.WordsService;
+import com.galaxy.novelit.workspace.domain.Workspace;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
+    private final WordsService wordsService;
+
     private final GroupRepository groupRepository;
     private final CharacterRepository characterRepository;
+    private final RelationRepository relationRepository;
+    private final WordsRepository wordsRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -70,6 +82,11 @@ public class GroupServiceImpl implements GroupService {
     public void createGroup(GroupCreateDtoReq dto, String userUUID) {
         // UUID 프론트에서 받아서 사용
 //        String groupUUID = UUID.randomUUID().toString();
+
+        // 단어장에 캐릭터 이름 저장
+        WordsCreateReqDTO wordsCreateReqDTO = new WordsCreateReqDTO(dto.getWorkspaceUUID(), dto.getGroupName());
+
+        wordsService.createWord(wordsCreateReqDTO, dto.getGroupUUID(),userUUID);
 
         GroupEntity newGroup;
         String parentGroupUUID = dto.getParentGroupUUID();
@@ -121,6 +138,12 @@ public class GroupServiceImpl implements GroupService {
             throw new DeletedElementException("이미 삭제된 그룹 입니다.");
         }
 
+//        // 단어장에서 단어 삭제
+//        WordsEntity we = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//            workspaceUUID, group.getGroupName());
+//        System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+//        wordsService.deleteWord(we.getWordUUID());
+
         group.deleteGroup();
         groupRepository.save(group);
 
@@ -131,6 +154,32 @@ public class GroupServiceImpl implements GroupService {
             parentGroup.removeChildGroup(groupRepository.findByGroupUUID(groupUUID));
             groupRepository.save(parentGroup);
         }
+
+        // 그룹에 속한 자식 캐릭터 삭제
+        List<CharacterEntity> childCharacters = group.getChildCharacters();
+        for (CharacterEntity childCharacter : childCharacters) {
+
+//            // 단어장에서 단어 삭제
+//            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//                workspaceUUID, childCharacter.getCharacterName());
+//            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+//            wordsService.deleteWord(we.getWordUUID());
+
+            childCharacter.deleteCharacter();
+            characterRepository.save(childCharacter);
+            relationRepository.deleteByCharacterUUID(childCharacter.getCharacterUUID());
+        }
+
+        // 그룹에 속한 자식 그룹들 삭제 재귀
+        List<GroupEntity> childGroups = group.getChildGroups();
+        for (GroupEntity childGroup : childGroups) {
+//            // 단어장에서 단어 삭제
+//            WordsEntity we2 = wordsRepository.findByUserUUIDAndWorkspaceUUIDAndWord(userUUID,
+//                workspaceUUID, childGroup.getGroupName());
+//            System.out.println("단어 삭제 UUID: " + we.getWordUUID());
+            deleteGroup(childGroup.getGroupUUID(), userUUID, workspaceUUID);
+        }
+
     }
 
     @Transactional
@@ -138,6 +187,11 @@ public class GroupServiceImpl implements GroupService {
     public void updateGroupName(String groupUUID, String newName, String userUUID, String workspaceUUID) {
         GroupEntity group = groupRepository.findByGroupUUID(groupUUID);
         checkGroupException(group);
+
+        // 단어장 단어 업데이트
+        Optional<WordsEntity> we = wordsRepository.findByWordUUID(groupUUID);
+//        System.out.println("단어 수정 UUID: " + we.get());
+        wordsService.updateWord(we.get().getWordUUID(), newName);
 
         group.updateGroupName(newName);
         groupRepository.save(group);
@@ -221,6 +275,17 @@ public class GroupServiceImpl implements GroupService {
         }
         if (group.isDeleted()) {
             throw new DeletedElementException("삭제된 그룹 입니다.");
+        }
+    }
+    public void checkAuthorizationException(Object entity, String userUUID) {
+        if (entity.getClass() == CharacterEntity.class && !((CharacterEntity) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
+        }
+        if (entity.getClass() == GroupEntity.class && !((GroupEntity) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
+        }
+        if (entity.getClass() == Workspace.class && !((Workspace) entity).getUserUUID().equals(userUUID)) {
+            throw new AccessRefusedException();
         }
     }
 
