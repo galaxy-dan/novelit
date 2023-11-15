@@ -1,4 +1,4 @@
-package com.galaxy.novelit.notification.redis.dto.response;
+package com.galaxy.novelit.notification.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
