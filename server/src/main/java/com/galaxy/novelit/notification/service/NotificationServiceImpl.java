@@ -89,6 +89,8 @@ public class NotificationServiceImpl implements NotificationService{
         NotificationResponseDto notificationResponseDto = NotificationResponseDto.createAlarmComment(
             commentNickname, id);
 
+        log.info("Send subscriberUUID : {}", id);
+
         /*sendToClient(new SseEmitter(DEFAULT_TIMEOUT), id, notificationResponseDto);
 
         // 알림 레디스에 저장
