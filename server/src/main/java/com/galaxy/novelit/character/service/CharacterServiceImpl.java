@@ -165,6 +165,7 @@ public class CharacterServiceImpl implements CharacterService {
 //        }
 
         RelationEntity newRelation = RelationEntity.builder()
+            .workspaceUUID(dto.getWorkspaceUUID())
             .characterUUID(dto.getCharacterUUID())
             .characterName(dto.getCharacterName())
             .relations(dto.getRelations())
@@ -216,6 +217,7 @@ public class CharacterServiceImpl implements CharacterService {
 
         newRelation = RelationEntity.builder()
             .id(relation.getId())
+            .workspaceUUID(relation.getWorkspaceUUID())
             .characterUUID(characterUUID)
             .characterName(dto.getCharacterName())
             .relations(dto.getRelations())
@@ -338,7 +340,7 @@ public class CharacterServiceImpl implements CharacterService {
     @Transactional(readOnly = true)
     @Override
     public List<RelationDtoRes> getRelationships(String userUUID, String workspaceUUID) {
-        List<RelationEntity> allRelation = relationRepository.findAll();
+        List<RelationEntity> allRelation = relationRepository.findAllByWorkspaceUUID(workspaceUUID);
         List<RelationDtoRes> allDto = new ArrayList<>();
 
         for (RelationEntity relation : allRelation) {
