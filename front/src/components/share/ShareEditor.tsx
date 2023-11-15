@@ -80,7 +80,7 @@ export default function ShareEditor() {
           setSpaceUUID(id);
           // console.log(e.target.id);
           setIsOpen(true);
-          // toast('버블');
+          toast('버블');
         }
       };
     }

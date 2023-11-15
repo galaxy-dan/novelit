@@ -12,8 +12,6 @@ import Favicon from '../../public/vercel.svg';
 import SSE from '@/components/SSE';
 import NotificationButton from '@/components/NotificationButton';
 import Side from '@/components/Side';
-import TopMenu from '@/components/TopMenu';
-import AuthContextProvider from '@/context/AuthContextProvider';
 
 // const nanumFont = Nanum_Myeongjo({
 //   subsets: ['latin'],
@@ -39,18 +37,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={nanumFont.className}>
-      <body className="w-full flex relative">
+      <body className="w-full flex">
         <QueryProvider>
           <RecoilProvider>
-            <AuthContextProvider>
-              <SSE />
-              <ToastContainer pauseOnFocusLoss={false} />
-              <TopMenu />
-              <Side />
-              <main className="flex-grow h-screen overflow-y-scroll scrollbar-hide">
-                {children}
-              </main>
-            </AuthContextProvider>
+            <SSE />
+            <ToastContainer pauseOnFocusLoss={false} />
+            <NotificationButton />
+            <Side />
+            <main className="flex-grow">{children}</main>
           </RecoilProvider>
         </QueryProvider>
       </body>
