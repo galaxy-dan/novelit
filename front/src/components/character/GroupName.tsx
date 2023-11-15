@@ -5,17 +5,24 @@ type Props = {
   groupUUID: string;
   groupName: string;
   setGroupName: React.Dispatch<React.SetStateAction<string>>;
+  slug: string;
 };
 export default function GroupName({
   groupUUID,
   groupName,
   setGroupName,
+  slug,
 }: Props) {
   const queryClient = useQueryClient();
   const [fetched, setFetched] = useState<boolean>(false);
 
   const patchMutate = useMutation({
-    mutationFn: () => patchGroup({ groupUUID: groupUUID, newName: groupName }),
+    mutationFn: () =>
+      patchGroup({
+        groupUUID: groupUUID,
+        newName: groupName,
+        workspace: slug,
+      }),
     onError: () => queryClient.refetchQueries(['group', groupUUID]),
     onSuccess: () => queryClient.refetchQueries(['group']),
   });
@@ -47,7 +54,7 @@ export default function GroupName({
   const [inputText, setInputText] = useState<string>('');
 
   return (
-    <div className='mt-10'>
+    <div className="mt-10">
       <span
         ref={characterNameRef}
         className="invisible opacity-0 absolute text-4xl font-extrabold"

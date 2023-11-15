@@ -56,9 +56,10 @@ export const postGroup = async (body: groupType) => {
 export const patchGroup = async (req: {
   groupUUID: string;
   newName: string;
+  workspace: string;
 }) => {
   const data = await patch(
-    `/group?groupUUID=${req.groupUUID}&newName=${req.newName}`,
+    `/group?workspaceUUID=${req.workspace}&groupUUID=${req.groupUUID}&newName=${req.newName}`,
   );
   return data;
 };

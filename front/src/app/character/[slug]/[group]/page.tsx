@@ -110,6 +110,7 @@ export default function page({ params }: Props) {
           groupUUID={params.group}
           groupName={groupNameInput}
           setGroupName={setGroupNameInput}
+          slug={params.slug}
         />
 
         <GroupCardGroup slug={params.slug} groups={groupData?.groups || []} />
