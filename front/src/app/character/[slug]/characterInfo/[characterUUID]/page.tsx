@@ -260,7 +260,7 @@ export default function page({ params }: Props) {
 
   return (
     <div
-      className="select-none w-full"
+      className="select-none w-full h-screen overflow-y-scroll scrollbar-hide"
       onClick={() => {
         setRelationCharacterSearchInput(-1);
       }}

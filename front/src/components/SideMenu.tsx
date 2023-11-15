@@ -120,8 +120,8 @@ export default function SideMenu() {
           <AiOutlineMenu size={25} />
         </button>
       ) : (
-        <div className="min-h-screen z-50 left-0 top-0 bg-violet-50 w-[260px] font-melody">
-          <div className="h-full">
+        <div className="h-screen z-50 left-0 top-0 bg-violet-50 w-[260px] font-melody">
+          <div className="h-screen">
             <div className="flex justify-between items-center pt-4 px-4  border-b-2 border-gray-300">
               <div className="flex gap-2 items-end">
                 <button className="pb-4" onClick={() => router.push('/main')}>
@@ -136,7 +136,7 @@ export default function SideMenu() {
                 <FiChevronsLeft size={20} />
               </button>
             </div>
-            <div className="flex h-full bg-violet-50">
+            <div className="flex bg-violet-50">
               <SideMenuMoveButton slug={slug} />
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
@@ -175,7 +175,7 @@ export default function SideMenu() {
                     initialData={workspace.directories}
                     openByDefault={false}
                     width={200}
-                    height={600}
+                    height={500}
                     indent={14}
                     rowHeight={30}
                     paddingTop={15}
@@ -277,12 +277,10 @@ function Node({ node, style, dragHandle, tree }: NodeRendererProps<any>) {
               onFocus={(e) => e.currentTarget.select()}
               onBlur={() => {
                 node.reset();
-                tree.delete(node.id);
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
                   node.reset();
-                  tree.delete(node.id);
                 }
                 if (e.key === 'Enter') {
                   if (node.id.includes('simple')) {

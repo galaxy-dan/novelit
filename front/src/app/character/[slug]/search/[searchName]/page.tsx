@@ -41,7 +41,7 @@ export default function page({ params }: Props) {
   }, [inputText]);
 
   return (
-    <div className="ml-10 my-20 select-none">
+    <div className="ml-10 py-20 select-none  h-screen overflow-y-scroll scrollbar-hide">
       {/* 제목 */}
       <CharacterHomeTitle slug={params.slug} />
       {/* 검색 창 */}
