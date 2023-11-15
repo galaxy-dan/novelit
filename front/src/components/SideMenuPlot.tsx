@@ -84,7 +84,7 @@ export default function SideMenuPlot() {
       </button>
 
       {isOpen && (
-        <div className="min-h-screen z-50 left-0 top-0 bg-violet-50 w-[260px] font-melody">
+        <div className="h-screen z-50 left-0 top-0 bg-violet-50 w-[260px] font-melody">
           <div className="h-full">
             <div className="flex justify-between items-center pt-4 px-4 border-b-2 border-gray-300">
               <div className="flex gap-2 items-end">
@@ -102,7 +102,7 @@ export default function SideMenuPlot() {
                 <FiChevronsLeft size={20} />
               </button>
             </div>
-            <div className="flex h-full bg-violet-50">
+            <div className="flex bg-violet-50">
               <SideMenuMoveButton slug={slug} />
               <div className="p-2">
                 <div className="flex justify-between items-center p-1">
