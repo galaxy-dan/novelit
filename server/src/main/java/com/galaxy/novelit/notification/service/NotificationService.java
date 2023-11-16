@@ -9,5 +9,5 @@ public interface NotificationService {
 
     void notify(String commentNickname, String directoryUUID, String publisherUUID);
 
-    void notice(CommentAddRequestDto commentAddRequestDto);
+    void notice(CommentAddRequestDto commentAddRequestDto, String publisherUUID);
 }
