@@ -139,13 +139,31 @@ public class NotificationServiceImpl implements NotificationService{
             .map(CommentInfo::getUserUUID)
             .collect(Collectors.toSet());
 
-       /* List<String> userList = commentInfoList.stream()
-            .map(CommentInfo::getUserUUID)
-            .collect(Collectors.toList());*/
+        if(userSet.size() >= 2) {
 
-        for (String userUUID: userSet) {
-            Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
-                userUUID);
+            for (String userUUID : userSet) {
+                Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
+                    userUUID);
+
+                sseEmitters.forEach(
+                    (key, emitter) -> {
+                        // 데이터 캐시 저장 (유실된 데이터 처리 위함)
+                        emitterRepository.saveEventCache(key, notificationResponseDto);
+
+                        sendToClient(emitter, key, "alertComment", notificationResponseDto);
+
+                        // 알림 레디스에 저장
+                        alarmRedisService.save(AlarmRedisRequestDto.builder()
+                            .pubName(commentAddRequestDto.getCommentNickname())
+                            .subUUID(subscriberUUID)
+                            .directoryName(directoryName)
+                            .build());
+                    }
+                );
+            }
+        }
+        else{
+            Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(subscriberUUID);
 
             sseEmitters.forEach(
                 (key, emitter) -> {
