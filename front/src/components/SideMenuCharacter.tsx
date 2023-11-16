@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useState } from 'react';
-import { NodeRendererProps, Tree, TreeApi } from 'react-arborist';
+import { NodeApi, NodeRendererProps, Tree, TreeApi } from 'react-arborist';
 import { BiSolidHome } from 'react-icons/bi';
 import { FiChevronsLeft } from 'react-icons/fi';
 import { AiFillFolderAdd, AiFillFileAdd } from 'react-icons/ai';
@@ -38,14 +38,23 @@ export default function SideMenuCharacter() {
   const router = useRouter();
   const searchParams = useParams();
 
+  const [render, setRender] = useState<boolean>(true);
+
   const slug = Array.isArray(searchParams.slug)
     ? searchParams.slug[0]
     : searchParams.slug;
 
   const { data: characters }: UseQueryResult<characterDirectory> = useQuery({
     queryKey: ['characterDirectory', slug],
+    onSuccess: (data) => {
+      setRender(false);
+      setTimeout(() => {
+        setRender(true);
+      }, 1);
+    },
     queryFn: () => getCharacterDirectory(slug),
     enabled: !!slug,
+    staleTime: 0,
   });
 
   const { data: workspace }: UseQueryResult<Novel> = useQuery({
@@ -92,7 +101,7 @@ export default function SideMenuCharacter() {
                     <button
                       className="py-1 hover:text-gray-600 hover:bg-gray-300"
                       onClick={() => {
-                        treeRef.current.createLeaf(treeRef.current.root.id);
+                        treeRef.current.createLeaf(treeRef.current.isSelected);
                       }}
                     >
                       <AiFillFileAdd size={19.5} className="" />
@@ -114,11 +123,11 @@ export default function SideMenuCharacter() {
                   value={term}
                   onChange={(e) => setTerm(e.target.value)}
                 />
-                {characters && (
+                {characters && render && (
                   <Tree
                     ref={treeRef}
                     initialData={characters?.children || []}
-                    openByDefault={false}
+                    openByDefault={true}
                     width={200}
                     height={500}
                     indent={14}
