@@ -64,8 +64,8 @@ public class SecurityConfig {
 				.requestMatchers("/comment").hasAnyAuthority("USER","EDITOR")
 				.requestMatchers("/share/token/validation").permitAll()
 				//.permitAll()
-				//.anyRequest().hasAuthority("USER")
-				.anyRequest().permitAll()
+				.anyRequest().hasAuthority("USER")
+				//.anyRequest().permitAll()
 			)
 
 			// http Session을 사용하지 않을 것이므로 Policy를 stateless로 설정한다.
