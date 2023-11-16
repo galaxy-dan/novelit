@@ -29,12 +29,10 @@ public class NotificationController {
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribe(Authentication authentication,
         @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
-        HttpServletResponse response)
-    {
-        String subscriberUUID = authentication.getName();
+        HttpServletResponse response) {
+        String subUUID = authentication.getName();
         response.setHeader("X-Accel-Buffering", "no");
-        log.info("subscribe: {}" ,subscriberUUID);
-        return ResponseEntity.ok(notificationService.subscribe(lastEventId, subscriberUUID, response));
+        return ResponseEntity.ok(notificationService.subscribe(lastEventId, subUUID, response));
     }
 
     @GetMapping("/alarmlist")
