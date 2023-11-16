@@ -33,12 +33,14 @@ type Props = {
   spaceUUID: string;
   directoryUUID: string | string[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setHtml: Dispatch<SetStateAction<string>>;
 };
 
 export default function Comment({
   spaceUUID,
   directoryUUID,
   setIsOpen,
+  setHtml,
 }: Props) {
   const queryClient = useQueryClient();
 
@@ -96,11 +98,23 @@ export default function Comment({
       queryClient.invalidateQueries(['comment', spaceUUID]);
     },
   });
+
+  const endClick = () => {
+    if (commentList?.length === 0) {
+      const space = document.getElementById(spaceUUID);
+      if (!space) return;
+      const text = space.innerHTML;
+      const regex = new RegExp(`<span id="${spaceUUID}">(.*?)<\/span>`);
+      setHtml((prev) => prev.replace(regex, text));
+    }
+    setIsOpen((prev) => !prev);
+  };
+
   return (
     <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-black rounded-md shadow-md p-2 bg-white">
       <div className="flex justify-between">
         <div>Comment</div>
-        <button onClick={() => setIsOpen((prev) => !prev)}>
+        <button onClick={endClick}>
           <AiOutlineMinus />
         </button>
       </div>
