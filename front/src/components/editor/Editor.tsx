@@ -343,7 +343,7 @@ export default function Editor() {
                 <MdEditOff size={20} />
               )}
             </div>
-            <div className="text-xs font-bold">쓰기</div>
+            <div className="text-xs font-bold whitespace-nowrap">쓰기</div>
           </button>
 
           <button
