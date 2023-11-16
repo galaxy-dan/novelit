@@ -121,7 +121,7 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    public void notice(CommentAddRequestDto commentAddRequestDto) {
+    public void notice(CommentAddRequestDto commentAddRequestDto, String publisherUUID) {
         Directory directory = directoryRepository.findDirectoryByUuid(
                 commentAddRequestDto.getDirectoryUUID())
             .orElseThrow(() -> new NoSuchElementFoundException("작품이 없습니다!"));
@@ -139,11 +139,15 @@ public class NotificationServiceImpl implements NotificationService{
             .map(CommentInfo::getUserUUID)
             .collect(Collectors.toSet());
 
+        log.info("userSet : {}", userSet.size());
+
         if(userSet.size() >= 2) {
 
             for (String userUUID : userSet) {
                 Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
                     userUUID);
+
+                log.info("userSet : 2 : {}", userUUID);
 
                 sseEmitters.forEach(
                     (key, emitter) -> {
@@ -162,8 +166,11 @@ public class NotificationServiceImpl implements NotificationService{
                 );
             }
         }
-        else{
+        else if (userSet.size() == 1){
+            if (subscriberUUID.equals(publisherUUID)) return;
             Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(subscriberUUID);
+
+            log.info("userSet : 1 : {}", subscriberUUID);
 
             sseEmitters.forEach(
                 (key, emitter) -> {
