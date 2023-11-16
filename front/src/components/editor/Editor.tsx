@@ -77,18 +77,37 @@ export default function Editor() {
     enabled: !!searchParams.slug?.[1],
   });
 
-  // 자동 저장
+  const [throttle, setThrottle] = useState<boolean>(false);
+  // 자동 저장 - throttle
   useEffect(() => {
     if (editor?.content === html) return;
-    const time = setTimeout(() => {
-      patchMutate.mutate({
-        uuid: searchParams.slug?.[1],
-        content: html ?? '<div><br/></div>',
-      });
-    }, 2000);
 
-    return () => clearTimeout(time);
+    if (throttle) return;
+
+    if (!throttle) {
+      setThrottle(true);
+      setTimeout(() => {
+        patchMutate.mutate({
+          uuid: searchParams.slug?.[1],
+          content: edit.current?.innerHTML ?? '<div><br/></div>',
+        });
+        setThrottle(false);
+      }, 2000);
+    }
   }, [html]);
+
+  // debounce
+  // useEffect(() => {
+  //   if (editor?.content === html) return;
+  //   const time = setTimeout(() => {
+  //     patchMutate.mutate({
+  //       uuid: searchParams.slug?.[1],
+  //       content: html ?? '<div><br/></div>',
+  //     });
+  //   }, 2000);
+
+  //   return () => clearTimeout(time);
+  // }, [html]);
 
   useEffect(() => {
     const editRef = edit?.current;
@@ -143,7 +162,7 @@ export default function Editor() {
     onSuccess: () => {
       queryClient.invalidateQueries(['editor']);
       setUploadIndex(3);
-      toast('저장 성공');
+      // toast('저장 성공');
     },
   });
 
@@ -179,13 +198,6 @@ export default function Editor() {
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
 
-    //임시
-    // setSpaceUUID(wrapper.id);
-    // 버블링 안되게
-    // wrapper.onclick = () => {
-    //   alert('되');
-    //   setSpaceUUID('aa');
-    // };
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
 
@@ -303,13 +315,13 @@ export default function Editor() {
             onChange={handleChange}
             // onBlur={sanitize}
           />
-          {/* <h3>source</h3>
+          <h3>source</h3>
           <textarea
             className="ml-2 w-3/4 min-h-[100px] border-gray-100 border-2 p-1 resize-none"
             value={html}
             onChange={handleChange}
             onBlur={sanitize}
-          /> */}
+          />
         </div>
 
         <div className="flex flex-col w-[180px] justify-start items-center gap-6">
@@ -415,11 +427,12 @@ export default function Editor() {
             </button>
             <div className="text-xs font-bold">검사</div>
           </div>
-          {isOpen && !editor?.editable && (
+          {isOpen && (
             <Comment
               spaceUUID={spaceUUID}
               directoryUUID={searchParams.slug?.[1]}
               setIsOpen={setIsOpen}
+              setHtml={setHtml}
             />
           )}
         </div>
