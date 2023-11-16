@@ -62,7 +62,7 @@ export default function page({ params }: Props) {
   const [groupNameInput, setGroupNameInput] = useState<string>('');
 
   return (
-    <div className="ml-14 py-20 select-none h-screen overflow-y-scroll scrollbar-hide">
+    <div className="ml-14 mr-4 py-20 select-none h-screen overflow-y-scroll scrollbar-hide">
       {/* 제목 */}
       <CharacterUpperGroup
         parentUUID={groupData?.parentGroupUUID}
@@ -72,7 +72,7 @@ export default function page({ params }: Props) {
       {/* 검색 창 */}
       <div className="flex justify-between w-full">
         <CharacterNameSearch slug={params.slug} />
-        <div className="flex mt-11 mr-[10rem]">
+        <div className="flex mt-11 mr-[5rem]">
           <div
             onClick={() => {
               const uuid = uuidv4();
@@ -104,7 +104,7 @@ export default function page({ params }: Props) {
         </div>
       </div>
       {/* 캐릭터 카드 전체 모음 */}
-      <div className="mt-6">
+      <div className="mt-6 mr-10">
         {/* 캐릭터 카드 그룹 */}
         <GroupName
           groupUUID={params.group}

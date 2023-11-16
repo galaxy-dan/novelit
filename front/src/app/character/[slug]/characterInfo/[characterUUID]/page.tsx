@@ -405,15 +405,14 @@ export default function page({ params }: Props) {
           <p className="text-xl font-extrabold">기본 정보</p>
           <table className="text-xl border w-full border-gray-300 rounded-xl border-separate border-spacing-0">
             <tbody>
-              {informationInput !== null &&
-                informationInput !== undefined &&
+              {informationInput &&
                 informationInput.length >= 1 &&
                 Object.entries(informationInput[0]).map(([key, value], i) => {
                   return (
                     <tr className="h-16  relative" key={i}>
                       <td
                         className={`${i === 0 && 'rounded-tl-xl'} ${
-                          i === informationInput.length - 1 && 'rounded-bl-xl'
+                          i === (Object.entries(informationInput[0]).length - 1) && 'rounded-bl-xl'
                         } border border-gray-300 w-1/5 px-2 py-1 text-center`}
                       >
                         <input
@@ -440,7 +439,7 @@ export default function page({ params }: Props) {
                       </td>
                       <td
                         className={`${i === 0 && 'rounded-tr-xl'} ${
-                          i === informationInput.length - 1 && 'rounded-br-xl'
+                          i === (Object.entries(informationInput[0]).length - 1) && 'rounded-br-xl'
                         } border h-full border-gray-300 w-4/5 px-2 pt-1`}
                       >
                         <div className="flex">
@@ -455,17 +454,21 @@ export default function page({ params }: Props) {
                               setInformationInput(newItem);
                             }}
                           />
-                          <FaMinus
-                            className="my-auto cursor-pointer h-10"
-                            onClick={() => {
-                              setLoadingState(1);
-                              let tmpInfo: informationType[] = [
-                                ...informationInput,
-                              ];
-                              delete tmpInfo[0][key];
-                              setInformationInput(tmpInfo);
-                            }}
-                          />
+                          {
+                            Object.keys(informationInput[0]).length >= 2 &&
+                            <FaMinus
+                              className="my-auto cursor-pointer h-10"
+                              onClick={() => {
+                                setLoadingState(1);
+                                let tmpInfo: informationType[] = [
+                                  ...informationInput,
+                                ];
+                                delete tmpInfo[0][key];
+                                setInformationInput(tmpInfo);
+                              }}
+                            />
+                          }
+
                         </div>
                       </td>
                     </tr>

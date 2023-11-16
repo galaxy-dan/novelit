@@ -7,7 +7,7 @@ type Props = {
 };
 export default function GroupCardGroup({ groups, slug }: Props) {
   return (
-    <div className="grid a:grid-cols-1 b:grid-cols-2 c:grid-cols-3 d:grid-cols-4 e:grid-cols-5 f:grid-cols-6 grid-flow-row gap-4 ">
+    <div className="flex flex-wrap gap-4 ">
       {groups?.map(
         (group, i) =>
           !group.deleted && (
