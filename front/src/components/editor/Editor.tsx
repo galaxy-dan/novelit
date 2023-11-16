@@ -315,13 +315,13 @@ export default function Editor() {
             onChange={handleChange}
             // onBlur={sanitize}
           />
-          <h3>source</h3>
+          {/* <h3>source</h3>
           <textarea
             className="ml-2 w-3/4 min-h-[100px] border-gray-100 border-2 p-1 resize-none"
             value={html}
             onChange={handleChange}
             onBlur={sanitize}
-          />
+          /> */}
         </div>
 
         <div className="flex flex-col w-[180px] justify-start items-center gap-6">
@@ -335,98 +335,98 @@ export default function Editor() {
           </button>
           <div className="text-2xl">{length && `${length}자`}</div>
 
-          <div className="flex items-center">
-            <button className="p-4 rounded-lg" onClick={toggleEditable}>
+          <button className="flex items-center" onClick={toggleEditable}>
+            <div className="p-4 rounded-lg">
               {editor?.editable ? (
                 <MdEdit size={20} />
               ) : (
                 <MdEditOff size={20} />
               )}
-            </button>
+            </div>
             <div className="text-xs font-bold">쓰기</div>
-          </div>
+          </button>
 
-          <div className="flex items-center">
-            <button
-              className="p-4 rounded-lg"
-              onClick={() => {
-                setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
-              }}
-            >
+          <button
+            className="flex items-center"
+            onClick={() => {
+              setFontFamilyIndex((prev) => (prev + 1) % fontFamily.length);
+            }}
+          >
+            <div className="p-4 rounded-lg">
               <BiFontFamily size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">글꼴</div>
-          </div>
+          </button>
 
-          <div className="flex items-center">
-            <button
-              className="p-4 rounded-lg"
-              onClick={() => {
-                setFontIndex((prev) => (prev + 1) % fontSize.length);
-              }}
-            >
+          <button
+            className="flex items-center"
+            onClick={() => {
+              setFontIndex((prev) => (prev + 1) % fontSize.length);
+            }}
+          >
+            <div className="p-4 rounded-lg">
               <BiFontSize size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">크기</div>
-          </div>
+          </button>
 
-          <div className="flex items-center">
-            <button
-              className="p-4 rounded-lg"
-              onClick={(e) => {
-                clickExecCommand(e, 'bold');
-              }}
-            >
+          <button
+            className="flex items-center"
+            onClick={(e) => {
+              clickExecCommand(e, 'bold');
+            }}
+          >
+            <div className="p-4 rounded-lg">
               <BiBold size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">굵기</div>
-          </div>
+          </button>
 
-          <div className="flex items-center">
-            <button className="p-4 rounded-lg" onClick={addReply}>
+          <button className="flex items-center" onClick={addReply}>
+            <div className="p-4 rounded-lg">
               <BiCommentDetail size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">댓글</div>
-          </div>
+          </button>
 
-          <div className="flex items-center">
-            <button className="p-4 rounded-lg" onClick={shareDoc}>
+          <button className="flex items-center" onClick={shareDoc}>
+            <div className="p-4 rounded-lg">
               <BiSolidDownload size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">다운</div>
-          </div>
-          <div className="flex items-center">
-            <button className="p-4 rounded-lg" onClick={getToken}>
+          </button>
+          <button className="flex items-center" onClick={getToken}>
+            <div className="p-4 rounded-lg">
               <GiToken size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">토큰</div>
-          </div>
-          <div className="flex items-center">
-            <button
-              className="p-4 rounded-lg"
-              onClick={() => setIsOpenWordbook(true)}
-            >
+          </button>
+          <button
+            className="flex items-center"
+            onClick={() => setIsOpenWordbook(true)}
+          >
+            <div className="p-4 rounded-lg">
               <FaBook size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">단어</div>
-          </div>
-          <div className="flex items-center">
-            <button
-              className="p-4 rounded-lg"
-              onClick={() =>
-                wordCheck({
-                  word: edit.current?.innerText ?? '',
-                  workspaceUUID: searchParams.slug?.[0],
-                }).then((data) => {
-                  setWordList(data);
-                  setIsOpenWord(true);
-                })
-              }
-            >
+          </button>
+          <button
+            className="flex items-center"
+            onClick={() =>
+              wordCheck({
+                word: edit.current?.innerText ?? '',
+                workspaceUUID: searchParams.slug?.[0],
+              }).then((data) => {
+                setWordList(data);
+                setIsOpenWord(true);
+              })
+            }
+          >
+            <div className="p-4 rounded-lg">
               <AiOutlineFileSearch size={20} />
-            </button>
+            </div>
             <div className="text-xs font-bold">검사</div>
-          </div>
+          </button>
           {isOpen && (
             <Comment
               spaceUUID={spaceUUID}
