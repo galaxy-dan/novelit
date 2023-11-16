@@ -36,12 +36,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 public class LettuceConnectionConfig {
 
-    @Value("${spring.redis.cluster.nodes}")
+    @Value("${spring.data.redis.cluster.nodes}")
     private String clusterNodes;
-    @Value("${spring.redis.cluster.max-redirects}")
+    @Value("${spring.data.redis.cluster.max-redirects}")
     private Integer maxRedirects;
-    @Value("${spring.redis.password}")
-    private String password;
+    /*@Value("${spring.redis.password}")
+    private String password;*/
     private final RedisMessageSubscriber redisMessageSubscriber;
 
 //    private final EntityManagerFactory entityManagerFactory;
@@ -82,7 +82,7 @@ public class LettuceConnectionConfig {
             .collect(Collectors.toList());
         RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(clusterNodeList);
         redisClusterConfiguration.setMaxRedirects(maxRedirects);
-        redisClusterConfiguration.setPassword(password);
+        //redisClusterConfiguration.setPassword(password);
         return redisClusterConfiguration;
     }
 
