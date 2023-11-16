@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+span[id] *,
 span[id] {
   /* background-color: rgba(197, 209, 100, 0.568); */
   background-color: rgb(255, 223, 223);

@@ -85,8 +85,6 @@ export default function ShareEditor() {
   }, []);
 
   useEffect(() => {
-    // document.getElementById("editor")?.innerText =
-
     let content = editor?.content ?? '';
     content = content.length === 0 ? '<div><br/></div>' : content;
     setHtml(content);
@@ -156,11 +154,11 @@ export default function ShareEditor() {
         <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
-            id="edit"
             className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
             html={html}
             disabled={true}
             onChange={() => {}}
+            tagName="span"
             // onBlur={sanitize}
           />
         </div>
@@ -179,6 +177,7 @@ export default function ShareEditor() {
               directoryUUID={searchParams.slug}
               setIsOpen={setIsOpen}
               setHtml={setHtml}
+              editRef={edit}
             />
           )}
         </div>

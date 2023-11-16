@@ -15,7 +15,7 @@ import {
 } from '@/service/api/editor';
 import { toast } from 'react-toastify';
 import { Comment } from '@/model/editor';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, RefObject, SetStateAction } from 'react';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
 
@@ -34,6 +34,7 @@ type Props = {
   directoryUUID: string | string[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   setHtml: Dispatch<SetStateAction<string>>;
+  editRef: RefObject<HTMLDivElement>;
 };
 
 export default function Comment({
@@ -41,6 +42,7 @@ export default function Comment({
   directoryUUID,
   setIsOpen,
   setHtml,
+  editRef,
 }: Props) {
   const queryClient = useQueryClient();
 
@@ -86,8 +88,7 @@ export default function Comment({
       // 글도 최신화
       patchMutate.mutate({
         uuid: directoryUUID,
-        content:
-          document.getElementById('edit')?.innerHTML ?? '<div><br/></div>',
+        content: editRef?.current?.innerHTML ?? '<div><br/></div>',
       });
     },
   });

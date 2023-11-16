@@ -147,7 +147,6 @@ export default function Editor() {
   }, []);
 
   useEffect(() => {
-    // document.getElementById("editor")?.innerText =
 
     let content = editor?.content ?? '';
     content = content.length === 0 ? '<div><br/></div>' : content;
@@ -181,6 +180,8 @@ export default function Editor() {
   const sanitize = () => {
     setHtml((prev) => sanitizeHtml(prev, sanitizeConf));
   };
+
+
 
   const addReply = () => {
     if (editor?.editable) {
@@ -308,11 +309,11 @@ export default function Editor() {
         <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
-            id="edit"
             className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
             html={html}
             disabled={!editor?.editable ?? false}
             onChange={handleChange}
+            tagName='span'
             // onBlur={sanitize}
           />
           {/* <h3>source</h3>
@@ -433,6 +434,7 @@ export default function Editor() {
               directoryUUID={searchParams.slug?.[1]}
               setIsOpen={setIsOpen}
               setHtml={setHtml}
+              editRef={edit}
             />
           )}
         </div>
