@@ -18,7 +18,7 @@ import org.springframework.data.redis.core.TimeToLive;
 @RedisHash("AlarmRedis")
 public class AlarmRedis {
     @Id
-    private String pubUUID;
+    private String pubName;
     private Noti noti;
 
     @TimeToLive // 초단위
@@ -26,9 +26,8 @@ public class AlarmRedis {
 
     public static AlarmRedis create(AlarmRedisRequestDto alarmRedisRequestDto){
         return AlarmRedis.builder()
-            .pubUUID(alarmRedisRequestDto.getPubUUID())
-            .noti(Noti.create(alarmRedisRequestDto.getPubName()
-                , alarmRedisRequestDto.getSubUUID()
+            .pubName(alarmRedisRequestDto.getPubName())
+            .noti(Noti.create(alarmRedisRequestDto.getSubUUID()
                 , alarmRedisRequestDto.getDirectoryName()))
             .expiration(1L * 60 * 24) // 유효기간 1일
             .build();

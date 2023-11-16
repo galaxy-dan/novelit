@@ -1,6 +1,9 @@
 package com.galaxy.novelit.notification.service;
 
-import com.galaxy.novelit.author.repository.UserRepository;
+import com.galaxy.novelit.comment.domain.Comment;
+import com.galaxy.novelit.comment.domain.CommentInfo;
+import com.galaxy.novelit.comment.dto.request.CommentAddRequestDto;
+import com.galaxy.novelit.comment.repository.CommentRepository;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
 import com.galaxy.novelit.directory.domain.Directory;
 import com.galaxy.novelit.directory.repository.DirectoryRepository;
@@ -10,7 +13,10 @@ import com.galaxy.novelit.notification.redis.service.AlarmRedisService;
 import com.galaxy.novelit.notification.repository.EmitterRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,8 +30,9 @@ public class NotificationServiceImpl implements NotificationService{
 
     private final EmitterRepository emitterRepository;
     private final DirectoryRepository directoryRepository;
-    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final AlarmRedisService alarmRedisService;
+
 
     public SseEmitter subscribe(String lastEventId, String subscriberUUID, HttpServletResponse response)
     {
@@ -104,12 +111,57 @@ public class NotificationServiceImpl implements NotificationService{
 
                 // 알림 레디스에 저장
                 alarmRedisService.save(AlarmRedisRequestDto.builder()
-                    .pubUUID(publisherUUID)
+//                    .pubUUID(publisherUUID)
                     .pubName(commentNickname)
                     .subUUID(subscriberUUID)
                     .directoryName(directoryName)
                     .build());
             }
         );
+    }
+
+    @Override
+    public void notice(CommentAddRequestDto commentAddRequestDto) {
+        Directory directory = directoryRepository.findDirectoryByUuid(
+                commentAddRequestDto.getDirectoryUUID())
+            .orElseThrow(() -> new NoSuchElementFoundException("작품이 없습니다!"));
+
+        String subscriberUUID = directory.getUserUUID();
+        String directoryName = directory.getName();
+
+        NotificationResponseDto notificationResponseDto = NotificationResponseDto.create(commentAddRequestDto);
+
+        Comment comment = commentRepository.findCommentBySpaceUUID(
+            commentAddRequestDto.getSpaceUUID());
+        List<CommentInfo> commentInfoList = comment.getCommentInfoList();
+
+        Set<String> userSet = commentInfoList.stream()
+            .map(CommentInfo::getUserUUID)
+            .collect(Collectors.toSet());
+
+       /* List<String> userList = commentInfoList.stream()
+            .map(CommentInfo::getUserUUID)
+            .collect(Collectors.toList());*/
+
+        for (String userUUID: userSet) {
+            Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
+                userUUID);
+
+            sseEmitters.forEach(
+                (key, emitter) -> {
+                    // 데이터 캐시 저장 (유실된 데이터 처리 위함)
+                    emitterRepository.saveEventCache(key, notificationResponseDto);
+
+                    sendToClient(emitter, key, "alertComment", notificationResponseDto);
+
+                    // 알림 레디스에 저장
+                    alarmRedisService.save(AlarmRedisRequestDto.builder()
+                        .pubName(commentAddRequestDto.getCommentNickname())
+                        .subUUID(subscriberUUID)
+                        .directoryName(directoryName)
+                        .build());
+                }
+            );
+        }
     }
 }
