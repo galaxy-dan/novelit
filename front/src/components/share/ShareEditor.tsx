@@ -43,7 +43,7 @@ export default function ShareEditor() {
   const searchParams = useParams();
   const queryClient = useQueryClient();
 
-  const [html, setHtml] = useState<string>('<div><br/></div>');
+  const [html, setHtml] = useState<string>('');
   const [length, setLength] = useState<number>();
 
   const [editable, setEditable] = useState<boolean>(true);
@@ -86,7 +86,7 @@ export default function ShareEditor() {
 
   useEffect(() => {
     let content = editor?.content ?? '';
-    content = content.length === 0 ? '<div><br/></div>' : content;
+    content = content.length === 0 ? '' : content;
     setHtml(content);
   }, [editor?.content]);
 
@@ -119,21 +119,23 @@ export default function ShareEditor() {
     }
 
     const selection = window.getSelection();
-    console.log(selection?.rangeCount);
-    console.log(selection?.isCollapsed);
 
     // 선택한 부분이 없으면 return
     if (selection?.isCollapsed) return;
 
     if (!selection?.rangeCount) return;
 
-    console.log('여기까지?');
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
 
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
+
+    patchMutate.mutate({
+      uuid: searchParams.slug,
+      content: edit.current?.innerHTML ?? '',
+    });
 
     setHtml(edit?.current?.innerHTML ?? html);
     setSpaceUUID(wrapper.id);
@@ -154,7 +156,7 @@ export default function ShareEditor() {
         <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
-            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
+            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]} break-words`}
             html={html}
             disabled={true}
             onChange={() => {}}
