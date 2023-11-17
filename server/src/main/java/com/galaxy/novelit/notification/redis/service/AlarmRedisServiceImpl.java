@@ -33,6 +33,7 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
     }
 
     public List<AlarmGetResponseDto> getAllList(String subUUID) {
+
         List<AlarmRedis> allList = alarmRedisRepository.findAllByNoti_SubUUID(subUUID).get();
 
         User user = userRepository.findByUserUUID(subUUID);
@@ -43,19 +44,22 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
             userNickname = userRepository.findByUserUUID(subUUID).getNickname();
         }
 
-        if (userNickname.equals("")) {
+        List<AlarmRedis> alarmRedisList;
+        
+        if (userNickname.equals("")) { // 편집자
             String authorUUID = directoryRepository.findDirectoryByUuid(subUUID).get().getUserUUID();
+
             String authorNickname = userRepository.findByUserUUID(authorUUID).getNickname();
-            List<AlarmRedis> alarmRedisList = allList.stream()
-                .filter(alarm -> alarm.getPubName().equals(authorNickname))
+
+            alarmRedisList = allList.stream()
+                .filter(alarm -> alarm.getPubName().equals(authorNickname)) // 작가 닉네임 알람만 조회
                 .collect(Collectors.toList());
-            return AlarmGetResponseDto.domainListToGetResDtoList(alarmRedisList);
         }
-        else{
-            List<AlarmRedis> alarmRedisList = allList.stream()
-                .filter(alarm -> !alarm.getPubName().equals(userNickname))
+        else{ // 작가
+            alarmRedisList = allList.stream()
+                .filter(alarm -> !alarm.getPubName().equals(userNickname)) // 자신과 같은 이름 알람리스트 제외
                 .collect(Collectors.toList());
-            return AlarmGetResponseDto.domainListToGetResDtoList(alarmRedisList);
         }
+        return AlarmGetResponseDto.domainListToGetResDtoList(alarmRedisList);
     }
 }
