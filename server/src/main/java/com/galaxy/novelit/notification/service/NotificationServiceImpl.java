@@ -144,7 +144,7 @@ public class NotificationServiceImpl implements NotificationService{
         if(userSet.size() >= 2) {
 
             for (String userUUID : userSet) {
-                if (!userUUID.equals(subscriberUUID)) {
+                if (!userUUID.equals(publisherUUID)) {
                     Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
                         userUUID);
 
