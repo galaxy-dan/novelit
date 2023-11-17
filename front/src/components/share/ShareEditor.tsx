@@ -64,8 +64,6 @@ export default function ShareEditor() {
     enabled: !!searchParams.slug,
   });
 
-
-
   useEffect(() => {
     const editRef = edit?.current;
     if (editRef) {
@@ -87,8 +85,6 @@ export default function ShareEditor() {
   }, []);
 
   useEffect(() => {
-    // document.getElementById("editor")?.innerText =
-
     let content = editor?.content ?? '';
     content = content.length === 0 ? '<div><br/></div>' : content;
     setHtml(content);
@@ -118,7 +114,7 @@ export default function ShareEditor() {
 
   const addReply = () => {
     if (editor?.editable) {
-      toast("글 작성중이어서 댓글을 작성할 수 없습니다.")
+      toast('글 작성중이어서 댓글을 작성할 수 없습니다.');
       return;
     }
 
@@ -144,11 +140,9 @@ export default function ShareEditor() {
     setIsOpen(true);
   };
 
-  
-
   return (
     <>
-    <div>편집자 페이지</div>
+      <div>편집자 페이지</div>
       <div
         className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
       >
@@ -160,11 +154,11 @@ export default function ShareEditor() {
         <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
-            id="edit"
             className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
             html={html}
             disabled={true}
             onChange={() => {}}
+            tagName="span"
             // onBlur={sanitize}
           />
         </div>
@@ -177,11 +171,13 @@ export default function ShareEditor() {
             <BiCommentDetail size={20} />
           </button>
 
-          {isOpen && !editor?.editable && (
+          {isOpen && (
             <Comment
               spaceUUID={spaceUUID}
               directoryUUID={searchParams.slug}
               setIsOpen={setIsOpen}
+              setHtml={setHtml}
+              editRef={edit}
             />
           )}
         </div>
