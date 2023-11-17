@@ -27,6 +27,8 @@ import {
 import { useRouter } from 'next/navigation';
 import { GiCancel } from 'react-icons/gi';
 import CharacterUpperGroup from '@/components/character/CharacterUpperGroup';
+import { useRecoilState } from 'recoil';
+import { isMovableState } from '@/store/state';
 
 type Props = {
   params: {
@@ -54,6 +56,8 @@ export default function page({ params }: Props) {
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
   const [isNameChanged, setIsNameChanged] = useState<boolean>(false);
+  const [loadingState, setLoadingState] = useState<number>(0);
+  const [isOpen, setIsOpen] = useRecoilState<boolean>(isMovableState);
 
   const { data: characterData }: UseQueryResult<characterType> = useQuery({
     queryKey: ['character', params.characterUUID],
@@ -71,8 +75,8 @@ export default function page({ params }: Props) {
     onError: () => {
       router.push(`/character/${params.slug}`);
     },
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    refetchOnWindowFocus: loadingState !== 1 && loadingState !== 2,
+    refetchOnMount: loadingState !== 1 && loadingState !== 2,
     staleTime: 0,
   });
 
@@ -99,14 +103,17 @@ export default function page({ params }: Props) {
       }),
     onSuccess: () => {
       setLoadingState(3);
+      setIsOpen(true);
       queryClient.invalidateQueries(['group']);
       queryClient.invalidateQueries(['characterDirectory']);
     },
     onError: () => {
       setLoadingState(4);
+      setIsOpen(true);
     },
     onMutate: () => {
       setLoadingState(2);
+      setIsOpen(false);
     },
   });
 
@@ -160,7 +167,7 @@ export default function page({ params }: Props) {
 
   const [relationCharacterSearchInput, setRelationCharacterSearchInput] =
     useState<number>(-1);
-  const [loadingState, setLoadingState] = useState<number>(0);
+  
 
   const updateCharacter = () => {
     setCharacter((prev) => ({
@@ -233,6 +240,7 @@ export default function page({ params }: Props) {
       }
     } else {
       setLoadingState(0);
+      setIsOpen(true);
     }
     ref.current = JSON.parse(JSON.stringify(character));
   }, [character]);
@@ -260,6 +268,8 @@ export default function page({ params }: Props) {
     }
   }, [loadingState]);
 
+  
+
   return (
     <div
       className="select-none w-full h-screen overflow-y-scroll scrollbar-hide"
@@ -286,6 +296,7 @@ export default function page({ params }: Props) {
                 onChange={(e) => {
                   setNameInput(e.target.value);
                   setLoadingState(1);
+                  setIsOpen(false);
                 }}
                 value={nameInput || ''}
               />
@@ -327,6 +338,7 @@ export default function page({ params }: Props) {
                     setImageUrl(null);
                     setImageInput(null);
                     setLoadingState(1);
+                    setIsOpen(false);
                   }}
                 ></GiCancel>
               </>
@@ -378,6 +390,7 @@ export default function page({ params }: Props) {
                 }
 
                 setLoadingState(1);
+                setIsOpen(false);
               }}
             />
           </div>
@@ -389,6 +402,7 @@ export default function page({ params }: Props) {
                 value={descriptionInput || ''}
                 onChange={(e) => {
                   setLoadingState(1);
+                  setIsOpen(false);
                   if (e.target.value.length < 1000) {
                     setdescriptionInput(e.target.value);
                   } else {
@@ -421,7 +435,7 @@ export default function page({ params }: Props) {
                           value={key.split('@;!')[0]}
                           onChange={(e) => {
                             setLoadingState(1);
-
+                            setIsOpen(false);
                             var newItem = [...informationInput];
                             let str: string =
                               e.target.value + '@;!' + key.split('@;!')[1];
@@ -449,6 +463,7 @@ export default function page({ params }: Props) {
                             value={value}
                             onChange={(e) => {
                               setLoadingState(1);
+                              setIsOpen(false);
                               var newItem = [...informationInput];
                               newItem[0][key] = e.target.value;
                               setInformationInput(newItem);
@@ -460,6 +475,7 @@ export default function page({ params }: Props) {
                               className="my-auto cursor-pointer h-10"
                               onClick={() => {
                                 setLoadingState(1);
+                                setIsOpen(false);
                                 let tmpInfo: informationType[] = [
                                   ...informationInput,
                                 ];
@@ -485,6 +501,7 @@ export default function page({ params }: Props) {
                 newInfo[0][uuid] = '';
                 setInformationInput(newInfo);
                 setLoadingState(1);
+                setIsOpen(false);
               }
             }}
           >
@@ -514,6 +531,7 @@ export default function page({ params }: Props) {
                       value={relationshipInput[i].targetName}
                       onChange={(e) => {
                         setLoadingState(1);
+                        setIsOpen(false);
                         var newItem = [...relationshipInput];
                         newItem[i].targetName = e.target.value;
                         newItem[i].targetUUID = null;
@@ -561,6 +579,7 @@ export default function page({ params }: Props) {
                             className="flex px-2 py-2 hover:bg-gray-200 cursor-pointer"
                             onClick={() => {
                               setLoadingState(1);
+                              setIsOpen(false);
                               var newItem = [...relationshipInput];
                               newItem[i].targetUUID =
                                 otherCharacter.characterUUID;
@@ -611,6 +630,7 @@ export default function page({ params }: Props) {
                         value={relationshipInput[i].content}
                         onChange={(e) => {
                           setLoadingState(1);
+                          setIsOpen(false);
                           var newItem = [...relationshipInput];
                           newItem[i].content = e.target.value;
                           setRelationInput(newItem);
@@ -620,6 +640,7 @@ export default function page({ params }: Props) {
                         className="my-auto cursor-pointer h-10"
                         onClick={() => {
                           setLoadingState(1);
+                          setIsOpen(false);
                           let tmpRelation = [...relationshipInput];
                           let tmp = tmpRelation.splice(i, 1);
                           setRelationInput(tmpRelation);
@@ -640,6 +661,7 @@ export default function page({ params }: Props) {
               ];
               setRelationInput(newRelation);
               setLoadingState(1);
+              setIsOpen(false);
             }}
           >
             <HiPlus className="text-white mx-auto font-bold" />
