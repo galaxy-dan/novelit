@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.galaxy.novelit.author.domain.User;
 import com.galaxy.novelit.author.repository.UserRepository;
+import com.galaxy.novelit.directory.repository.DirectoryRepository;
 import com.galaxy.novelit.notification.redis.domain.AlarmRedis;
 import com.galaxy.novelit.notification.redis.dto.request.AlarmRedisRequestDto;
 import com.galaxy.novelit.notification.redis.dto.response.AlarmGetResponseDto;
@@ -23,6 +24,7 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
 
     private final AlarmRedisRepository alarmRedisRepository;
     private final UserRepository userRepository;
+    private final DirectoryRepository directoryRepository;
 
     @Transactional
     public void save(AlarmRedisRequestDto alarmRedisRequestDto) {
@@ -35,17 +37,25 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
 
         User user = userRepository.findByUserUUID(subUUID);
         String userNickname;
-        if(user == null){
+        if(user == null){ // 편집자
             userNickname = "";
-        }else{
+        }else{ // 작가
             userNickname = userRepository.findByUserUUID(subUUID).getNickname();
         }
 
-        List<AlarmRedis> alarmRedisList = allList.stream()
-            .filter(alarm -> !alarm.getPubName().equals(userNickname))
-            .collect(Collectors.toList());
-
-
-        return AlarmGetResponseDto.domainListToGetResDtoList(alarmRedisList);
+        if (userNickname != "") {
+            String authorUUID = directoryRepository.findDirectoryByUuid(subUUID).get().getUserUUID();
+            String authorNickname = userRepository.findByUserUUID(authorUUID).getNickname();
+            List<AlarmRedis> alarmRedisList = allList.stream()
+                .filter(alarm -> alarm.getPubName().equals(authorNickname))
+                .collect(Collectors.toList());
+            return AlarmGetResponseDto.domainListToGetResDtoList(alarmRedisList);
+        }
+        else{
+            List<AlarmRedis> alarmRedisList = allList.stream()
+                .filter(alarm -> !alarm.getPubName().equals(userNickname))
+                .collect(Collectors.toList());
+            return AlarmGetResponseDto.domainListToGetResDtoList(alarmRedisList);
+        }
     }
 }
