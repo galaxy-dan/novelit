@@ -42,7 +42,7 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
         }
 
         List<AlarmRedis> alarmRedisList = allList.stream()
-            .filter(alarm -> alarm.getPubName().equals(userNickname))
+            .filter(alarm -> !alarm.getPubName().equals(userNickname))
             .collect(Collectors.toList());
 
 
