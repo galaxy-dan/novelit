@@ -1,16 +1,20 @@
 package com.galaxy.novelit.notification.redis.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.galaxy.novelit.author.domain.User;
 import com.galaxy.novelit.author.repository.UserRepository;
 import com.galaxy.novelit.notification.redis.domain.AlarmRedis;
 import com.galaxy.novelit.notification.redis.dto.request.AlarmRedisRequestDto;
 import com.galaxy.novelit.notification.redis.dto.response.AlarmGetResponseDto;
 import com.galaxy.novelit.notification.redis.repository.AlarmRedisRepository;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -29,7 +33,13 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
     public List<AlarmGetResponseDto> getAllList(String subUUID) {
         List<AlarmRedis> allList = alarmRedisRepository.findAllByNoti_SubUUID(subUUID).get();
 
-        String userNickname = userRepository.findByUserUUID(subUUID).getNickname();
+        User user = userRepository.findByUserUUID(subUUID);
+        String userNickname;
+        if(user == null){
+            userNickname = "";
+        }else{
+            userNickname = userRepository.findByUserUUID(subUUID).getNickname();
+        }
 
         List<AlarmRedis> alarmRedisList = allList.stream()
             .filter(alarm -> alarm.getPubName().equals(userNickname))
