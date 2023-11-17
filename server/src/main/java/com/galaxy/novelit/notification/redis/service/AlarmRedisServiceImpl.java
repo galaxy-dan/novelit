@@ -43,7 +43,7 @@ public class AlarmRedisServiceImpl implements AlarmRedisService{
             userNickname = userRepository.findByUserUUID(subUUID).getNickname();
         }
 
-        if (userNickname != "") {
+        if (userNickname.equals("")) {
             String authorUUID = directoryRepository.findDirectoryByUuid(subUUID).get().getUserUUID();
             String authorNickname = userRepository.findByUserUUID(authorUUID).getNickname();
             List<AlarmRedis> alarmRedisList = allList.stream()
