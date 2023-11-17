@@ -139,16 +139,14 @@ public class NotificationServiceImpl implements NotificationService{
             .map(CommentInfo::getUserUUID)
             .collect(Collectors.toSet());
 
-        log.info("userSet : {}", userSet.size());
 
         if(userSet.size() >= 2) {
 
             for (String userUUID : userSet) {
-                if (!userUUID.equals(publisherUUID)) {
+                if (!publisherUUID.equals(userUUID)) {
                     Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
                         userUUID);
 
-                    log.info("userSet : 2 : {}", userUUID);
 
                     sseEmitters.forEach(
                         (key, emitter) -> {
@@ -160,7 +158,7 @@ public class NotificationServiceImpl implements NotificationService{
                             // 알림 레디스에 저장
                             alarmRedisService.save(AlarmRedisRequestDto.builder()
                                 .pubName(commentAddRequestDto.getCommentNickname())
-                                .subUUID(subscriberUUID)
+                                .subUUID(userUUID)
                                 .directoryName(directoryName)
                                 .build());
                         }
