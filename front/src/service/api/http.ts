@@ -53,6 +53,15 @@ axios.interceptors.response.use(
         .catch(() => {});
     }
 
+    if (
+      error?.response?.status === 403 &&
+      window.location.pathname.startsWith('/share')
+    ) {
+      localStorage.clear();
+      toast("다시 로그인해주세요!");
+      location.href = '/share';
+    }
+
     return Promise.reject(error);
   },
 );
