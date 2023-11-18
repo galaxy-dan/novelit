@@ -41,8 +41,8 @@ export default function SSE() {
     eventSource.addEventListener('alertComment', function (event: any) {
       const data = JSON.parse(event.data);
       if (data.type !== 'Connection') {
-        console.log(queryClient);
         queryClient.refetchQueries(['editor']);
+        queryClient.refetchQueries(['alarm']);
         toast(data.content);
 
       }
