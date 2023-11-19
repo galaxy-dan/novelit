@@ -28,7 +28,7 @@ public class Workspace {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "workspace_id", nullable = false)
+    @Column(name = "workspace_id")
     private Long id;
 
     @Column(name = "workspace_uuid", length = 36, nullable = false)

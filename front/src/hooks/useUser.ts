@@ -2,8 +2,8 @@ import { AuthContext } from '@/context/AuthContext';
 import { useContext, useState } from 'react';
 
 export interface User {
-  userId: string;
-  role: 0 | 1; // 0 : 구매자, 1 : 판매자
+  id: string;
+  role: string; // USER : 작가, EDITOR : 편집자
   authToken?: string;
 }
 

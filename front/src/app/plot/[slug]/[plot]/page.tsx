@@ -15,6 +15,8 @@ import { useRouter } from 'next/navigation';
 import { plotType } from '@/model/plot';
 import { deletePlot, getPlot, putPlot } from '@/service/api/plot';
 import { FaFolderTree } from 'react-icons/fa6';
+import { isMovableState } from '@/store/state';
+import { useRecoilState } from 'recoil';
 
 type Props = {
   params: {
@@ -42,6 +44,7 @@ export default function page({ params }: Props) {
 
   const [isFetched, setIsFetched] = useState<boolean>(false);
   const [istitleChanged, setIstitleChanged] = useState<boolean>(false);
+  const [state, setState] = useState<number>(0);
 
   const { data: plotData }: UseQueryResult<plotType> = useQuery({
     queryKey: ['plot', params.plot],
@@ -58,7 +61,8 @@ export default function page({ params }: Props) {
     onError: () => {
       router.push(`/plot/${params.slug}`);
     },
-    enabled: !isFetched,
+    refetchOnWindowFocus: state !== 1 && state !== 2,
+    refetchOnMount: state !== 1 && state !== 2,
     staleTime: 0,
   });
 
@@ -66,6 +70,7 @@ export default function page({ params }: Props) {
     mutationFn: () => putPlot(params.plot, plot),
     onSuccess: () => {
       setState(3);
+      setIsOpen(true);
       if (istitleChanged) {
         queryClient.refetchQueries(['plotDirectory']);
         queryClient.refetchQueries(['plotList']);
@@ -74,9 +79,11 @@ export default function page({ params }: Props) {
     },
     onError: () => {
       setState(4);
+      setIsOpen(true);
     },
     onMutate: () => {
       setState(2);
+      setIsOpen(false);
     },
   });
 
@@ -89,6 +96,7 @@ export default function page({ params }: Props) {
     },
     onError: () => {
       setState(4);
+      setIsOpen(true);
     },
   });
 
@@ -110,7 +118,7 @@ export default function page({ params }: Props) {
 
   const [width, setWidth] = useState(100);
   const nameRef = useRef<HTMLInputElement>(null);
-
+  const [isOpen, setIsOpen] = useRecoilState<boolean>(isMovableState);
   const [beginningInput, setBeginningInput] = useState<string | null>('');
   const [risingInput, setRisingInput] = useState<string | null>('');
   const [crisisInput, setCrisisInput] = useState<string | null>('');
@@ -123,7 +131,6 @@ export default function page({ params }: Props) {
   const climaxRef = useRef<HTMLTextAreaElement>(null);
   const endingRef = useRef<HTMLTextAreaElement>(null);
 
-  const [state, setState] = useState<number>(0);
 
   const hello = () => {
     setPlot((prev) => ({
@@ -167,6 +174,7 @@ export default function page({ params }: Props) {
       }
     } else {
       setState(0);
+      setIsOpen(true);
     }
     ref.current = JSON.parse(JSON.stringify(plot));
   }, [plot]);
@@ -266,6 +274,7 @@ export default function page({ params }: Props) {
               onChange={(e) => {
                 setPlotTitleInput(e.target.value);
                 setState(1);
+                setIsOpen(false);
               }}
               value={plotTitleInput || ''}
             />
@@ -294,6 +303,7 @@ export default function page({ params }: Props) {
                 if (e.target.value.length < 1000) {
                   setStoryInput(e.target.value);
                   setState(1);
+                  setIsOpen(false);
                 } else {
                   alert('글자 수 제한 1000자!');
                 }
@@ -320,6 +330,7 @@ export default function page({ params }: Props) {
                   rows={1}
                   onChange={(e) => {
                     setState(1);
+                    setIsOpen(false);
                     setBeginningInput(e.target.value);
                   }}
                 ></textarea>
@@ -338,6 +349,7 @@ export default function page({ params }: Props) {
                   rows={1}
                   onChange={(e) => {
                     setState(1);
+                    setIsOpen(false);
                     setRisingInput(e.target.value);
                   }}
                 ></textarea>
@@ -356,6 +368,7 @@ export default function page({ params }: Props) {
                   rows={1}
                   onChange={(e) => {
                     setState(1);
+                    setIsOpen(false);
                     setCrisisInput(e.target.value);
                   }}
                 ></textarea>
@@ -374,6 +387,7 @@ export default function page({ params }: Props) {
                   rows={1}
                   onChange={(e) => {
                     setState(1);
+                    setIsOpen(false);
                     setClimaxInput(e.target.value);
                   }}
                 ></textarea>
@@ -392,6 +406,7 @@ export default function page({ params }: Props) {
                   rows={1}
                   onChange={(e) => {
                     setState(1);
+                    setIsOpen(false);
                     setEndingInput(e.target.value);
                   }}
                 ></textarea>

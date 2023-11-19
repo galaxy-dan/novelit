@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 import { useContext, useState } from 'react';
 
 export default function NotificationButton() {
-
+  const { user } = useContext(AuthContext);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   // const { user } = useContext(AuthContext);
@@ -25,7 +25,7 @@ export default function NotificationButton() {
       const data: any = await get('/notifications/alarmlist');
       return data;
     },
-    // enabled: !!user?.userId,
+    enabled: !!user?.id,
   });
 
   return (

@@ -14,8 +14,8 @@ public class EmitterRepository {
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
 
-    public SseEmitter save(String subscriberUUID, SseEmitter sseEmitter) {
-        emitters.put(subscriberUUID, sseEmitter);
+    public SseEmitter save(String id, SseEmitter sseEmitter) {
+        emitters.put(id, sseEmitter);
         return sseEmitter;
     }
 
@@ -23,14 +23,24 @@ public class EmitterRepository {
         eventCache.put(id, object);
     }
 
-    public Map<String, SseEmitter> findAllStartById(String id) {
+    public SseEmitter get (String id) {
+        return emitters.get(id);
+    }
+
+    public Map<String, SseEmitter> findAllEmittersStartWithId(String id) {
         return emitters.entrySet().stream()
             .filter(entry -> entry.getKey().startsWith(id))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 
-    public void deleteAllStartByWithId(String id) {
+
+    public void deleteById(String emitterId) {
+        emitters.remove(emitterId);
+    }
+
+    /*public void deleteAllStartByWithId(String id) {
+
         emitters.forEach((key, emitter) -> {
             if (key.startsWith(id)) emitters.remove(key);
         });

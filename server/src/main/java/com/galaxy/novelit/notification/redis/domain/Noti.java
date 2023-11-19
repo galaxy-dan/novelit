@@ -14,15 +14,13 @@ import org.springframework.data.redis.core.index.Indexed;
 @Builder
 public class Noti {
 
-    private String pubName;
     @Indexed
     private String subUUID;
     @Indexed
     private String directoryName;
 
-    public static Noti create(String pubName, String subUUID, String directoryName){
+    public static Noti create(String subUUID, String directoryName){
         return Noti.builder()
-            .pubName(pubName)
             .subUUID(subUUID)
             .directoryName(directoryName)
             .build();

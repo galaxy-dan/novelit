@@ -8,6 +8,7 @@ import com.galaxy.novelit.comment.dto.request.CommentDeleteRequestDto;
 import com.galaxy.novelit.comment.dto.request.CommentUpdateRequestDto;
 import com.galaxy.novelit.comment.repository.CommentRepository;
 import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +40,16 @@ public class CommentServiceImpl implements CommentService {
             // save
             commentRepository.save(comment);
         }
-
     }
 
     @Override
     public List<CommentInfoDto> getAllComments(String spaceUUID) {
         Comment comment = commentRepository.findCommentBySpaceUUID(spaceUUID);
+
+        if (comment == null) {
+            List<CommentInfoDto> commentInfoList = new ArrayList<>();
+            return commentInfoList;
+        }
 
         return CommentInfoDto.infoListToDtoList(comment.getCommentInfoList());
     }

@@ -1,13 +1,14 @@
 'use client';
 
 import { getConfig, post } from '@/service/api/http';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { EventSourcePolyfill, NativeEventSource } from 'event-source-polyfill';
 import { toast } from 'react-toastify';
 import { getAlarmMessage } from '@/service/alarm';
 import { Alarm } from '@/model/alarm';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { AuthContext } from '@/context/AuthContext';
 
 export default function SSE() {
   const [listening, setListening] = useState(false);
@@ -15,10 +16,12 @@ export default function SSE() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) return;
+  const { user } = useContext(AuthContext);
 
+  
+  
+  useEffect(() => {
+    if (!user) return;
     //     let eventSource: EventSource | undefined = undefined;
     const EventSource = EventSourcePolyfill || NativeEventSource;
     const eventSource = new EventSource(
@@ -38,7 +41,10 @@ export default function SSE() {
     eventSource.addEventListener('alertComment', function (event: any) {
       const data = JSON.parse(event.data);
       if (data.type !== 'Connection') {
+        queryClient.refetchQueries(['editor']);
+        queryClient.refetchQueries(['alarm']);
         toast(data.content);
+
       }
     });
     eventSource.onmessage = (error) => {
@@ -48,7 +54,7 @@ export default function SSE() {
     eventSource.onerror = (error) => {
       // console.log(error);
     };
-  }, [router]);
+  }, [router, user]);
 
   return <></>;
 }

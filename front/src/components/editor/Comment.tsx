@@ -15,7 +15,7 @@ import {
 } from '@/service/api/editor';
 import { toast } from 'react-toastify';
 import { Comment } from '@/model/editor';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, RefObject, SetStateAction } from 'react';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
 
@@ -33,12 +33,16 @@ type Props = {
   spaceUUID: string;
   directoryUUID: string | string[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setHtml: Dispatch<SetStateAction<string>>;
+  editRef: RefObject<HTMLDivElement>;
 };
 
 export default function Comment({
   spaceUUID,
   directoryUUID,
   setIsOpen,
+  setHtml,
+  editRef,
 }: Props) {
   const queryClient = useQueryClient();
 
@@ -72,7 +76,7 @@ export default function Comment({
   const patchMutate = useMutation({
     mutationFn: patchEditor,
     onSuccess: () => {
-      queryClient.invalidateQueries(['editor']);
+      queryClient.refetchQueries(['editor']);
     },
   });
 
@@ -80,12 +84,11 @@ export default function Comment({
     mutationFn: postComment,
     onSuccess: () => {
       queryClient.invalidateQueries(['comment', spaceUUID]);
-
+      reset();
       // 글도 최신화
       patchMutate.mutate({
         uuid: directoryUUID,
-        content:
-          document.getElementById('edit')?.innerHTML ?? '<div><br/></div>',
+        content: editRef?.current?.innerHTML ?? '<div><br/></div>',
       });
     },
   });
@@ -96,11 +99,39 @@ export default function Comment({
       queryClient.invalidateQueries(['comment', spaceUUID]);
     },
   });
+
+  const endClick = () => {
+    if (commentList?.length === 0) {
+      const space = document.getElementById(spaceUUID);
+      if (!space) return;
+      const text = space.innerHTML;
+      const regex = new RegExp(`<span id="${spaceUUID}">([\\s\\S]*?)<\/span>`);
+      // const regex = new RegExp(`<span>(.*?)<\/span>`);
+      // setHtml((prev) => {
+      //   const data = prev.replace(regex, text);
+      //   console.log(regex);
+      //   console.log(data);
+      //   return prev.replace(regex, text);
+      // });
+      setHtml((prev) => prev.replace(regex, text));
+
+
+      // 글도 최신화
+      patchMutate.mutate({
+        uuid: directoryUUID,
+        content:
+          editRef?.current?.innerHTML.replace(regex, text) ??
+          '<div><br/></div>',
+      });
+    }
+    setIsOpen((prev) => !prev);
+  };
+
   return (
     <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-black rounded-md shadow-md p-2 bg-white">
       <div className="flex justify-between">
         <div>Comment</div>
-        <button onClick={() => setIsOpen((prev) => !prev)}>
+        <button onClick={endClick}>
           <AiOutlineMinus />
         </button>
       </div>
