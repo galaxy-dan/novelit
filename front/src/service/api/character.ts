@@ -7,7 +7,7 @@ const transformDiagramData = (characterData: any) => {
   let edgeDatas: EdgeType[] = [];
   let nodeUUID: string[] = [];
 
-  characterData.Relations.array.forEach((ele: any) => {
+  characterData.Relations.forEach((ele: any) => {
     nodeUUID.push(ele.characterUUID);
   });
 
@@ -41,8 +41,9 @@ const transformDiagramData = (characterData: any) => {
         },
       });
     }
-
+    console.log("hmm?");
     dat.relations.forEach((element: any) => {
+      console.log("hmm2?");
       if (element.targetUUID && nodeUUID.includes(element.targetUUID)) {
         edgeDatas.push({
           data: {
