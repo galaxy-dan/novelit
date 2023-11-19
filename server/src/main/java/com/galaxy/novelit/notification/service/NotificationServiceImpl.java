@@ -48,7 +48,7 @@ public class NotificationServiceImpl implements NotificationService{
             .build());
 
         if (!lastEventId.isEmpty()) {
-            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(id);
+            Map<String, SseEmitter> events = emitterRepository.findAllStartById(subscriberUUID);
             events.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
                 .forEach(entry -> sendToClient(emitter, entry.getKey(),"alertComment" , entry.getValue()));
@@ -78,7 +78,7 @@ public class NotificationServiceImpl implements NotificationService{
                 .data(data));
         } catch (IOException exception)
         {
-            emitterRepository.deleteById(id);
+            emitterRepository.deleteAllStartByWithId(id);
             emitter.completeWithError(exception);
         }
     }
@@ -100,7 +100,6 @@ public class NotificationServiceImpl implements NotificationService{
 
 
         Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(subscriberUUID);
-
 
         sseEmitters.forEach(
             (key, emitter) -> {
