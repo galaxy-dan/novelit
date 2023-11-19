@@ -43,7 +43,7 @@ export default function ShareEditor() {
   const searchParams = useParams();
   const queryClient = useQueryClient();
 
-  const [html, setHtml] = useState<string>('<div><br/></div>');
+  const [html, setHtml] = useState<string>('');
   const [length, setLength] = useState<number>();
 
   const [editable, setEditable] = useState<boolean>(true);
@@ -63,8 +63,6 @@ export default function ShareEditor() {
     queryFn: () => getEditor({ uuid: searchParams.slug }),
     enabled: !!searchParams.slug,
   });
-
-
 
   useEffect(() => {
     const editRef = edit?.current;
@@ -87,10 +85,8 @@ export default function ShareEditor() {
   }, []);
 
   useEffect(() => {
-    // document.getElementById("editor")?.innerText =
-
     let content = editor?.content ?? '';
-    content = content.length === 0 ? '<div><br/></div>' : content;
+    content = content.length === 0 ? '' : content;
     setHtml(content);
   }, [editor?.content]);
 
@@ -118,20 +114,17 @@ export default function ShareEditor() {
 
   const addReply = () => {
     if (editor?.editable) {
-      toast("글 작성중이어서 댓글을 작성할 수 없습니다.")
+      toast('글 작성중이어서 댓글을 작성할 수 없습니다.');
       return;
     }
 
     const selection = window.getSelection();
-    console.log(selection?.rangeCount);
-    console.log(selection?.isCollapsed);
 
     // 선택한 부분이 없으면 return
     if (selection?.isCollapsed) return;
 
     if (!selection?.rangeCount) return;
 
-    console.log('여기까지?');
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
@@ -139,16 +132,19 @@ export default function ShareEditor() {
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
 
+    patchMutate.mutate({
+      uuid: searchParams.slug,
+      content: edit.current?.innerHTML ?? '',
+    });
+
     setHtml(edit?.current?.innerHTML ?? html);
     setSpaceUUID(wrapper.id);
     setIsOpen(true);
   };
 
-  
-
   return (
     <>
-    <div>편집자 페이지</div>
+      <div>편집자 페이지</div>
       <div
         className={`flex justify-center w-screen text-4xl border-b-2 border-gray-100 pb-12 mb-6 mt-24 font-${fontFamily[fontFamilyIndex]}`}
       >
@@ -160,11 +156,11 @@ export default function ShareEditor() {
         <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
-            id="edit"
-            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
+            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]} break-words`}
             html={html}
             disabled={true}
             onChange={() => {}}
+            tagName="span"
             // onBlur={sanitize}
           />
         </div>
@@ -177,11 +173,13 @@ export default function ShareEditor() {
             <BiCommentDetail size={20} />
           </button>
 
-          {isOpen && !editor?.editable && (
+          {isOpen && (
             <Comment
               spaceUUID={spaceUUID}
               directoryUUID={searchParams.slug}
               setIsOpen={setIsOpen}
+              setHtml={setHtml}
+              editRef={edit}
             />
           )}
         </div>

@@ -425,13 +425,7 @@ export default function RelationshipDiagram({ params }: Props) {
           <div className="flex items-end">
             <p className="text-4xl font-extrabold mr-4">관계도</p>
           </div>
-          <div className="flex items-center">
-            <p className="text-2xl font-extrabold mr-2">저장중</p>
-            <AiOutlineLoading3Quarters className="animate-spin text-xl " />
-            <AiOutlineCheck className="text-2xl" />
-          </div>
         </div>
-
         <div>
           <div
             className={`rounded-xl border border-gray-300 shadow-md mt-12 w-full h-[80vh]`}

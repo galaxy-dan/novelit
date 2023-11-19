@@ -34,11 +34,12 @@ public class CommentController {
         Authentication authentication){
         String publisherUUID = authentication.getName();
 
-        log.info("addComment : {}", publisherUUID);
         commentService.addComment(commentAddRequestDto, publisherUUID);
 
-        notificationService.send(commentAddRequestDto.getCommentNickname()
-            , commentAddRequestDto.getDirectoryUUID(), publisherUUID);
+       /* notificationService.notify(commentAddRequestDto.getCommentNickname()
+            , commentAddRequestDto.getDirectoryUUID(), publisherUUID);*/
+
+        notificationService.notice(commentAddRequestDto, publisherUUID);
 
         return ResponseEntity.ok().build();
     }

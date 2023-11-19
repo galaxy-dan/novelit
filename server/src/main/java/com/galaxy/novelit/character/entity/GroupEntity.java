@@ -50,16 +50,43 @@ public class GroupEntity {
         this.childGroups.add(child);
     }
     public void removeChildGroup(GroupEntity child) {
-        this.childGroups.remove(child);
+        List<GroupEntity> childList = this.childGroups;
+        int idx = 0;
+        for (GroupEntity group : childList) {
+            if (group.equals(child)) {
+                childList.remove(idx);
+                break;
+            }
+            idx++;
+        }
+        this.childGroups = childList;
     }
     public void addChildCharacter(CharacterEntity child) {
         this.childCharacters.add(child);
     }
     public void removeChildCharacter(CharacterEntity child) {
-        this.childCharacters.remove(child);
+        List<CharacterEntity> childList = this.childCharacters;
+        int idx = 0;
+        for (CharacterEntity character : childList) {
+            if (character.equals(child)) {
+                childList.remove(idx);
+                break;
+            }
+            idx++;
+        }
+        this.childCharacters = childList;
     }
     public void moveGroupNode(Double x, Double y) {
         this.groupNode.replace("x", x);
         this.groupNode.replace("y", y);
+    }
+
+    @Override
+    public boolean equals(Object entity) {
+        GroupEntity group = (GroupEntity) entity;
+        if (group.getGroupUUID().equals(groupUUID)) {
+            return true;
+        }
+        return super.equals(entity);
     }
 }

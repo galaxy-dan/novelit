@@ -51,13 +51,13 @@ export default function page({ params }: Props) {
   });
 
   return (
-    <div className="ml-14 py-20 select-none h-screen overflow-y-scroll scrollbar-hide ">
+    <div className="ml-14 mr-4 py-20 select-none h-screen overflow-y-scroll scrollbar-hide ">
       {/* 제목 */}
       <CharacterHomeTitle slug={params.slug} />
       {/* 검색 창 */}
       <div className="flex justify-between w-full">
         <CharacterNameSearch slug={params.slug} />
-        <div className="flex mt-11 mr-[8vw]">
+        <div className="flex mt-11 mr-[5rem]">
           <div
             onClick={() => {
               const uuid = uuidv4();

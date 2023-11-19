@@ -21,7 +21,7 @@ public class AlarmGetResponseDto {
     public static AlarmGetResponseDto domainToGetResDto(AlarmRedis alarmRedis) {
         return AlarmGetResponseDto.
             builder()
-            .pubName(alarmRedis.getNoti().getPubName())
+            .pubName(alarmRedis.getPubName())
             .directoryName(alarmRedis.getNoti().getDirectoryName())
             .build();
     }

@@ -6,7 +6,7 @@ import com.galaxy.novelit.words.dto.res.WordsDtoRes;
 
 public interface WordsService {
     WordsDtoRes getWords(String workspaceUUID);
-    void createWord(WordsCreateReqDTO dto, String userUUID);
+    void createWord(WordsCreateReqDTO dto, String uuid, String userUUID);
     void updateWord(String wordUUID, String newWord);
     void deleteWord(String wordUUID);
 }

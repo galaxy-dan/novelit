@@ -8,7 +8,7 @@ type Props = {
 };
 export default function CharacterCard({ character, slug }: Props) {
   const router = useRouter();
-
+  
   return (
     <div
       className="flex border-2 rounded-md w-72 h-40 px-3 items-center shadow-lg mt-8 cursor-pointer hover:bg-neutral-200"
@@ -41,12 +41,15 @@ export default function CharacterCard({ character, slug }: Props) {
       <div className="ml-4 w-36 my-auto">
         <p className="font-extrabold text-xl">{character.characterName}</p>
         <div className="font-bold">
-          {character?.information?.slice(0, 3).map((info, i) => (
-            <div className="flex mt-1 min-w-0" key={i}>
-              <p className="mr-2">{info.title}</p>
-              <p className="flex-1 truncate">{info.content}</p>
-            </div>
-          ))}
+          {character?.information &&
+            Object.keys(character.information[0]).map((key, i) => (
+              <div className="flex mt-1 min-w-0" key={i}>
+                <p className="mr-2">{key.split('@;!')[0]}</p>
+                <p className="flex-1 truncate">
+                  {character?.information && character?.information[0][key]}
+                </p>
+              </div>
+            ))}
         </div>
       </div>
     </div>

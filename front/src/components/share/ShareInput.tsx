@@ -7,6 +7,8 @@ import { getShareTokenValidation } from '@/service/api/share';
 import { useRouter } from 'next/navigation';
 import { getJwtPayload } from '@/service/editor/editor';
 import { toast } from 'react-toastify';
+import { useContext } from 'react';
+import { AuthContext } from '@/context/AuthContext';
 
 const schema = yup
   .object({
@@ -28,6 +30,7 @@ type Inputs = {
 
 export default function ShareInput() {
   const router = useRouter();
+  const { setUser } = useContext(AuthContext);
 
   const {
     register,
@@ -52,6 +55,8 @@ export default function ShareInput() {
       if (data.valid) {
         const payload = getJwtPayload(req.token);
         localStorage.setItem('accessToken', req.token);
+
+        setUser({ id: payload.id, role: payload.role });
         router.replace(`/share/${payload.id}`);
       } else {
         toast.error('토큰이 잘못되었습니다');
@@ -72,7 +77,7 @@ export default function ShareInput() {
         className="border-2 m-2 p-1 rounded-lg w-full"
       />
       <input
-        type="text"
+        type="password"
         {...register('token')}
         placeholder="토큰"
         className="border-2 m-2 p-1 rounded-lg w-full"
