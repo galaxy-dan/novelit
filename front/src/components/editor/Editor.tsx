@@ -83,13 +83,14 @@ export default function Editor() {
     if (editor?.content === html) return;
 
     if (throttle) return;
-
     if (!throttle) {
       setThrottle(true);
       setTimeout(() => {
+        if (!edit.current?.innerHTML && edit.current?.innerHTML !== "") return;
+
         patchMutate.mutate({
           uuid: searchParams.slug?.[1],
-          content: edit.current?.innerHTML ?? '',
+          content: edit.current?.innerHTML,
         });
         setThrottle(false);
       }, 5000);
@@ -147,7 +148,6 @@ export default function Editor() {
   }, []);
 
   useEffect(() => {
-
     let content = editor?.content ?? '';
     content = content.length === 0 ? '' : content;
     setHtml(content);
@@ -181,8 +181,6 @@ export default function Editor() {
     setHtml((prev) => sanitizeHtml(prev, sanitizeConf));
   };
 
-
-
   const addReply = () => {
     if (editor?.editable) {
       toast('글 작성중이어서 댓글을 작성할 수 없습니다.');
@@ -195,8 +193,7 @@ export default function Editor() {
 
     if (!selection?.rangeCount) return;
 
-    if (selection.focusNode?.parentNode?.nodeName !== "SPAN") return;
-
+    if (selection.focusNode?.parentNode?.nodeName !== 'SPAN') return;
 
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
@@ -321,7 +318,7 @@ export default function Editor() {
             html={html}
             disabled={!editor?.editable ?? false}
             onChange={handleChange}
-            tagName='span'
+            tagName="span"
             // onBlur={sanitize}
           />
           {/* <h3>source</h3>
