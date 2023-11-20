@@ -3,9 +3,11 @@ package com.galaxy.novelit.notification.repository;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Repository
@@ -44,6 +46,6 @@ public class EmitterRepository {
         emitters.forEach((key, emitter) -> {
             if (key.startsWith(id)) emitters.remove(key);
         });
-    }
+    }*/
 
 }
