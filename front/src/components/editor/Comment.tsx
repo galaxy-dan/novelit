@@ -76,7 +76,7 @@ export default function Comment({
   const patchMutate = useMutation({
     mutationFn: patchEditor,
     onSuccess: () => {
-      queryClient.invalidateQueries(['editor']);
+      queryClient.refetchQueries(['editor']);
     },
   });
 
@@ -105,8 +105,24 @@ export default function Comment({
       const space = document.getElementById(spaceUUID);
       if (!space) return;
       const text = space.innerHTML;
-      const regex = new RegExp(`<span id="${spaceUUID}">(.*?)<\/span>`);
+      const regex = new RegExp(`<span id="${spaceUUID}">([\\s\\S]*?)<\/span>`);
+      // const regex = new RegExp(`<span>(.*?)<\/span>`);
+      // setHtml((prev) => {
+      //   const data = prev.replace(regex, text);
+      //   console.log(regex);
+      //   console.log(data);
+      //   return prev.replace(regex, text);
+      // });
       setHtml((prev) => prev.replace(regex, text));
+
+
+      // 글도 최신화
+      patchMutate.mutate({
+        uuid: directoryUUID,
+        content:
+          editRef?.current?.innerHTML.replace(regex, text) ??
+          '<div><br/></div>',
+      });
     }
     setIsOpen((prev) => !prev);
   };

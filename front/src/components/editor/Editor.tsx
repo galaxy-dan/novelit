@@ -51,7 +51,7 @@ export default function Editor() {
   const searchParams = useParams();
   const queryClient = useQueryClient();
 
-  const [html, setHtml] = useState<string>('<div><br/></div>');
+  const [html, setHtml] = useState<string>('');
   const [length, setLength] = useState<number>();
 
   const [editable, setEditable] = useState<boolean>(true);
@@ -93,9 +93,8 @@ export default function Editor() {
           content: edit.current?.innerHTML,
         });
         setThrottle(false);
-      }, 2000);
+      }, 5000);
     }
-
   }, [html]);
 
   // debounce
@@ -104,7 +103,7 @@ export default function Editor() {
   //   const time = setTimeout(() => {
   //     patchMutate.mutate({
   //       uuid: searchParams.slug?.[1],
-  //       content: html ?? '<div><br/></div>',
+  //       content: html ?? '',
   //     });
   //   }, 2000);
 
@@ -149,9 +148,8 @@ export default function Editor() {
   }, []);
 
   useEffect(() => {
-
     let content = editor?.content ?? '';
-    content = content.length === 0 ? '<div><br/></div>' : content;
+    content = content.length === 0 ? '' : content;
     setHtml(content);
   }, [editor?.content]);
 
@@ -183,8 +181,6 @@ export default function Editor() {
     setHtml((prev) => sanitizeHtml(prev, sanitizeConf));
   };
 
-
-
   const addReply = () => {
     if (editor?.editable) {
       toast('글 작성중이어서 댓글을 작성할 수 없습니다.');
@@ -197,12 +193,19 @@ export default function Editor() {
 
     if (!selection?.rangeCount) return;
 
+    if (selection.focusNode?.parentNode?.nodeName !== 'SPAN') return;
+
     const range = selection.getRangeAt(0);
     const wrapper = document.createElement('span');
     wrapper.id = uuidv4();
 
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
+
+    patchMutate.mutate({
+      uuid: searchParams.slug?.[1],
+      content: edit.current?.innerHTML ?? '',
+    });
 
     setHtml(edit?.current?.innerHTML ?? html);
     setSpaceUUID(wrapper.id);
@@ -300,7 +303,7 @@ export default function Editor() {
           onClick={() => {
             patchMutate.mutate({
               uuid: searchParams.slug?.[1],
-              content: edit?.current?.innerHTML ?? '<div><br/></div>',
+              content: edit?.current?.innerHTML ?? '',
             });
           }}
         >
@@ -311,11 +314,11 @@ export default function Editor() {
         <div className=" flex flex-col justify-center items-center">
           <ContentEditable
             innerRef={edit}
-            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]}`}
+            className={`ml-2 w-[960px] min-h-screen p-1 resize-none text-${fontSize[fontIndex]} outline-none font-${fontFamily[fontFamilyIndex]} break-words`}
             html={html}
             disabled={!editor?.editable ?? false}
             onChange={handleChange}
-            tagName='span'
+            tagName="span"
             // onBlur={sanitize}
           />
           {/* <h3>source</h3>

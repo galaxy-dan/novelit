@@ -48,7 +48,7 @@ public class NotificationServiceImpl implements NotificationService{
             .build());
 
         if (!lastEventId.isEmpty()) {
-            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(id);
+            Map<String, SseEmitter> events = emitterRepository.findAllStartById(subscriberUUID);
             events.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
                 .forEach(entry -> sendToClient(emitter, entry.getKey(),"alertComment" , entry.getValue()));
@@ -78,7 +78,7 @@ public class NotificationServiceImpl implements NotificationService{
                 .data(data));
         } catch (IOException exception)
         {
-            emitterRepository.deleteById(id);
+            emitterRepository.deleteAllStartByWithId(id);
             emitter.completeWithError(exception);
         }
     }
@@ -100,7 +100,6 @@ public class NotificationServiceImpl implements NotificationService{
 
 
         Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(subscriberUUID);
-
 
         sseEmitters.forEach(
             (key, emitter) -> {
@@ -139,31 +138,31 @@ public class NotificationServiceImpl implements NotificationService{
             .map(CommentInfo::getUserUUID)
             .collect(Collectors.toSet());
 
-        log.info("userSet : {}", userSet.size());
 
         if(userSet.size() >= 2) {
 
             for (String userUUID : userSet) {
-                Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
-                    userUUID);
+                if (!publisherUUID.equals(userUUID)) {
+                    Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(
+                        userUUID);
 
-                log.info("userSet : 2 : {}", userUUID);
 
-                sseEmitters.forEach(
-                    (key, emitter) -> {
-                        // 데이터 캐시 저장 (유실된 데이터 처리 위함)
-                        emitterRepository.saveEventCache(key, notificationResponseDto);
+                    sseEmitters.forEach(
+                        (key, emitter) -> {
+                            // 데이터 캐시 저장 (유실된 데이터 처리 위함)
+                            emitterRepository.saveEventCache(key, notificationResponseDto);
 
-                        sendToClient(emitter, key, "alertComment", notificationResponseDto);
+                            sendToClient(emitter, key, "alertComment", notificationResponseDto);
 
-                        // 알림 레디스에 저장
-                        alarmRedisService.save(AlarmRedisRequestDto.builder()
-                            .pubName(commentAddRequestDto.getCommentNickname())
-                            .subUUID(subscriberUUID)
-                            .directoryName(directoryName)
-                            .build());
-                    }
-                );
+                            // 알림 레디스에 저장
+                            alarmRedisService.save(AlarmRedisRequestDto.builder()
+                                .pubName(commentAddRequestDto.getCommentNickname())
+                                .subUUID(userUUID)
+                                .directoryName(directoryName)
+                                .build());
+                        }
+                    );
+                }
             }
         }
         else if (userSet.size() == 1){

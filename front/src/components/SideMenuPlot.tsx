@@ -27,6 +27,7 @@ import { Novel } from '@/model/workspace';
 import SideMenuMoveButton from './SideMenuMoveButton';
 import { useRecoilState } from 'recoil';
 import { menuOpenState } from '@/store/menu';
+import { isMovableState } from '@/store/state';
 
 export default function SideMenuPlot() {
   const [isOpen, setIsOpen] = useRecoilState<boolean>(menuOpenState);
@@ -35,7 +36,7 @@ export default function SideMenuPlot() {
   const [term, setTerm] = useState<string>('');
   const queryClient = useQueryClient();
   const router = useRouter();
-
+  const [isMovable, setIsMovable] = useRecoilState<boolean>(isMovableState);
   const searchParams = useParams();
 
   const slug = Array.isArray(searchParams.slug)
@@ -88,7 +89,14 @@ export default function SideMenuPlot() {
           <div className="h-full">
             <div className="flex justify-between items-center pt-4 px-4 border-b-2 border-gray-300">
               <div className="flex gap-2 items-end">
-                <button className="pb-4" onClick={() => router.push('/main')}>
+                <button
+                  className="pb-4"
+                  onClick={() => {
+                    if (isMovable || confirm("기록이 저장되지 않을 수 있습니다.")) {
+                      router.push('/main');
+                    }
+                  }}
+                >
                   <BiSolidHome size={30} />
                 </button>
                 <div className="font-bold text-xl  pb-3">
@@ -160,7 +168,7 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
   const searchParams = useParams();
   const queryClient = useQueryClient();
   const router = useRouter();
-
+  const [isMovable, setIsMovable] = useRecoilState<boolean>(isMovableState);
   const slug = Array.isArray(searchParams.slug)
     ? searchParams.slug[0]
     : searchParams.slug;
@@ -190,7 +198,9 @@ function Node({ node, style, tree }: NodeRendererProps<any>) {
             queryClient.removeQueries(['plot', node.id]);
             queryClient.refetchQueries(['plotList']);
             queryClient.refetchQueries(['plotDirectory']);
-            router.push(`/plot/${slug}/${node.id}`);
+            if (isMovable || confirm("기록이 저장되지 않을 수 있습니다.")) {
+              router.push(`/plot/${slug}/${node.id}`);
+            }
           }
         }}
       >
