@@ -86,7 +86,7 @@ export default function Editor() {
     if (!throttle) {
       setThrottle(true);
       setTimeout(() => {
-        if (!edit.current?.innerHTML) return;
+        if (!edit.current?.innerHTML && edit.current?.innerHTML !== "") return;
 
         patchMutate.mutate({
           uuid: searchParams.slug?.[1],
