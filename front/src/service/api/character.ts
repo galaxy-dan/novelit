@@ -5,6 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 const transformDiagramData = (characterData: any) => {
   let nodeDatas: NodeType[] = [];
   let edgeDatas: EdgeType[] = [];
+  let nodeUUID: string[] = [];
+
+  characterData.Relations.forEach((ele: any) => {
+    nodeUUID.push(ele.characterUUID);
+  });
 
   characterData.Relations.forEach((dat: any) => {
     nodeDatas.push({
@@ -36,9 +41,10 @@ const transformDiagramData = (characterData: any) => {
         },
       });
     }
-
+    console.log("hmm?");
     dat.relations.forEach((element: any) => {
-      if (element.targetUUID) {
+      console.log("hmm2?");
+      if (element.targetUUID && nodeUUID.includes(element.targetUUID)) {
         edgeDatas.push({
           data: {
             source: dat.characterUUID,

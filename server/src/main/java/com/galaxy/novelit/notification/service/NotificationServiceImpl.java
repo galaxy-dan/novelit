@@ -48,7 +48,7 @@ public class NotificationServiceImpl implements NotificationService{
             .build());
 
         if (!lastEventId.isEmpty()) {
-            Map<String, SseEmitter> events = emitterRepository.findAllStartById(subscriberUUID);
+            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(id);
             events.entrySet().stream()
                 .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
                 .forEach(entry -> sendToClient(emitter, entry.getKey(),"alertComment" , entry.getValue()));
@@ -78,7 +78,7 @@ public class NotificationServiceImpl implements NotificationService{
                 .data(data));
         } catch (IOException exception)
         {
-            emitterRepository.deleteAllStartByWithId(id);
+            emitterRepository.deleteById(id);
             emitter.completeWithError(exception);
         }
     }
@@ -101,6 +101,7 @@ public class NotificationServiceImpl implements NotificationService{
 
         Map<String,SseEmitter> sseEmitters = emitterRepository.findAllEmittersStartWithId(subscriberUUID);
 
+
         sseEmitters.forEach(
             (key, emitter) -> {
                 // 데이터 캐시 저장 (유실된 데이터 처리 위함)
@@ -110,7 +111,7 @@ public class NotificationServiceImpl implements NotificationService{
 
                 // 알림 레디스에 저장
                 alarmRedisService.save(AlarmRedisRequestDto.builder()
-//                    .pubUUID(publisherUUID)
+                    //                    .pubUUID(publisherUUID)
                     .pubName(commentNickname)
                     .subUUID(subscriberUUID)
                     .directoryName(directoryName)
