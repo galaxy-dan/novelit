@@ -83,17 +83,19 @@ export default function Editor() {
     if (editor?.content === html) return;
 
     if (throttle) return;
-
     if (!throttle) {
       setThrottle(true);
       setTimeout(() => {
+        if (!edit.current?.innerHTML) return;
+
         patchMutate.mutate({
           uuid: searchParams.slug?.[1],
-          content: edit.current?.innerHTML ?? '<div><br/></div>',
+          content: edit.current?.innerHTML,
         });
         setThrottle(false);
       }, 2000);
     }
+
   }, [html]);
 
   // debounce
