@@ -1,25 +1,20 @@
 package com.galaxy.novelit.common.exception.advice;
 
-import com.galaxy.novelit.common.exception.DeletedElementException;
+import com.galaxy.novelit.common.exception.*;
+import com.galaxy.novelit.common.exception.custom.CustomException;
+import com.galaxy.novelit.common.exception.custom.dto.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.galaxy.novelit.common.exception.AccessRefusedException;
-import com.galaxy.novelit.common.exception.EditRefusedException;
-import com.galaxy.novelit.common.exception.IllegalUUIDException;
-import com.galaxy.novelit.common.exception.InvalidTokenException;
-import com.galaxy.novelit.common.exception.NoSuchDirectoryException;
-import com.galaxy.novelit.common.exception.NoSuchElementFoundException;
-import com.galaxy.novelit.common.exception.NoSuchWorkspaceException;
-import com.galaxy.novelit.common.exception.NonUniqueException;
-import com.galaxy.novelit.common.exception.NotLoggedInException;
-import com.galaxy.novelit.common.exception.WrongDirectoryTypeException;
 import com.galaxy.novelit.common.exception.dto.ExceptionResDTO;
 
+@Slf4j
 @ControllerAdvice
 public class ExceptionAdvice {
+
 	//존재하지 않는 directory
 	@ExceptionHandler(NoSuchDirectoryException.class)
 	public ResponseEntity<ExceptionResDTO> noSuchUserException(NoSuchDirectoryException e) {
@@ -37,15 +32,15 @@ public class ExceptionAdvice {
 	public ResponseEntity<ExceptionResDTO> wrongDirectoryTypeException(WrongDirectoryTypeException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
 	}
-	
+
 
 	@ExceptionHandler(IllegalUUIDException.class)
-	public ResponseEntity<ExceptionResDTO> IllegalUUIDException(IllegalUUIDException e){
+	public ResponseEntity<ExceptionResDTO> IllegalUUIDException(IllegalUUIDException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResDTO(e.getMessage()));
 	}
 
 	@ExceptionHandler(NoSuchWorkspaceException.class)
-	public ResponseEntity<ExceptionResDTO> NoSuchWorkspaceException(NoSuchWorkspaceException e){
+	public ResponseEntity<ExceptionResDTO> NoSuchWorkspaceException(NoSuchWorkspaceException e) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResDTO(e.getMessage()));
 	}
 
@@ -77,5 +72,11 @@ public class ExceptionAdvice {
 	@ExceptionHandler(DeletedElementException.class)
 	public ResponseEntity<ExceptionResDTO> DeletedElementException(DeletedElementException e) {
 		return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new ExceptionResDTO(e.getMessage()));
+	}
+
+	@ExceptionHandler(CustomException.class)
+	public ResponseEntity<ErrorResponse> handleCustomException(CustomException exception) {
+		log.error(exception.toString());
+		return ErrorResponse.of(exception.getErrorCode(), exception.getMessage());
 	}
 }

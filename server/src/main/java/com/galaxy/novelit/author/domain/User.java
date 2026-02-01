@@ -11,12 +11,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "user")
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Builder
 public class User {
     @Id
     @Column(name = "user_id")
@@ -32,4 +32,17 @@ public class User {
     @Column(name = "nickname", length = 16, nullable = false)
     private String nickname;
 
+    @Builder
+    public User(String userUUID, String email, String nickname) {
+        this.userUUID = userUUID;
+        this.email = email;
+        this.nickname = nickname;
+    }
+
+    @Builder
+    public User(String email, String nickname) {
+        this.userUUID = String.valueOf(UUID.randomUUID());
+        this.email = email;
+        this.nickname = nickname;
+    }
 }

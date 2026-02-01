@@ -1,0 +1,8 @@
+###
+### 설정파일 ###
+src/main/resources/data.sql
+src/main/resources/env_local.yml
+src/main/resources/env_aws.yml
+src/main/resources/env_monitoring.yml
+src/main/resources/env_test.yml
+docker-compose/.env

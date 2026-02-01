@@ -29,9 +29,10 @@ public class WorkspaceController {
 
     @PostMapping
     public ResponseEntity<?> createWorkspace(@RequestBody WorkSpaceCreateReqDTO
-            workSpaceCreateReqDTO, Authentication authentication) {
+            workSpaceCreateReqDTO, String uuid) {
         String workSpaceUUID = String.valueOf(UUID.randomUUID());
-        String userUUID = authentication.getName();
+        String userUUID = uuid;
+        //String userUUID = authentication.getName();
         String title = workSpaceCreateReqDTO.getTitle();
         workspaceService.createWorkspace(workSpaceUUID, userUUID, title);
 

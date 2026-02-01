@@ -1,0 +1,34 @@
+spring:
+  config:
+    import: env_test.yml
+---
+
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${MARIA_TEST_URL}
+    username: ${MARIA_USERNAME}
+    password: ${MARIA_PASSWORD}
+    hikari:
+      maximum-pool-size: 148
+      max-lifetime: 60000
+  sql:
+    init:
+      data-locations: ""
+
+---
+spring:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    #show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+
+---
+spring:
+  sql:
+    init:
+      mode: always

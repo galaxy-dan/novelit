@@ -1,28 +1,9 @@
 spring:
   config:
-    import: env.yml
-  profiles:
-    group:
-      1:
-        - common
-        - development_database
-        - port_8003
-      production-set1:
-        - common
-        - production_database
-        - port_8001
-      production-set2:
-        - common
-        - production_database
-        - port_8002
+    import: env_local.yml
 ---
 
 spring:
-
-  config:
-    activate:
-      on-profile: common
-
   security:
     oauth2:
       client:
@@ -35,7 +16,7 @@ spring:
             authorization-grant-type: authorization_code
             #            redirect-uri: ${KAKAO_REDIRECT_URL}
             #            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
-            redirect-uri: ${KAKAO_REDIRECT_URL}
+            redirect-uri: ${KAKAO_REDIRECT_URI}
             scope:
               - profile_nickname
               - account_email
@@ -46,202 +27,108 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
+---
+
 jwt:
   header: Authorization
   secret: ${JWT_SECRET_KEY}
   access-token-expire: ${ACCESS_TOKEN_EXPIRE}
   refresh-token-expire: ${REFRESH_TOKEN_EXPIRE}
   share-token-expire: ${SHARE_TOKEN_EXPIRE}
----
-
-spring:
-  config:
-    activate:
-      on-profile: development_database
-    import: env.yml
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-    hikari:
-      maximum-pool-size: 10
-      max-lifetime: 60000
-  data:
-    mongodb:
-#      host: mongo
-#      port: 27017
-#      authentication-database: admin
-#      username: ${MONGO_DATABASE_USERNAME}
-#      password: ${DATABASE_PASSWORD}
-#      database: novelit
-        uri: mongodb://localhost:27017/novelit
 
 ---
 
 spring:
-  config:
-    activate:
-      on-profile: production_database
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    url: ${MARIA_URL}
+    username: ${MARIA_USERNAME}
+    password: ${MARIA_PASSWORD}
     hikari:
       maximum-pool-size: 148
       max-lifetime: 60000
   data:
     mongodb:
-      host: mongo
-      port: 27017
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      uri: ${MONGODB_URI}
       authentication-database: admin
       username: ${MONGO_DATABASE_USERNAME}
       password: ${DATABASE_PASSWORD}
-      database: novelit
+      database: ${MONGO_DATABASE_NAME}
 
 ---
 
 spring:
-  config:
-    activate:
-      on-profile: port_8003
-    import: env.yml
-    kafka:
-      topic:
-        article: testing
-        comment: comment
-      bootstrap-servers: localhost:9092
-      consumer:
-        #        group-id: group-id-test
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
-        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
-      producer:
-        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-
   jpa:
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl # ?? camelCase-> underscore ?? ??.
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-        format_sql: true
+        show_sql: true              # sql 보기 옵션
+        format_sql: true            # 예쁘게 포맷팅
+        highlight_sql: true         # ANSI 코드에 색을 나타낸다
+        use_sql_comments: true      # jpql 실행문 볼수있음
         dialect: org.hibernate.dialect.MariaDBDialect
         order_updates: true
         order_inserts: true
         jdbc:
           batch_size: 100
     open-in-view: false
+    defer-datasource-initialization: true
 
-
-server:
-  servlet:
-    #    context-path: /api
-    encoding:
-      charset: UTF-8
-      force: true
-  port: 8003
-  address: 0.0.0.0
+---
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
 ---
 
 spring:
-  config:
-    activate:
-      on-profile: port_8001
-    import: env.yml
-    kafka:
-      topic:
-        article: testing
-        comment: comment
-      bootstrap-servers: localhost:9092
-      consumer:
-        #        group-id: group-id-test
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
-        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
-      producer:
-        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+  main:
+    allow-bean-definition-overriding: true
 
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-      naming:
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl # ?? camelCase-> underscore ?? ??.
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MariaDBDialect
-        order_updates: true
-        order_inserts: true
-        jdbc:
-          batch_size: 100
-
-
-
-server:
-  servlet:
-    #    context-path: /api
-    encoding:
-      charset: UTF-8
-      force: true
-  port: 8001
-  address: 0.0.0.0
 ---
-
+server:
+  port: ${SPRING_SERVER_PORT}
+  
+  
+---
+## 더미데이터 테스트
 spring:
-  config:
-    activate:
-      on-profile: port_8002
-    import: env.yml
-    kafka:
-      topic:
-        article: testing
-        comment: comment
-      bootstrap-servers: localhost:9092
-      consumer:
-        #        group-id: group-id-test
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
-        value-deserializer: org.apache.kafka.common.serialization.ByteArraySerializer
-      producer:
-        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-      naming:
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl # ?? camelCase-> underscore ?? ??.
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MariaDBDialect
-        order_updates: true
-        order_inserts: true
-        jdbc:
-          batch_size: 100
-
-server:
-  servlet:
-    #    context-path: /api
-    encoding:
-      charset: UTF-8
-      force: true
-  port: 8002
-  address: 0.0.0.0
+  sql:
+    init:
+      mode: always
 
 ---
+### monitoring
+management:
+  server:
+    port: ${MANAGEMENT_SERVER_PORT}
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+---
+logging:
+  level:
+    com:
+      galaxy:
+        novelit: info
+
+
 
 # 토큰 관련 secret Key 및 RedirectUri 설정
 #  app:

@@ -3,8 +3,6 @@ package com.galaxy.novelit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.KafkaAdmin.NewTopics;
 
 @SpringBootApplication
 public class NovelitApplication {

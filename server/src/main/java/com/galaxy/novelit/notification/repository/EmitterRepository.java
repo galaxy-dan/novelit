@@ -1,56 +1,26 @@
 package com.galaxy.novelit.notification.repository;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
+import com.galaxy.novelit.notification.response.NotificationInfo;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
 
-@RequiredArgsConstructor
 @Repository
-public class EmitterRepository {
-    // <UUID, SseEmitter>
-    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private final Map<String, Object> eventCache = new ConcurrentHashMap<>();
+public interface EmitterRepository{
+    SseEmitter save(String id, SseEmitter sseEmitter);
 
-    public SseEmitter save(String id, SseEmitter sseEmitter) {
-        emitters.put(id, sseEmitter);
-        return sseEmitter;
-    }
+    void saveEventCache(String id, NotificationInfo notificationInfo);
 
-    public void saveEventCache(String id, Object object) {
-        eventCache.put(id, object);
-    }
+    SseEmitter getEmitter(String id);
 
-    public SseEmitter get (String id) {
-        return emitters.get(id);
-    }
+    Map<String, SseEmitter> findAllEmittersStartWithId(String id);
 
-    public Map<String, SseEmitter> findAllEmittersStartWithId(String id) {
-        return emitters.entrySet().stream()
-            .filter(entry -> entry.getKey().startsWith(id))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
+    Map<String, NotificationInfo> findAllEventCacheStartWithId(String id);
 
-    public Map<String, Object> findAllEventCacheStartWithId(String id) {
-        return eventCache.entrySet().stream()
-            .filter(entry -> entry.getKey().startsWith(id))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
+    void deleteById(String id);
 
+    void deleteAllStartWithById(String id);
 
-    public void deleteById(String emitterId) {
-        emitters.remove(emitterId);
-    }
-
-    /*public void deleteAllStartByWithId(String id) {
-        emitters.forEach((key, emitter) -> {
-            if (key.startsWith(id)) emitters.remove(key);
-        });
-    }*/
-
-
+    void deleteAllEventCacheStartWithById(String id);
 }

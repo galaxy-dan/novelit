@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService{
 	private String KAKAO_CLIENT_SECRET;
 
 	@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-	private String KAKAO_REDIRECT_URL;
+	private String KAKAO_REDIRECT_URI;
 
 	@Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
 	private String KAKAO_TOKEN_URL;
@@ -57,7 +57,9 @@ public class AuthServiceImpl implements AuthService{
 	private final RedisTemplate<String, String> redisTemplate;
 	@Override
 	public LoginResDTO kakaoLogin(String code) {
+		// 카카오 엑세스 토큰을 요청하는 함수
 		KaKaoAccessTokenDTO kakaoAccessToken = getAccessToken(code);
+		// 카카오 유저정보를 요청하는 함수
 		KakaoUserInfoDTO kakaoUserInfo = getKakaoUserInfo(kakaoAccessToken);
 		String email = (String)kakaoUserInfo.getKakaoAccount().get("email");
 		String nickname = kakaoUserInfo.getProperties().get("nickname");
@@ -77,7 +79,9 @@ public class AuthServiceImpl implements AuthService{
 					.build());
 		}
 
+		// 유저정보를 저장하고 Authentication을 발급받음.
 		Authentication authenticate = new UsernamePasswordAuthenticationToken(userUUID, "", List.of(() -> "USER"));
+		// SecurityContextHolder에 인증정보를 저장하고, accessToken, RefreshToken을 생성하여 redis에 저장
 		SecurityContextHolder.getContext().setAuthentication(authenticate);
 		String accessToken = jwtUtils.generateAccessToken(authenticate);
 		String refreshToken = jwtUtils.generateRefreshToken(authenticate);
@@ -89,6 +93,7 @@ public class AuthServiceImpl implements AuthService{
 			TimeUnit.MILLISECONDS
 		);
 
+		// API로 요청한 accessToken, RefreshToken 정보를 리턴
 		return new LoginResDTO(accessToken, refreshToken);
 	}
 
@@ -98,7 +103,7 @@ public class AuthServiceImpl implements AuthService{
 		params.add("grant_type", "authorization_code");
 		params.add("client_id", KAKAO_CLIENT_ID);
 		params.add("client_secret", KAKAO_CLIENT_SECRET);
-		params.add("redirect_uri", KAKAO_REDIRECT_URL);
+		params.add("redirect_uri", KAKAO_REDIRECT_URI);
 		params.add("code", code);
 
 
@@ -114,10 +119,13 @@ public class AuthServiceImpl implements AuthService{
 
 	private KakaoUserInfoDTO getKakaoUserInfo(KaKaoAccessTokenDTO kakaoAccessToken) {
 		HttpHeaders headers = new HttpHeaders();
+
+		// 카카오에서 발급받은 엑세스토큰에 Authorization, Bearer을 추가해 해더에 셋팅.
 		headers.set("Authorization", "Bearer " + kakaoAccessToken.getAccessToken());
 
 		HttpEntity<Object> entity = new HttpEntity<>(headers);
 
+		// 그대로 restTemplate를 사용해서 KAKAO_INFO_URL로 요청 때림. 카카오 유저정보를 받아옴.
 		return restTemplate.postForObject(KAKAO_INFO_URL, entity, KakaoUserInfoDTO.class);
 	}
 

@@ -25,8 +25,8 @@ public class DirectoryController {
 	private final DirectoryService directoryService;
 
 	@PostMapping
-	public ResponseEntity<Void> createDirectory(@RequestBody DirectoryCreateReqDTO dto, Authentication authentication){
-		directoryService.createDirectory(dto, authentication.getName());
+	public ResponseEntity<Void> createDirectory(@RequestBody DirectoryCreateReqDTO dto, String uuid){
+		directoryService.createDirectory(dto, uuid);
 		return ResponseEntity.ok().build();
 	}
 

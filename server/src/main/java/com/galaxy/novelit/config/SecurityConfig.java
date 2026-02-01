@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity	// prepostenabled = true (default), @EnableGlobalMethodSecurity deprecated
 @RequiredArgsConstructor
 public class SecurityConfig {
 	private final JwtFilter jwtFilter;
@@ -53,20 +55,23 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 
 			// 사용자 로그인이 필요한 API는 필터가 적용되도록 별도 설정해준다.
-			.authorizeHttpRequests(r -> r
-				.requestMatchers(
-					"/login/**",
-					"/util/**",
-					"/actuator/**"
-				).permitAll()
-				.requestMatchers(HttpMethod.GET,"/file").hasAnyAuthority("USER","EDITOR")
-				.requestMatchers(HttpMethod.PATCH,"/file").hasAnyAuthority("USER","EDITOR")
-				.requestMatchers("/comment").hasAnyAuthority("USER","EDITOR")
-				.requestMatchers("/notifications/**").hasAnyAuthority("USER","EDITOR")
-				.requestMatchers("/share/token/validation").permitAll()
-				//.permitAll()
-				.anyRequest().hasAuthority("USER")
-				//.anyRequest().permitAll()
+			.authorizeHttpRequests(request
+							-> request.requestMatchers(
+									"/",
+									"/actuator/**",
+									"/login/**",
+									"/util/**",
+									"/plot/**"
+							).permitAll()
+							.requestMatchers(HttpMethod.GET,"/file").hasAnyAuthority("USER","EDITOR")
+							.requestMatchers(HttpMethod.PATCH,"/file").hasAnyAuthority("USER","EDITOR")
+							//.requestMatchers("/comment").hasAnyAuthority("USER","EDITOR")
+							//.requestMatchers("/notifications/**").hasAnyAuthority("USER","EDITOR")
+							.requestMatchers("/share/token/validation").permitAll()
+							.anyRequest().permitAll()
+					//.anyRequest().hasAuthority("USER")
+
+
 			)
 
 			// http Session을 사용하지 않을 것이므로 Policy를 stateless로 설정한다.
